@@ -11,13 +11,34 @@ hAzzle.define('Jiesa', function() {
         _selector = hAzzle.require('selector'),
 
         // RegEx
-
+        _quickMatch = /^(\w*)(?:#([\w\-]+))?(?:\[([\w\-\=]+)\])?(?:\.([\w\-]+))?$/,
         _relativeSel = /^\s*[+~]/,
         _reSpace = /[\n\t\r]/g,
         _idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
         _tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
         _unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
         _rattributeQuotes = /=[\x20\t\r\n\f]*([^\]'"]*?)[\x20\t\r\n\f]*\]/g,
+
+        pseudos = {
+
+            ":focus": function(elem) {},
+            ":hidden": function(elem) {
+                var style = elem.style;
+                if (style) {
+
+                    if (style.display === 'none' ||
+                        style.visibility === 'hidden') {
+                        return true;
+                    }
+                }
+                return elem.type === 'hidden';
+
+            },
+            ":visible": function(elem) {
+
+                return !pseudos[':hidden'](elem);
+            }
+        },
 
         fixedRoot = function(context, query, method) {
             var oldContext = context,
@@ -82,7 +103,7 @@ hAzzle.define('Jiesa', function() {
                 return document;
             }
             if (typeof root === 'string') {
-                return Jiesa(root);
+                return jiesa(root);
             }
             if (!root.nodeType && _types.isArrayLike(root)) {
                 return root[0];
@@ -92,8 +113,8 @@ hAzzle.define('Jiesa', function() {
 
         // Find elements by selectors.
 
-        Jiesa = function(sel, ctx) {
-            var m, nodeType, elem, results = [];
+        jiesa = function(sel, ctx) {
+            var m, nodeType, elem, ret, results = [];
 
             ctx = normalizeCtx(ctx);
 
@@ -103,22 +124,6 @@ hAzzle.define('Jiesa', function() {
 
             if ((nodeType = ctx.nodeType) !== 1 && nodeType !== 9 && nodeType !== 11) {
                 return [];
-            }
-
-            // Split selectors by comma if it's exists.
-            if (_util.indexOf(sel, ',') !== -1 && (m = sel.split(','))) {
-                // Comma separated selectors. E.g $('p, a');
-                // unique result, e.g 'ul id=foo class=foo' should not appear two times.
-                _util.each(m, function(el) {
-                    _util.each(Jiesa(el), function(el) {
-                        // FIXME! For better performance, do a test to see if we only can
-                        // use inArray() here, and not bother the DOM.
-                        if (!_core.contains(results, el)) {
-                            results.push(el);
-                        }
-                    });
-                });
-                return results;
             }
 
             if (_core.isHTML) {
@@ -140,11 +145,11 @@ hAzzle.define('Jiesa', function() {
                             }
                         }
                     } else if ((sel = m[2])) {
-                        return _collection.slice(ctx.getElementsByClassName(sel));
+                        ret = ctx.getElementsByClassName(sel);
                     } else if ((sel = m[3])) {
-
-                        return _collection.slice(ctx.getElementsByTagName(sel));
+                        ret = ctx.getElementsByTagName(sel);
                     }
+                    return _collection.slice(ret);
                     // E.g. hAzzle( 'span.selected' )  
                 } else if ((m = _tagNameAndOrIdAndOrClassExp.exec(sel))) {
                     var result = ctx.getElementsByTagName(m[1]),
@@ -158,15 +163,22 @@ hAzzle.define('Jiesa', function() {
                     return results;
                 }
                 // Fallback to QSA if the native selector engine are not installed
-                if (!hAzzle.installed.selector && _has.has('qsa') && (!_core.brokenCheckedQSA ||
+                if (hAzzle.installed.selector && _has.has('qsa') && (!_core.brokenCheckedQSA ||
                         !_core.ioASaf ||
                         !_core.brokenEmptyAttributeQSA)) {
                     try {
-                        return qsa(sel, ctx);
+                        if (ctx.nodeType === 1) {
+                            ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
+                        } else {
+                            // we can use the native qSA
+                            ret = ctx.querySelectorAll(sel);
+                        }
+                        return ret;
                     } catch (e) {}
 
                 }
             }
+
             // We are dealing with HTML / XML documents, so check if the native selector engine are installed 
             // To avoid bloating the hAzzle Core - the main selector engine are a separate module            
 
@@ -174,16 +186,11 @@ hAzzle.define('Jiesa', function() {
 
             return _selector.find(sel, ctx);
         },
-        qsa = function(sel, ctx) {
-            var ret;
-            if (ctx.nodeType === 1 && ctx.nodeName.toLowerCase() !== 'object') {
-                ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
-            } else {
-                // we can use the native qSA
-                ret = ctx.querySelectorAll(sel);
-            }
-            return _collection.slice(ret);
-        },
+        
+        // Speeding up matches
+        // Many people uses "is(':hidden') / "is(':visible'), so to make them happy we introduced basic 
+        // CSS2 / CSS3 pseudo support
+
         matches = function(elem, sel, ctx) {
 
             if (sel.nodeType) {
@@ -209,25 +216,53 @@ hAzzle.define('Jiesa', function() {
                 return false;
             }
 
-            if (_core.nativeMatches && _core.isHTML) {
+            var quick = _quickMatch.exec(sel);
 
-                try {
-                    var ret = matchesSelector(elem, sel, ctx);
-
-                    // IE 9's matchesSelector returns false on disconnected nodes
-                    if (ret || _core.disconnectedMatch ||
-
-                        // As well, disconnected nodes are said to be in a document
-                        // fragment in IE 9
-                        elem.document && elem.document.nodeType !== 11) {
-                        return ret;
-                    }
-                } catch (e) {}
+            if (quick) {
+                //   0  1    2   3          4
+                // [ _, tag, id, attribute, class ]
+                if (quick[1]) quick[1] = quick[1].toLowerCase();
+                if (quick[3]) quick[3] = quick[3].split("=");
+                if (quick[4]) quick[4] = " " + quick[4] + " ";
             }
-            // FIX ME!! Fallback solution need to be developed here!
+
+            if (quick) {
+                return (
+                    (!quick[1] || elem.nodeName.toLowerCase() === quick[1]) &&
+                    (!quick[2] || elem.id === quick[2]) &&
+                    (!quick[3] || (quick[3][1] ? elem.getAttribute(quick[3][0]) === quick[3][1] : elem.hasAttribute(quick[3][0]))) &&
+                    (!quick[4] || (" " + elem.className + " ").indexOf(quick[4]) >= 0)
+                );
+            } else {
+
+                var checker = pseudos[sel];
+                if (checker) {
+
+                    return !!checker(elem);
+                } else {
+                    if (_core.nativeMatches && _core.isHTML) {
+
+                        try {
+                            var ret = matchesSelector(elem, sel, ctx);
+
+                            // IE 9's matchesSelector returns false on disconnected nodes
+                            if (ret || _core.disconnectedMatch ||
+
+                                // As well, disconnected nodes are said to be in a document
+                                // fragment in IE 9
+                                elem.document && elem.document.nodeType !== 11) {
+                                return ret;
+                            }
+                        } catch (e) {}
+                    } else {
+                    
+                    // FIX ME!! Fallback solution need to be developed here!
+                    }
+                }
+            }
         };
 
-    // Find is not the same as 'Jiesa', but a optimized version for 
+    // Find is not the same as 'jiesa', but a optimized version for 
     // better performance
 
     this.find = function(selector, context, /*internal*/ internal) {
@@ -235,7 +270,7 @@ hAzzle.define('Jiesa', function() {
         // Only for use by hAzzle.js module
 
         if (internal) {
-            return Jiesa(selector, context);
+            return jiesa(selector, context);
         }
 
         if (typeof selector === 'string') {
@@ -243,19 +278,20 @@ hAzzle.define('Jiesa', function() {
             // Single look-up should always be faster then multiple look-ups
 
             if (this.length === 1) {
-                return hAzzle(Jiesa(selector, this.elements[0]));
+                return hAzzle(jiesa(selector, this.elements[0]));
             } else {
                 return _util.reduce(this.elements, function(els, element) {
-                    return hAzzle(els.concat(_collection.slice(Jiesa(selector, element))));
+                    return hAzzle(els.concat(_collection.slice(jiesa(selector, element))));
                 }, []);
             }
         }
 
-        var i, len = this.length,
+        var i = 0,
+            len = this.length,
             self = this.elements;
 
         return hAzzle(_util.filter(hAzzle(selector).elements, function(node) {
-            for (i = 0; i < len; i++) {
+            for (; i < len; i++) {
                 if (_core.contains(self[i], node)) {
                     return true;
                 }
@@ -265,15 +301,15 @@ hAzzle.define('Jiesa', function() {
 
     // Filter element collection
 
-    this.filter = function(selector, not) {
+    this.filter = function(sel, not) {
 
-        if (selector === undefined) {
+        if (sel === undefined) {
             return this;
         }
-        if (typeof selector === 'function') {
+        if (typeof sel === 'function') {
             var els = [];
             this.each(function(el, index) {
-                if (selector.call(el, index)) {
+                if (sel.call(el, index)) {
                     els.push(el);
                 }
             });
@@ -282,7 +318,7 @@ hAzzle.define('Jiesa', function() {
 
         } else {
             return this.filter(function() {
-                return matchesSelector(this, selector) !== (not || false);
+                return matches(this, sel) !== (not || false);
             });
         }
     };
@@ -290,7 +326,7 @@ hAzzle.define('Jiesa', function() {
     return {
         matchesSelector: matchesSelector,
         matches: matches,
-        qsa: qsa,
-        find: Jiesa
+        pseudos:pseudos,
+        find: jiesa
     };
 });
