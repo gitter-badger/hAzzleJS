@@ -4,6 +4,11 @@ hAzzle.define('curCSS', function() {
     var _storage = hAzzle.require('Storage'),
         _core = hAzzle.require('Core'),
         _feature = hAzzle.require('has'),
+        _widthheight = /^(width|height)$/,
+        _inline = /^(b|big|i|small|tt|abbr|acronym|cite|code|dfn|em|kbd|strong|samp|var|a|bdo|br|img|map|object|q|script|span|sub|sup|button|input|label|select|textarea)$/i,
+        _listitem = /^(li)$/i,
+        _tablerow = /^(tr)$/i,
+        _table = /^(_table)$/i,
 
         computedValues = function(elem) {
             if (elem && elem.ownerDocument !== null) {
@@ -39,12 +44,31 @@ hAzzle.define('curCSS', function() {
             // to round for integer pixels.
             return parseFloat(value) || 0;
         },
+        getDisplayType = function(element) {
+            var tagName = element && element.tagName.toString().toLowerCase();
+            if (_inline.test(tagName)) {
+                return 'inline';
+            } else if (_listitem.test(tagName)) {
+                return 'list-item';
+            } else if (_tablerow.test(tagName)) {
+                return 'table-row';
+            } else if (_table.test(tagName)) {
+                return 'table';
+            } else {
+                return 'block';
+            }
+        },
 
         css = function(elem, prop, force) {
 
             elem = elem instanceof hAzzle ? elem.elements[0] : elem;
 
             var ret = 0;
+
+            if (_widthheight.test(prop) && css(elem, 'display') === 0) {
+                elem.style.display = 'none';
+                elem.style.display = getDisplayType(elem);
+            }
 
             if (_feature.has('ie') && prop === 'auto') {
                 if (prop === 'height') {
@@ -72,6 +96,7 @@ hAzzle.define('curCSS', function() {
                         (toPixel(css(elem, 'paddingLeft'))) -
                         (toPixel(css(elem, 'paddingRight')));
                 }
+
             }
 
             var computedStyle = getStyles(elem);
