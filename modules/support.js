@@ -38,23 +38,6 @@ hAzzle.define('Support', function() {
     input.type = 'radio';
     support.radioValue = input.value === 't';
 
-    assert(function(adiv) {
-        var fragment = document.createDocumentFragment(),
-            div = fragment.appendChild(adiv),
-            input = document.createElement('input');
-
-        input.setAttribute('type', 'radio');
-        input.setAttribute('checked', 'checked');
-        input.setAttribute('name', 't');
-
-        div.appendChild(input);
-
-        // Support: IE<=11+
-        // Make sure textarea (and checkbox) defaultValue is properly cloned
-        div.innerHTML = '<textarea>x</textarea>';
-        support.noCloneChecked = !!div.cloneNode(true).lastChild.defaultValue;
-
-    });
     assert(function(div) {
         support.supportBorderRadius = div.style.borderRadius != null;
     });

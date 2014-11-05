@@ -3,8 +3,8 @@ var hAzzle = window.hAzzle || (window.hAzzle = {});
 
 hAzzle.define('Manipulation', function() {
 
-    var _util = hAzzle.require('Util'),
-        _support = hAzzle.require('Support'),
+    var _doc = window.document,
+        _util = hAzzle.require('Util'),
         _core = hAzzle.require('Core'),
         _events = hAzzle.require('Events'),
         _types = hAzzle.require('Types'),
@@ -40,17 +40,36 @@ hAzzle.define('Manipulation', function() {
             link: noscope,
             param: noscope,
             base: noscope
-        };
+        },
+        // Support: IE<=11+
+        // Make sure textarea (and checkbox) defaultValue is properly cloned
+        cloneChecked = (function() {
 
-    var imcHTML = (function() {
+            var div = _doc.createElement('div'), res,
+                fragment = _doc.createDocumentFragment(),
+                fragdiv = fragment.appendChild(div),
+                input = _doc.createElement('input');
 
-        if (typeof document.implementation.createHTMLDocument === 'function') {
-            return true;
-        }
-        return false;
-    })(),
+            input.setAttribute('type', 'radio');
+            input.setAttribute('checked', 'checked');
+            input.setAttribute('name', 't');
 
-      createHTML = function(html, context) {
+            fragdiv.appendChild(input);
+            fragdiv.innerHTML = '<textarea>x</textarea>';
+            res = !!div.cloneNode(true).lastChild.defaultValue;
+            div = null;
+            return res;
+        }()),
+
+        imcHTML = (function() {
+
+            if (typeof _doc.implementation.createHTMLDocument === 'function') {
+                return true;
+            }
+            return false;
+        })(),
+
+        createHTML = function(html, context) {
             return hAzzle(create(html, context));
         },
 
@@ -67,7 +86,7 @@ hAzzle.define('Manipulation', function() {
             }
         },
 
-        // Returns a duplicate of `element`
+        // Returns a duplicate of `elem`
         // - deep (Boolean): Whether to clone events as well.
         // - evtName: event type to be cloned (e.g. 'click', 'mouseenter')
         cloneElem = function(elem, deep, evtName) {
@@ -75,7 +94,6 @@ hAzzle.define('Manipulation', function() {
             if (elem === null || elem === undefined) {
                 return elem;
             }
-            // Wrap it out if it's a instanceof hAzzle
 
             elem = getElem(elem);
 
@@ -85,7 +103,7 @@ hAzzle.define('Manipulation', function() {
                 i, l;
             if (source) {
                 // Fix IE cloning issues
-                if (!_support.noCloneChecked && (elem.nodeType === 1 || elem.nodeType === 11) &&
+                if (!cloneChecked && (elem.nodeType === 1 || elem.nodeType === 11) &&
                     !_core.isXML(elem)) {
 
                     destElements = grab(source);
@@ -136,8 +154,8 @@ hAzzle.define('Manipulation', function() {
                 // Mitigate XSS vulnerability
 
                 var defaultContext = imcHTML ?
-                    document.implementation.createHTMLDocument() :
-                    document,
+                    _doc.implementation.createHTMLDocument() :
+                    _doc,
                     ctx = context || defaultContext,
                     fragment = ctx.createDocumentFragment();
 
