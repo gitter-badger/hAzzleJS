@@ -1621,8 +1621,24 @@ hAzzle.define('Jiesa', function() {
 
         pseudos = {
 
-            ":focus": function(elem) {},
-            ":hidden": function(elem) {
+            ':focus': function(elem) {
+                return elem === document.activeElement && (!document.hasFocus || document.hasFocus()) && !!(elem.type || elem.href || ~elem.tabIndex);
+            },
+            ':enabled': function(elem) {
+                return elem.disabled === false;
+            },
+
+            ':disabled': function(elem) {
+                return elem.disabled === true;
+            },
+
+            ':checked': function(elem) {
+                // In CSS3, :checked should return both checked and selected elements
+                // http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
+                var nodeName = elem.nodeName.toLowerCase();
+                return (nodeName === 'input' && !!elem.checked) || (nodeName === 'option' && !!elem.selected);
+            },
+            ':hidden': function(elem) {
                 var style = elem.style;
                 if (style) {
 
@@ -1634,7 +1650,7 @@ hAzzle.define('Jiesa', function() {
                 return elem.type === 'hidden';
 
             },
-            ":visible": function(elem) {
+            ':visible': function(elem) {
 
                 return !pseudos[':hidden'](elem);
             }
@@ -1662,7 +1678,7 @@ hAzzle.define('Jiesa', function() {
             for (var i = 0; i < selectors.length; i++) {
                 selectors[i] = "[id='" + nid + "'] " + selectors[i];
             }
-            query = selectors.join(",");
+            query = selectors.join(',');
 
             try {
                 return method.call(context, query);
@@ -1763,7 +1779,7 @@ hAzzle.define('Jiesa', function() {
                     return results;
                 }
                 // Fallback to QSA if the native selector engine are not installed
-                if (hAzzle.installed.selector && _has.has('qsa') && (!_core.brokenCheckedQSA ||
+                if (!hAzzle.installed.selector && _has.has('qsa') && (!_core.brokenCheckedQSA ||
                         !_core.ioASaf ||
                         !_core.brokenEmptyAttributeQSA)) {
                     try {
@@ -1786,7 +1802,7 @@ hAzzle.define('Jiesa', function() {
 
             return _selector.find(sel, ctx);
         },
-        
+
         // Speeding up matches
         // Many people uses "is(':hidden') / "is(':visible'), so to make them happy we introduced basic 
         // CSS2 / CSS3 pseudo support
@@ -1822,8 +1838,8 @@ hAzzle.define('Jiesa', function() {
                 //   0  1    2   3          4
                 // [ _, tag, id, attribute, class ]
                 if (quick[1]) quick[1] = quick[1].toLowerCase();
-                if (quick[3]) quick[3] = quick[3].split("=");
-                if (quick[4]) quick[4] = " " + quick[4] + " ";
+                if (quick[3]) quick[3] = quick[3].split('=');
+                if (quick[4]) quick[4] = ' ' + quick[4] + ' ';
             }
 
             if (quick) {
@@ -1831,14 +1847,14 @@ hAzzle.define('Jiesa', function() {
                     (!quick[1] || elem.nodeName.toLowerCase() === quick[1]) &&
                     (!quick[2] || elem.id === quick[2]) &&
                     (!quick[3] || (quick[3][1] ? elem.getAttribute(quick[3][0]) === quick[3][1] : elem.hasAttribute(quick[3][0]))) &&
-                    (!quick[4] || (" " + elem.className + " ").indexOf(quick[4]) >= 0)
+                    (!quick[4] || (' ' + elem.className + ' ').indexOf(quick[4]) >= 0)
                 );
             } else {
 
-                var checker = pseudos[sel];
-                if (checker) {
+                var m = pseudos[sel];
 
-                    return !!checker(elem);
+                if (m) {
+                    return !!m(elem);
                 } else {
                     if (_core.nativeMatches && _core.isHTML) {
 
@@ -1854,10 +1870,7 @@ hAzzle.define('Jiesa', function() {
                                 return ret;
                             }
                         } catch (e) {}
-                    } else {
-                    
-                    // FIX ME!! Fallback solution need to be developed here!
-                    }
+                    } else {} // FIX ME!! Fallback solution need to be developed here!
                 }
             }
         };
@@ -1926,7 +1939,7 @@ hAzzle.define('Jiesa', function() {
     return {
         matchesSelector: matchesSelector,
         matches: matches,
-        pseudos:pseudos,
+        pseudos: pseudos,
         find: jiesa
     };
 });
