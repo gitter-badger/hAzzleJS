@@ -21,9 +21,6 @@ hAzzle.define('Jiesa', function() {
 
         pseudos = {
 
-            ':focus': function(elem) {
-                return elem === document.activeElement && (!document.hasFocus || document.hasFocus()) && !!(elem.type || elem.href || ~elem.tabIndex);
-            },
             ':enabled': function(elem) {
                 return elem.disabled === false;
             },
@@ -179,10 +176,10 @@ hAzzle.define('Jiesa', function() {
                     return results;
                 }
                 // Fallback to QSA if the native selector engine are not installed
-                if (!hAzzle.installed.selector && _has.has('qsa') && (!_core.brokenCheckedQSA ||
-                        !_core.ioASaf ||
-                        !_core.brokenEmptyAttributeQSA)) {
-                    try {
+                // Fixme! Check for installed selector engine will be set to false soon
+                
+                if (hAzzle.installed.selector && _core.qsa && (!_core.QSABugs || !_core.QSABugs.test(sel))) {
+                    try { 
                         if (ctx.nodeType === 1) {
                             ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
                         } else {
@@ -191,7 +188,6 @@ hAzzle.define('Jiesa', function() {
                         }
                         return ret;
                     } catch (e) {}
-
                 }
             }
 
@@ -240,9 +236,7 @@ hAzzle.define('Jiesa', function() {
                 if (quick[1]) quick[1] = quick[1].toLowerCase();
                 if (quick[3]) quick[3] = quick[3].split('=');
                 if (quick[4]) quick[4] = ' ' + quick[4] + ' ';
-            }
 
-            if (quick) {
                 return (
                     (!quick[1] || elem.nodeName.toLowerCase() === quick[1]) &&
                     (!quick[2] || elem.id === quick[2]) &&
@@ -256,13 +250,16 @@ hAzzle.define('Jiesa', function() {
                 if (m) {
                     return !!m(elem);
                 } else {
-                    if (_core.nativeMatches && _core.isHTML) {
+
+                    if (_core.matches && _core.isHTML &&
+                        (!_core.rbuggyMatches || !_core.rbuggyMatches.test(sel)) &&
+                        (!_core.QSABugs || !_core.QSABugs.test(sel))) {
 
                         try {
                             var ret = matchesSelector(elem, sel, ctx);
 
                             // IE 9's matchesSelector returns false on disconnected nodes
-                            if (ret || _core.disconnectedMatch ||
+                            if (ret || _core.disconMatch ||
 
                                 // As well, disconnected nodes are said to be in a document
                                 // fragment in IE 9
@@ -270,7 +267,10 @@ hAzzle.define('Jiesa', function() {
                                 return ret;
                             }
                         } catch (e) {}
-                    } else {} // FIX ME!! Fallback solution need to be developed here!
+                    } else {
+                        hAzzle.err(!hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
+                        return _selector.matches(sel, elem, sel);
+                    }
                 }
             }
         };
