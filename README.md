@@ -221,13 +221,13 @@ Jiesa
 
 **hAzzle** have a build in selector engine - **jiesa**. The selector engine uses native **querySelectorAll (QSA)** if no other selector engines are installed. The main selector engine for **hAzzle** are a stand-alone module - **selector.js** - and can be replaced with your own selector engine.
 
-If you want to use your own, you need to use this skeleton to get your module to work:
+To get your own selector engine work with **hAzzle**, you need to include this piece of code: 
 
 ```javascript
 
 hAzzle.define('selector', function() {
 
- return { find: find  };
+ return { find: { YOUR NAME HERE }  };
 
 });
 
