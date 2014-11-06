@@ -219,9 +219,11 @@ It's also easy to create your own methods. No examples given, but with the **. e
 Jiesa
 -----
 
-**hAzzle** have a build in selector engine - **jiesa**. The selector engine uses native **querySelectorAll (QSA)** if no other selector engines are installed. The main selector engine for **hAzzle** are a stand-alone module - **selector.js** - and can be replaced with your own selector engine.
+**hAzzle** have a build in selector engine - **jiesa**. **Jiesa** are using the native **querySelectorAll (QSA)** if no other selector engines are installed. 
 
-To get your own selector engine work with **hAzzle**, you need to include this piece of code: 
+The main selector engine for **hAzzle** are a stand-alone module - **selector.js** - and can be replaced with your own selector engine.
+
+To get your engine to work with **hAzzle**, you need to include this piece of code: 
 
 ```javascript
 
@@ -232,7 +234,7 @@ hAzzle.define('selector', function() {
 });
 
 ```
-**find { YOUR NAME HERE }  };** are important because **Jiesa** will check if the **selector.js** are installed and use that selector engine over **QSA** if installed.
+**find { YOUR NAME HERE };** are important because **Jiesa** will check if the **selector.js** are installed and use that selector engine over **QSA** if installed.
 
 **hAzzle** also have a quick way to detect browsers features / bugs, if you choose to develop your own selector engine. 
 
@@ -246,14 +248,14 @@ _core.addFeature('supportAttributes', !div.getAttribute('className'));
 
 // Output the result
 
-console.log(_core.docEnv.supportAttributes); // boolean true / false
+console.log(_core.environment.supportAttributes); // boolean true / false
 
 ```
 You can get unique ID for current document like this:
 
 ```javascript
 
-console.log(_core.docEnv.id);
+console.log(_core.environment.id);
 
 ```
 
