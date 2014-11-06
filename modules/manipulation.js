@@ -9,6 +9,7 @@ hAzzle.define('Manipulation', function() {
         _events = hAzzle.require('Events'),
         _types = hAzzle.require('Types'),
         _text = hAzzle.require('Text'),
+        _jiesa = hAzzle.require('Jiesa'),
         _scriptStyle = /<(?:script|style|link)/i,
         _tagName = /<([\w:]+)/,
         _htmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
@@ -45,7 +46,8 @@ hAzzle.define('Manipulation', function() {
         // Make sure textarea (and checkbox) defaultValue is properly cloned
         cloneChecked = (function() {
 
-            var div = _doc.createElement('div'), res,
+            var div = _doc.createElement('div'),
+                res,
                 fragment = _doc.createDocumentFragment(),
                 fragdiv = fragment.appendChild(div),
                 input = _doc.createElement('input');
@@ -229,9 +231,7 @@ hAzzle.define('Manipulation', function() {
             // No point to continue clearing events if the events.js module
             // are not installed
 
-            if (!hAzzle.installed.Events) {
-                hAzzle.err(true, 17, 'events.js module are not installed');
-            }
+            hAzzle.err(!hAzzle.installed.Events, 17, 'events.js module are not installed');
 
             var elem, i = 0;
 
@@ -267,7 +267,7 @@ hAzzle.define('Manipulation', function() {
             }
 
             if (clone) {
-                ret = []; // don't change original array
+                ret = []; // Don't change original array
 
                 for (i = 0, l = node.length; i < l; i++) {
                     ret[i] = cloneElem(node[i], true);
@@ -289,10 +289,13 @@ hAzzle.define('Manipulation', function() {
         //  Remove all child nodes of the set of matched elements from the DOM
         empty = function(elem) {
             elem = getElem(elem);
+           if(elem) {
             // Do a 'deep each' and clear all listeners if any 
             deepEach(elem.children, clearData);
+            // Remove children
             while (elem.firstChild) {
                 elem.removeChild(elem.firstChild);
+            }
             }
         },
         remove = function(elem) {
@@ -341,7 +344,6 @@ hAzzle.define('Manipulation', function() {
             content[content.length - 1] === '>' &&
             content.length >= 3) {
             nodes = content;
-
         } else {
             nodes = hAzzle(content);
         }
@@ -403,11 +405,13 @@ hAzzle.define('Manipulation', function() {
         return value === undefined ?
             _text.getText(this.elements) :
             this.empty().each(function(elem) {
+                if(elem != null) {
                 if (elem.nodeType === 1 ||
                     elem.nodeType === 11 ||
                     elem.nodeType === 9) {
                     elem.textContent = value;
                 }
+               } 
             });
     };
 
@@ -420,8 +424,8 @@ hAzzle.define('Manipulation', function() {
             i = 0,
             l = this.length;
 
-        if (value === undefined && els[0].nodeType === 1) {
-            return els[0].innerHTML;
+        if (value === undefined && elem.nodeType === 1) {
+            return elem.innerHTML;
         }
         // See if we can take a shortcut and just use innerHTML
 
