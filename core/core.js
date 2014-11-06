@@ -49,9 +49,8 @@ hAzzle.define('Core', function() {
             }
             return a ? 1 : -1;
         },
-
         isNative = function(method) {
-            return (method + '').indexOf('[native code]') !== -1;
+            return /^[^{]+\{\s*\[native \w/.test('' + method);
         },
 
         // Feature/bug detection & init compiler enviroment
@@ -69,7 +68,6 @@ hAzzle.define('Core', function() {
             }
 
             // Set our document
-
             document = doc;
 
             if ((div = root.getAttribute('__hAzzle'))) {
@@ -86,23 +84,22 @@ hAzzle.define('Core', function() {
             environment.compare = isNative(root.compareDocumentPosition);
             environment.contains = isNative(root.contains);
 
-             environment.QSABugs = QSABugs = [];
-             environment.matchesBugs = matchesBugs = [];
+            environment.QSABugs = QSABugs = [];
+            environment.matchesBugs = matchesBugs = [];
 
             // QSA buggy detection
             if (environment.qsa) {
-                
+
                 div = doc.createElement('div');
                 div.appendChild(doc.createElement('select'));
                 (node = doc.createElement('option')).setAttribute('selected', '');
                 div.firstChild.appendChild(node);
 
                 // :checked should return selected option elements
-                // IE8 throws exceptions for some dynamic pseudos
-                
-                if ( !div.querySelectorAll(":checked").length ) {
-				QSABugs.push(":checked");
-			    }
+
+                if (!div.querySelectorAll(':checked').length) {
+                    QSABugs.push(':checked');
+                }
 
                 environment.QSABugs = QSABugs.length && new RegExp(QSABugs.join('|'));
             }
@@ -113,17 +110,7 @@ hAzzle.define('Core', function() {
                     root.msMatchesSelector))) {
 
                 environment.matchesSelector = matches;
-                // Check to see if it's possible to do matchesSelector
-                // on a disconnected node (IE 9)
                 environment.disconMatch = matches.call(div, 'div');
-
-                // This should fail with an exception
-                // Gecko does not error, returns false instead
-                try {
-                    matches.call(div, '[s!=""]:x');
-                    //matchesBugs.push('!=', pseudos);
-                } catch (e) {}
-
                 environment.matchesBugs = matchesBugs.length && new RegExp(matchesBugs.join('|'));
             }
 
@@ -131,13 +118,16 @@ hAzzle.define('Core', function() {
 
             div = node = null;
 
+            // Cache the result
+
             return (envsCache[docset] = environment);
         };
 
     setDocument(document);
 
     var isXML = function(elem) {
-            return (elem.ownerDocument || elem).documentElement.nodeName !== 'HTML';
+            var documentElement = elem && (elem.ownerDocument || elem).documentElement;
+            return documentElement ? documentElement.nodeName !== 'HTML' : false;
         },
 
         contains = (environment.compare && environment.contains) ? function(a, b) {
@@ -205,7 +195,6 @@ hAzzle.define('Core', function() {
             hasDuplicate = true;
             return 0;
         }
-
         var cur,
             i = 0,
             aup = a.parentNode,
@@ -290,13 +279,14 @@ hAzzle.define('Core', function() {
         environment: environment,
         expando: expando,
         addFeature: addFeature,
+        setDocument:setDocument,
         isXML: isXML,
         isHTML: !isXML(document),
         contains: contains,
         unique: unique,
-        matches:environment.matchesSelector,
+        matches: environment.matchesSelector,
         qsa: environment.qsa,
-        QSABugs:environment.QSABugs,
-        matchesBugs:environment.matchesBugs
+        QSABugs: environment.QSABugs,
+        matchesBugs: environment.matchesBugs
     };
 });
