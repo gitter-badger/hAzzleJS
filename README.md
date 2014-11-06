@@ -232,7 +232,23 @@ hAzzle.define('selector', function() {
 });
 
 ```
-simply because **Jiesa** will check if the **selector.js** are installed and use that selector engine over **QSA** if installed.
+**find { YOUR NAME HERE }  };** are important because **Jiesa** will check if the **selector.js** are installed and use that selector engine over **QSA** if installed.
+
+**hAzzle** also have a quick way to detect browsers features / bugs, if you choose to develop your own selector engine. 
+
+Example:
+
+```javascript
+
+// Use addFeature() to add a feature / bug check
+
+_core.addFeature('supportAttributes', !div.getAttribute('className'));
+
+// Output the result
+
+console.log(_core.docEnv.supportAttributes); // boolean true / false
+
+```
 
 Module order ( Core)
 ---------------------
