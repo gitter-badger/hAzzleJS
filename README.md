@@ -269,6 +269,20 @@ console.log(_core.isXML);
 
 ```
 
+**Note!** hAzzle's selector engine has a few similarites with other selector engines regarding the **core.js** module. It can't be avoid, for if you
+look at **Prototype**, **Slick** or even **Sizzle** they are almost the same when it comes to sorting DOM nodes e.g.
+Based on this **hAzzle** supports similarities with Sizzle when it comes to **QSA** and **matchesSelector** bug tests. 
+
+**Sizzle**
+ 
+* rbuggyQSA     
+*  rbuggyMatches 
+
+**hAzzle**
+ 
+* QSABugs
+* matchesBugs
+
 Module order ( Core)
 ---------------------
 Correct module order for the Core if you need to test individual modules:
