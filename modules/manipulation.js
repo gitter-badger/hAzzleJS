@@ -9,7 +9,6 @@ hAzzle.define('Manipulation', function() {
         _events = hAzzle.require('Events'),
         _types = hAzzle.require('Types'),
         _text = hAzzle.require('Text'),
-        _jiesa = hAzzle.require('Jiesa'),
         _scriptStyle = /<(?:script|style|link)/i,
         _tagName = /<([\w:]+)/,
         _htmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,

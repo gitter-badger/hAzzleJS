@@ -78,7 +78,7 @@ hAzzle.define('Setters', function() {
 
         // get/set attribute
 
-        Attr = function(elem, name, value) {
+        attr = function(elem, name, value) {
 
             elem = getElem(elem);
 
@@ -89,7 +89,7 @@ hAzzle.define('Setters', function() {
 
                 // Fallback to prop when attributes are not supported
                 if (typeof elem.getAttribute === 'undefined') {
-                    return Prop(elem, name, value);
+                    return prop(elem, name, value);
                 }
 
                 notxml = nodeType !== 1 || !_core.isXML(elem);
@@ -133,7 +133,7 @@ hAzzle.define('Setters', function() {
             return '';
         },
 
-        Prop = function(elem, name, value) {
+        prop = function(elem, name, value) {
 
             elem = getElem(elem);
 
@@ -230,17 +230,17 @@ hAzzle.define('Setters', function() {
         if (typeof name === 'object') {
             return this.each(function(elem) {
                 _util.each(name, function(value, key) {
-                    Prop(elem, key, value);
+                    prop(elem, key, value);
                 });
             });
         }
 
         if (typeof value === 'undefined') {
-            return Prop(elem[0], name);
+            return prop(elem[0], name);
         }
 
         this.each(elem, function(elem) {
-            Prop(elem, name, value);
+            prop(elem, name, value);
 
         });
     };
@@ -272,14 +272,14 @@ hAzzle.define('Setters', function() {
         if (typeof name === 'object') {
             return this.each(function(elem) {
                 _util.each(name, function(value, key) {
-                    Attr(elem, key, value);
+                    attr(elem, key, value);
                 });
             });
         }
         return typeof value === 'undefined' ?
-            Attr(elem[0], name) :
+            attr(elem[0], name) :
             this.each(function(elem) {
-                Attr(elem, name, value);
+                attr(elem, name, value);
             });
     };
 
@@ -291,7 +291,7 @@ hAzzle.define('Setters', function() {
         boolElem[prop.toUpperCase()] = true;
     });
 
-    // Populate propMap - all properties written as camelCase
+    // Populate propMap - all properties are written as camelCase
     _util.each(['cellPadding', 'cellSpacing', 'maxLength', 'rowSpan',
         'colSpan', 'useMap', 'frameBorder', 'contentEditable', 'textContent', 'valueType',
         'tabIndex', 'readOnly', 'type', 'accessKey', 'tabIndex', 'dropZone', 'spellCheck',
@@ -312,7 +312,7 @@ hAzzle.define('Setters', function() {
         boolAttr: boolAttr,
         boolElem: boolElem,
         removeAttr: removeAttr,
-        attr: Attr,
-        prop: Prop
+        attr: attr,
+        prop: prop
     };
 });

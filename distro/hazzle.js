@@ -1017,10 +1017,11 @@ hAzzle.define('Core', function() {
         envsCache = {},
         sortInput,
         sortDetached = (function() {
-            var div = document.createElement('div');
+            var ret, div = document.createElement('div');
             // Should return 1, but returns 4 (following)
-            return div.compareDocumentPosition(document.createElement('div')) & 1;
+            ret = div.compareDocumentPosition(document.createElement('div')) & 1;
             div = null;
+            return ret;
         }()),
         hasDuplicate,
         detectDuplicates = function() {
@@ -1127,7 +1128,8 @@ hAzzle.define('Core', function() {
 
             // Cache the result
 
-            return (envsCache[docset] = environment);
+            envsCache[docset] = environment
+            return envsCache[docset];
         };
 
     setDocument(document);
@@ -1297,7 +1299,6 @@ hAzzle.define('Core', function() {
         matchesBugs: environment.matchesBugs
     };
 });
-
 // collection.js
 hAzzle.define('Collection', function() {
 
@@ -1685,9 +1686,9 @@ hAzzle.define('Jiesa', function() {
                 }
                 // Fallback to QSA if the native selector engine are not installed
                 // Fixme! Check for installed selector engine will be set to false soon
-                
+
                 if (hAzzle.installed.selector && _core.qsa && (!_core.QSABugs || !_core.QSABugs.test(sel))) {
-                    try { 
+                    try {
                         if (ctx.nodeType === 1) {
                             ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
                         } else {
@@ -1741,9 +1742,15 @@ hAzzle.define('Jiesa', function() {
             if (quick) {
                 //   0  1    2   3          4
                 // [ _, tag, id, attribute, class ]
-                if (quick[1]) quick[1] = quick[1].toLowerCase();
-                if (quick[3]) quick[3] = quick[3].split('=');
-                if (quick[4]) quick[4] = ' ' + quick[4] + ' ';
+                if (quick[1]) {
+                    quick[1] = quick[1].toLowerCase();
+                }
+                if (quick[3]) {
+                    quick[3] = quick[3].split('=');
+                }
+                if (quick[4]) {
+                    quick[4] = ' ' + quick[4] + ' ';
+                }
 
                 return (
                     (!quick[1] || elem.nodeName.toLowerCase() === quick[1]) &&
@@ -2510,7 +2517,7 @@ hAzzle.define('Setters', function() {
 
         // get/set attribute
 
-        Attr = function(elem, name, value) {
+        attr = function(elem, name, value) {
 
             elem = getElem(elem);
 
@@ -2521,7 +2528,7 @@ hAzzle.define('Setters', function() {
 
                 // Fallback to prop when attributes are not supported
                 if (typeof elem.getAttribute === 'undefined') {
-                    return Prop(elem, name, value);
+                    return prop(elem, name, value);
                 }
 
                 notxml = nodeType !== 1 || !_core.isXML(elem);
@@ -2529,10 +2536,10 @@ hAzzle.define('Setters', function() {
                 if (notxml) {
 
                     name = name.toLowerCase();
-                    hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
-                        getBooleanAttrName(elem, name) ?
-                        boolHooks[value === 'undefined' ?
-                            'get' : 'set'][name] : nodeHooks[value === 'undefined' ? 'get' : 'set'][name];
+                hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
+                    getBooleanAttrName(elem, name) ?
+                    boolHooks[value === 'undefined' ?
+                  'get' : 'set'][name] : nodeHooks[value === 'undefined' ? 'get' : 'set'][name];
                 }
 
                 // Get attribute
@@ -2551,9 +2558,9 @@ hAzzle.define('Setters', function() {
                         undefined :
                         ret;
                 }
-
+               
                 // Set attribute
-
+                
                 if (!value) {
                     removeAttr(elem, name);
                 } else if (hooks && (ret = hooks.set(elem, value, name)) !== undefined) {
@@ -2565,7 +2572,7 @@ hAzzle.define('Setters', function() {
             return '';
         },
 
-        Prop = function(elem, name, value) {
+        prop = function(elem, name, value) {
 
             elem = getElem(elem);
 
@@ -2574,24 +2581,24 @@ hAzzle.define('Setters', function() {
 
             if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
 
-                if (nodeType !== 1 || _core.isHTML) {
+            if (nodeType !== 1 || _core.isHTML) {
 
-                    // Fix name and attach hooks
-                    name = propMap[name] || name;
-                    hook = value === 'undefined' ? propHooks.get[name] : propHooks.set[name];
-                }
+                // Fix name and attach hooks
+                name = propMap[name] || name;
+                hook = value === 'undefined' ? propHooks.get[name] : propHooks.set[name];
+            }
 
-                if (typeof value !== 'undefined') {
+            if (typeof value !== 'undefined') {
 
-                    return hook && (ret = hook.set(elem, value, name)) !== undefined ?
-                        ret : (elem[name] = value);
+                return hook && (ret = hook.set(elem, value, name)) !== undefined ?
+                    ret : (elem[name] = value);
 
-                } else {
+            } else {
 
-                    return hook && (ret = hook(elem, name)) !== null ?
-                        ret :
-                        elem[name];
-                }
+                return hook && (ret = hook(elem, name)) !== null ?
+                    ret :
+                    elem[name];
+            }
             }
             return '';
         };
@@ -2662,29 +2669,29 @@ hAzzle.define('Setters', function() {
         if (typeof name === 'object') {
             return this.each(function(elem) {
                 _util.each(name, function(value, key) {
-                    Prop(elem, key, value);
+                    prop(elem, key, value);
                 });
             });
         }
 
         if (typeof value === 'undefined') {
-            return Prop(elem[0], name);
+            return prop(elem[0], name);
         }
 
         this.each(elem, function(elem) {
-            Prop(elem, name, value);
+            prop(elem, name, value);
 
         });
     };
 
-    // Toggle properties on DOM elements
+  // Toggle properties on DOM elements
 
     this.toggleProp = function(prop) {
         return this.each(function(elem) {
             return elem.prop(prop, !elem.prop(prop));
         });
     };
-
+    
     this.removeProp = function(name) {
         return this.each(function() {
             delete this[propMap[name] || name];
@@ -2704,14 +2711,14 @@ hAzzle.define('Setters', function() {
         if (typeof name === 'object') {
             return this.each(function(elem) {
                 _util.each(name, function(value, key) {
-                    Attr(elem, key, value);
+                    attr(elem, key, value);
                 });
             });
         }
         return typeof value === 'undefined' ?
-            Attr(elem[0], name) :
+            attr(elem[0], name) :
             this.each(function(elem) {
-                Attr(elem, name, value);
+                attr(elem, name, value);
             });
     };
 
@@ -2723,7 +2730,7 @@ hAzzle.define('Setters', function() {
         boolElem[prop.toUpperCase()] = true;
     });
 
-    // Populate propMap - all properties written as camelCase
+    // Populate propMap - all properties are written as camelCase
     _util.each(['cellPadding', 'cellSpacing', 'maxLength', 'rowSpan',
         'colSpan', 'useMap', 'frameBorder', 'contentEditable', 'textContent', 'valueType',
         'tabIndex', 'readOnly', 'type', 'accessKey', 'tabIndex', 'dropZone', 'spellCheck',
@@ -2744,8 +2751,8 @@ hAzzle.define('Setters', function() {
         boolAttr: boolAttr,
         boolElem: boolElem,
         removeAttr: removeAttr,
-        attr: Attr,
-        prop: Prop
+        attr: attr,
+        prop: prop
     };
 });
 // attrhooks.js

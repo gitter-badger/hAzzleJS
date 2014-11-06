@@ -10,10 +10,11 @@ hAzzle.define('Core', function() {
         envsCache = {},
         sortInput,
         sortDetached = (function() {
-            var div = document.createElement('div');
+            var ret, div = document.createElement('div');
             // Should return 1, but returns 4 (following)
-            return div.compareDocumentPosition(document.createElement('div')) & 1;
+            ret = div.compareDocumentPosition(document.createElement('div')) & 1;
             div = null;
+            return ret;
         }()),
         hasDuplicate,
         detectDuplicates = function() {
@@ -120,7 +121,8 @@ hAzzle.define('Core', function() {
 
             // Cache the result
 
-            return (envsCache[docset] = environment);
+            envsCache[docset] = environment
+            return envsCache[docset];
         };
 
     setDocument(document);

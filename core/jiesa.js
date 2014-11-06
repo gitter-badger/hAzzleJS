@@ -177,9 +177,9 @@ hAzzle.define('Jiesa', function() {
                 }
                 // Fallback to QSA if the native selector engine are not installed
                 // Fixme! Check for installed selector engine will be set to false soon
-                
+
                 if (hAzzle.installed.selector && _core.qsa && (!_core.QSABugs || !_core.QSABugs.test(sel))) {
-                    try { 
+                    try {
                         if (ctx.nodeType === 1) {
                             ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
                         } else {
@@ -233,9 +233,15 @@ hAzzle.define('Jiesa', function() {
             if (quick) {
                 //   0  1    2   3          4
                 // [ _, tag, id, attribute, class ]
-                if (quick[1]) quick[1] = quick[1].toLowerCase();
-                if (quick[3]) quick[3] = quick[3].split('=');
-                if (quick[4]) quick[4] = ' ' + quick[4] + ' ';
+                if (quick[1]) {
+                    quick[1] = quick[1].toLowerCase();
+                }
+                if (quick[3]) {
+                    quick[3] = quick[3].split('=');
+                }
+                if (quick[4]) {
+                    quick[4] = ' ' + quick[4] + ' ';
+                }
 
                 return (
                     (!quick[1] || elem.nodeName.toLowerCase() === quick[1]) &&
