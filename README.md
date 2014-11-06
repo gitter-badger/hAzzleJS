@@ -249,6 +249,25 @@ _core.addFeature('supportAttributes', !div.getAttribute('className'));
 console.log(_core.docEnv.supportAttributes); // boolean true / false
 
 ```
+You can get unique ID for current document like this:
+
+```javascript
+
+console.log(_core.docEnv.id);
+
+```
+
+And if you want to check if current document is HTML or XML, you do:
+
+```javascript
+
+// HTML doc
+console.log(_core.isHTML);
+
+// XML doc
+console.log(_core.isXML);
+
+```
 
 Module order ( Core)
 ---------------------
