@@ -216,6 +216,24 @@ and you are dealing with the array.
 ```
 It's also easy to create your own methods. No examples given, but with the **. elements array** as illustrated below you can use all native methods or **UnderscoreJS** // **Loadash** and create your own methods with the array.
 
+Jiesa
+-----
+
+**hAzzle** have a build in selector engine - **jiesa**. The selector engine uses native **querySelectorAll (QSA)** if no other selector engines are installed. The main selector engine for **hAzzle** are a stand-alone module - **selector.js** - and can be replaced with your own selector engine.
+
+If you want to use your own, you need to use this skeleton to get your module to work:
+
+```javascript
+
+hAzzle.define('selector', function() {
+
+ return { find: find  };
+
+});
+
+```
+simply because **Jiesa** will check if the **selector.js** are installed and use that selector engine over **QSA** if installed.
+
 Module order ( Core)
 ---------------------
 Correct module order for the Core if you need to test individual modules:
