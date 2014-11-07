@@ -13,18 +13,6 @@ hAzzle.define('Strings', function() {
 
         sHyphenate = /[A-Z]/g,
 
-        // UnescapeHTML RegExp
-
-        unEscapeFirst = /^#x([\da-fA-F]+)$/,
-
-        // UnescapeHTML RegExp
-
-        unEscapeLast = /^#(\d+)$/,
-
-        // escapeHTML regExp
-
-        escHTML = /[&<>"']/g,
-
         // Microsoft RegExp
 
         msPrefix = /^-ms-/,
@@ -36,16 +24,6 @@ hAzzle.define('Strings', function() {
         // Cache array for hAzzle.camelize()
 
         camelCache = [],
-
-        escapeMap = {
-            lt: '<',
-            gt: '>',
-            quot: '"',
-            apos: "'",
-            amp: '&'
-        },
-
-        reversedescapeMap = {},
 
         // Used by camelize as callback to replace()
 
@@ -59,10 +37,10 @@ hAzzle.define('Strings', function() {
         },
 
         capitalize = function(str) {
-           return str && typeof str === 'string' ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+            return str && typeof str === 'string' ? str.charAt(0).toUpperCase() + str.slice(1) : '';
         },
         unCapitalize = function(str) {
-           return str && typeof str === 'string' ? str.charAt(0).toLowerCase() + str.slice(1) : '';
+            return str && typeof str === 'string' ? str.charAt(0).toLowerCase() + str.slice(1) : '';
         },
 
         // Convert a string from camel case to 'CSS case', where word boundaries are
@@ -97,41 +75,14 @@ hAzzle.define('Strings', function() {
             return str == null ? '' : nTrim ? (typeof str === 'string' ? str.trim() : str) :
                 // Who are still using Android 4.1 ?
                 (str + '').replace(nNTrim, '');
-        },
-
-        escapeHTML = function(str) {
-            return str.replace(escHTML, function(m) {
-                return '&' + reversedescapeMap[m] + ';';
-            });
-        },
-        unescapeHTML = function(str) {
-            return str.replace(/\&([^;]+);/g, function(entity, entityCode) {
-                var m;
-                if (entityCode in escapeMap) {
-                    return escapeMap[entityCode];
-                } else if ((m = entityCode.match(unEscapeFirst))) {
-                    return String.fromCharCode(parseInt(m[1], 16));
-                } else if ((m = entityCode.match(unEscapeLast))) {
-                    return String.fromCharCode(~~m[1]);
-                } else {
-                    return entity;
-                }
-            });
         };
-
-    for (var key in escapeMap) {
-        reversedescapeMap[escapeMap[key]] = key;
-    }
-    reversedescapeMap["'"] = '#39';
 
     return {
 
         capitalize: capitalize,
-        unCapitalize:unCapitalize,
+        unCapitalize: unCapitalize,
         hyphenate: hyphenate,
         camelize: camelize,
-        trim: trim,
-        escapeHTML: escapeHTML,
-        unescapeHTML: unescapeHTML
+        trim: trim
     };
 });

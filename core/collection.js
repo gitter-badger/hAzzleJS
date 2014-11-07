@@ -40,8 +40,6 @@ hAzzle.define('Collection', function() {
             return result;
         };
 
-    /* ------------- INTERNAL ARRAY METHODS ------------------------------- */
-
     // Convert hAzzle '.elements Array' to a jQuery / Zepto array
     // where 'this' contains the elements. The '.elements Array 
     // will be kept, but it will be possible to run jQuery / Zepto functions
@@ -58,13 +56,13 @@ hAzzle.define('Collection', function() {
     // Return an array or a specific DOM element matched by the hAzzle object
 
     this.get = function(index) {
-        var result;
+        var result, els = this.elements;
         if (index === undefined) {
-            result = slice(this.elements, 0);
+            result = slice(els, 0);
         } else if (index < 0) {
-            result = this.elements[this.length + index];
+            result = els[this.length + index];
         } else {
-            result = this.elements[index];
+            result = els[index];
         }
         return result;
     };
@@ -86,13 +84,13 @@ hAzzle.define('Collection', function() {
         return hAzzle(_util.map(this.elements, fn, args));
     };
 
-    this.each = function(fn, args, rev) {
+    this.each = function(fn, args, /*reverse*/rev) {
         _util.each(this.elements, fn, args, rev);
         return this;
     };
 
     this.slice = function(start, end) {
-        return new hAzzle(slice(this.elements, start, end));
+        return hAzzle(slice(this.elements, start, end));
     };
 
     // Concatenate two elements lists

@@ -67,22 +67,6 @@ hAzzle.define('has', function() {
         return mu;
     });
 
-    // XPath
-
-    add('xpath', !!doc.evaluate);
-
-    // Air 
-
-    add('air', !!win.runtime);
-
-    // Detects native support for the Dart programming language
-
-    add('dart', !!(win.startDart || doc.startDart));
-
-    // Detects native support for promises
-
-    add('promise', !!win.Promise);
-
     // mobile
 
     add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
@@ -92,7 +76,7 @@ hAzzle.define('has', function() {
     add('android', /^Android/i.test(ua));
 
     // opera
-    add('opera', 
+    add('opera',
         // Opera 8.x+ can be detected with `window.opera`
         // This is a safer inference than plain boolean type conversion of `window.opera`
         // But note that the newer Opera versions (15.x+) are using the webkit engine
@@ -115,25 +99,6 @@ hAzzle.define('has', function() {
     add('ie', function() {
         return false || !!doc.documentMode;
     });
-
-    // Touch support
-
-    add('touch', 'ontouchstart' in document ||
-            ('onpointerdown' in document && navigator.maxTouchPoints > 0) ||
-            window.navigator.msMaxTouchPoints);
-
-    // Touch events 
-
-    add('touchEvents', 'ontouchstart' in document);
-
-    // Pointer Events
-
-    add('pointerEvents', 'onpointerdown' in document);
-
-    add('MSPointer', 'msMaxTouchPoints' in navigator); //IE10+
-
-    // querySelectorAll
-    add('qsa', !!document.querySelectorAll);
 
     // ClassList
     add('classlist', !!document.documentElement.classList);

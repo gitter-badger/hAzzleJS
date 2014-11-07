@@ -11,13 +11,13 @@ hAzzle.define('Jiesa', function() {
         _selector = hAzzle.require('selector'),
 
         // RegEx
-        _quickMatch = /^(\w*)(?:#([\w\-]+))?(?:\[([\w\-\=]+)\])?(?:\.([\w\-]+))?$/,
-        _relativeSel = /^\s*[+~]/,
-        _reSpace = /[\n\t\r]/g,
         _idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
         _tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
         _unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
         _rattributeQuotes = /=[\x20\t\r\n\f]*([^\]'"]*?)[\x20\t\r\n\f]*\]/g,
+        _quickMatch = /^(\w*)(?:#([\w\-]+))?(?:\[([\w\-\=]+)\])?(?:\.([\w\-]+))?$/,
+        _relativeSel = /^\s*[+~]/,
+        _reSpace = /[\n\t\r]/g,
 
         pseudos = {
 

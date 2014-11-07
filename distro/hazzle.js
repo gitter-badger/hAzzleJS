@@ -1,12 +1,11 @@
 /*!
  * hAzzle.js
  * Copyright (c) 2014 Kenny Flashlight
- * Version: 1.0.0d Release Candidate
+ * Version: 1.0.1a
  * Released under the MIT License.
  *
- * Date: 2014-11-05
+ * Date: 2014-11-08
  */
- 
 (function() {
 
     var
@@ -83,7 +82,7 @@
             // Include required module
 
             var m, els, _util = hAzzle.require('Util'),
-               // Document ready
+                // Document ready
                 _ready = hAzzle.require('Ready');
 
             // If a function is given, call it when the DOM is ready
@@ -234,22 +233,6 @@ hAzzle.define('has', function() {
         return mu;
     });
 
-    // XPath
-
-    add('xpath', !!doc.evaluate);
-
-    // Air 
-
-    add('air', !!win.runtime);
-
-    // Detects native support for the Dart programming language
-
-    add('dart', !!(win.startDart || doc.startDart));
-
-    // Detects native support for promises
-
-    add('promise', !!win.Promise);
-
     // mobile
 
     add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
@@ -259,7 +242,7 @@ hAzzle.define('has', function() {
     add('android', /^Android/i.test(ua));
 
     // opera
-    add('opera', 
+    add('opera',
         // Opera 8.x+ can be detected with `window.opera`
         // This is a safer inference than plain boolean type conversion of `window.opera`
         // But note that the newer Opera versions (15.x+) are using the webkit engine
@@ -283,25 +266,6 @@ hAzzle.define('has', function() {
         return false || !!doc.documentMode;
     });
 
-    // Touch support
-
-    add('touch', "ontouchstart" in document
-			|| ("onpointerdown" in document && navigator.maxTouchPoints > 0)
-			|| window.navigator.msMaxTouchPoints);
-
-    // Touch events 
-
-    add('touchEvents', 'ontouchstart' in document);
-
-    // Pointer Events
-
-    add('pointerEvents', 'onpointerdown' in document);
-
-    add('MSPointer', 'msMaxTouchPoints' in navigator); //IE10+
-
-    // querySelectorAll
-    add('qsa', !!document.querySelectorAll);
-
     // ClassList
     add('classlist', !!document.documentElement.classList);
 
@@ -318,36 +282,24 @@ hAzzle.define('has', function() {
 hAzzle.define('Types', function() {
 
     var i,
-        _toString = Object.prototype.toString,
+        oString = Object.prototype.toString,
         isArray = Array.isArray,
-        arrayLikeClasses = {};
+        twinClasses = {},
 
-    var positive = ('Arguments Array Boolean Date Error Function Map Number Object RegExp Set String' +
-        'WeakMap ArrayBuffer Float32Array Float64Array Int8Array Int16Array Int32Array' +
-        'Uint8Array Uint8ClampedArray Uint16Array Uint32Array').split(' ');
+        positive = ('Arguments Array Boolean Date Error Function Map Number Object RegExp Set String' +
+            'WeakMap ArrayBuffer Float32Array Float64Array Int8Array Int16Array Int32Array' +
+            'Uint8Array Uint8ClampedArray Uint16Array Uint32Array').split(' '),
 
-    i = positive.length;
+        negative = ('ArrayBuffer Float32Array Float64Array Int8Array Int16Array Int32Array ' +
+            'Uint8Array Uint8ClampedArray Uint16Array Uint32Array').split(' '),
 
-    while (i--) {
-        arrayLikeClasses['[object ' + positive[i] + ']'] = true;
-    }
-
-    var negative = ('ArrayBuffer Float32Array Float64Array Int8Array Int16Array Int32Array ' +
-        'Uint8Array Uint8ClampedArray Uint16Array Uint32Array').split(' ');
-
-    i = negative.length;
-    while (i--) {
-
-        arrayLikeClasses['[object ' + negative[i] + ']'] = false;
-    }
-
-    var isString = function(value) {
+        isString = function(value) {
             return typeof value === 'string';
         },
 
         isArrayLike = function(value) {
             return (value && typeof value === 'object' && typeof value.length === 'number' &&
-                arrayLikeClasses[_toString.call(value)]) || false;
+                twinClasses[oString.call(value)]) || false;
         },
         isNumber = function(value) {
             return typeof value === 'number';
@@ -355,15 +307,14 @@ hAzzle.define('Types', function() {
         isBoolean = function(value) {
             return typeof value === 'boolean';
         },
-        isNumeric = function(obj) {
-            return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
-        },
 
         isEmpty = function(value) {
             if (value == null) {
                 return true;
             }
-            if (isArray(value) || isString(value) || isType('Arguments')(value)) {
+            if (isArray(value) ||
+                isString(value) ||
+                isType('Arguments')(value)) {
                 return value.length === 0;
             }
             var key;
@@ -375,8 +326,7 @@ hAzzle.define('Types', function() {
         },
 
         isElement = function(value) {
-            return (value && typeof value === 'object' && value.ELEMENT_NODE &&
-                _toString.call(value).indexOf('Element') > -1) || false;
+            return !!(value && value.nodeType === 1);
         },
         isNaN = function(value) {
             // `NaN` as a primitive is the only value that is not equal to itself
@@ -395,7 +345,6 @@ hAzzle.define('Types', function() {
             }
             return true;
         },
-        // This looks bad. Is it worth it?
         isWindow = function(obj) {
             return obj && obj.window === obj;
         },
@@ -405,15 +354,12 @@ hAzzle.define('Types', function() {
 
         isType = function(type) {
             return type ? function(arg) {
-                return _toString.call(arg) === '[object ' + type + ']';
+                return oString.call(arg) === '[object ' + type + ']';
             } : function() {};
         },
 
         isObject = function(value) {
-            // avoid a V8 bug in Chrome 19-20
-            // https://code.google.com/p/v8/issues/detail?id=2291
-            var type = typeof value;
-            return type === 'function' || (value && type === 'object') || false;
+            return value != null && typeof value === 'object';
         },
 
         isPlainObject = function(obj) {
@@ -443,6 +389,18 @@ hAzzle.define('Types', function() {
 
     this.isNodeList = isNodeList;
 
+    i = positive.length;
+
+    while (i--) {
+        twinClasses['[object ' + positive[i] + ']'] = true;
+    }
+
+    i = negative.length;
+    while (i--) {
+
+        twinClasses['[object ' + negative[i] + ']'] = false;
+    }
+
     return {
 
         isType: isType,
@@ -458,61 +416,44 @@ hAzzle.define('Types', function() {
         isArrayLike: isArrayLike,
         isNumber: isNumber,
         isBoolean: isBoolean,
-        isNumeric: isNumeric,
         isNaN: isNaN,
         isDefined: isDefined,
         isUndefined: isUndefined,
         isNodeList: isNodeList
     };
-}); // text.js
+});
+
+// text.js
 hAzzle.define('Text', function() {
 
     var getText = function(elem) {
 
-        if (elem) {
+        var node,
+            ret = '',
+            i = 0,
+            nodeType = elem.nodeType;
 
-            var node, text = '',
-                i = 0,
-                l = elem.length,
-                etc, nodetype = elem.nodeType;
-
-            if (!nodetype) {
-
-                for (; i < l; i++) {
-
-                    node = elem[i++];
-
-                    ///Skip comments.
-                    if (node.nodeType !== 8) {
-                        text += getText(node);
-                    }
-                }
-
-            } else if (nodetype === 1 ||
-                nodetype === 9 ||
-                nodetype === 11) {
-
-                etc = elem.textContent;
-
-                if (typeof etc === 'string') {
-                    return elem.textContent;
-                } else {
-
-                    for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
-                        text += getText(elem);
-                    }
-                }
-            } else if (nodetype === 3 || nodetype === 4) { // Text or CDataSection
-
-                // Use nodedValue so we avoid that <br/> tags e.g, end up in
-                // the text as any sort of line return.
-
-                return elem.nodeValue;
+        if (!nodeType) {
+            // If no nodeType, this is expected to be an array
+            while ((node = elem[i++])) {
+                // Do not traverse comment nodes
+                ret += getText(node);
             }
-            return text;
+        } else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
+            if (typeof elem.textContent === 'string') {
+                return elem.textContent;
+            } else {
+                // Traverse its children
+                for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
+                    ret += getText(elem);
+                }
+            }
+        } else if (nodeType === 3 || nodeType === 4) { // Text or CDataSection
+            return elem.nodeValue;
         }
-        return;
-    };
+        return ret;
+    }
+
     return {
         getText: getText
     };
@@ -523,63 +464,53 @@ hAzzle.define('Util', function() {
 
     var // Modules
 
-        _types = hAzzle.require('Types'),
-
-        // Save a reference to some core methods
-
-        _arrayProto = Array.prototype,
-        _objectProto = Object.prototype,
-        _hasOwn = _objectProto.hasOwnProperty,
-        _slice = _arrayProto.slice,
-        _keys = Object.keys,
-
-        noop = function() {},
+        types = hAzzle.require('Types'),
+        oKeys = Object.keys,
 
         // Short cut for `hasOwnProperty`.
 
         has = function(arg, id) {
-            return _hasOwn.call(arg, id);
+            return Object.prototype.hasOwnProperty.call(arg, id);
         },
 
         // Optimized each function
         // Replacement for forEach - ECMAScript 5 15.4.4.18 
 
-        each = function(obj, fn, ctx, rev) {
+        each = function(obj, fn, args, /*reverse*/ rev) {
 
             if (obj === undefined) {
                 return obj;
             }
 
-            if (typeof fn !== 'function') {
-                hAzzle.err(true, 5, "'fn' must be a function in util.each()");
-            }
+            hAzzle.err(typeof fn !== 'function', 5, "'fn' must be a function in util.each()");
+
             var i, length = obj.length,
                 key;
 
+            if (typeof fn === 'function' &&
+                typeof args === 'undefined' &&
+                typeof rev === 'undefined' &&
+                types.isArray(obj)) {
 
-            if (typeof fn == 'function' && typeof ctx === 'undefined' && typeof rev === 'undefined' && _types.isArray(obj)) {
                 while (++i < length) {
-                    if (fn(obj[i], i, obj) === false) {
+                    i = rev ? obj.length - i - 1 : i;
+                    if (fn.call(obj[i], obj[i], i, obj) === false) {
                         break;
                     }
                 }
             }
-            fn = createCallback(fn, ctx);
 
             if (length === +length) {
-                fn = createCallback(fn, ctx);
-
                 for (i = 0; i < length; i++) {
-                    // Reverse  
                     i = rev ? obj.length - i - 1 : i;
-                    if (fn(obj[i], i, obj) === false) {
+                    if (fn.call(obj[i], obj[i], i, obj) === false) {
                         break;
                     }
                 }
             } else {
                 if (obj) {
                     for (key in obj) {
-                        if (fn(obj[key], key, obj) === false) {
+                        if (fn.call(obj[key], obj[key], key, obj) === false) {
                             break;
                         }
                     }
@@ -587,51 +518,53 @@ hAzzle.define('Util', function() {
             }
             return obj;
         },
-
-        // Internal function that returns an efficient (for current engines) version
-        // of the passed-in callback, to be repeatedly applied in other functions.
-
-        createCallback = function(fn, arg, argCount) {
+        createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
-                if (arg === undefined) {
-                    return fn;
-                }
-
-                var dir = !argCount ? 3 : argCount;
-
-                return dir === 1 ? function(value) {
+                if (arg === undefined) return fn;
+                count = !count ? 3 : count;
+                return count === 1 ? function(value) {
                         return fn.call(arg, value);
-                    } : dir === 2 ?
+                    } : count === 2 ?
                     function(value, other) {
                         return fn.call(arg, value, other);
-                    } : dir === 3 ?
+                    } : count === 3 ?
                     function(value, index, collection) {
                         return fn.call(arg, value, index, collection);
-                    } : dir === 4 ?
+                    } : count === 4 ?
                     function(accumulator, value, index, collection) {
                         return fn.call(arg, accumulator, value, index, collection);
                     } : function() {
                         return fn.apply(arg, arguments);
                     };
+            }
 
-            }
-            if (!fn) {
-                return identity;
-            }
+            if (!fn) return identity;
         },
-        // Faster alternative then Some - ECMAScript 5 15.4.4.17
+
+        // Determine if at least one element in the object matches a truth test. 
+        // ECMAScript 5 15.4.4.17
+
         some = function(obj, fn, ctx) {
-
             if (obj) {
-
                 fn = iterate(fn, ctx);
 
-                var keys = obj.length !== +obj.length && keys(obj),
-                    length = (keys || obj).length,
-                    index, currentKey;
+                ctx = (keys || obj).length;
 
-                for (index = 0; index < length; index++) {
-                    currentKey = keys ? keys[index] : index;
+                var keys,
+                    i = 0,
+                    currentKey;
+
+                if (obj.length !== +obj.length) {
+                    keys = keys(obj);
+                }
+
+                for (; i < ctx; i++) {
+
+                    if (keys) {
+                        currentKey = keys[i];
+                    } else {
+                        currentKey = i;
+                    }
                     if (fn(obj[currentKey], currentKey, obj)) {
                         return true;
                     }
@@ -657,7 +590,7 @@ hAzzle.define('Util', function() {
         // properties from the `src` object(s)
 
         mixin = function(obj) {
-            if (_types.isObject(obj)) {
+            if (types.isObject(obj)) {
                 var source, prop, i = 1,
                     length = arguments.length;
 
@@ -674,9 +607,10 @@ hAzzle.define('Util', function() {
         },
         makeArray = function(nodeList) {
 
-            if (nodeList instanceof Array) {
+            if (types.isArray(nodeList)) {
                 return nodeList;
             }
+
             var index = -1,
                 length = nodeList.length,
                 array = Array(length);
@@ -688,18 +622,14 @@ hAzzle.define('Util', function() {
         },
 
         iterate = function(value, ctx, argCount) {
-            if (!value) {
-                return identity;
-            }
-            if (_types.isType('Function')(value)) {
-                return createCallback(value, ctx, argCount);
-            }
-            if (_types.isObject(value)) {
-                return matches(value);
-            }
-            return property(value);
+            return value ?
+                typeof value === 'function' ?
+                createCallback(value, ctx, argCount) :
+                types.isObject(value) ?
+                matches(value) :
+                property(value) :
+                identity;
         },
-
         // Keep the identity function around for default iteratees.
         identity = function(value) {
             return value;
@@ -732,7 +662,7 @@ hAzzle.define('Util', function() {
 
         // Convert an object into a list of `[key, value]` pairs.
         pairs = function(obj) {
-            var keys = _keys(obj),
+            var keys = oKeys(obj),
                 length = keys.length,
                 pairs = Array(length),
                 i = 0;
@@ -752,7 +682,7 @@ hAzzle.define('Util', function() {
             if (!arr) {
                 return [];
             }
-            if (_types.isBoolean(isSorted)) {
+            if (types.isBoolean(isSorted)) {
                 ctx = fn;
                 fn = isSorted;
                 isSorted = false;
@@ -764,10 +694,11 @@ hAzzle.define('Util', function() {
             var result = [],
                 seen = [],
                 i = 0,
+                value,
                 length = arr.length;
 
             for (; i < length; i++) {
-                var value = arr[i];
+                value = arr[i];
                 if (isSorted) {
                     if (!i || seen !== value) {
                         result.push(value);
@@ -786,7 +717,8 @@ hAzzle.define('Util', function() {
             return result;
         },
 
-        // Replacement for indexOf - ECMAScript 5 15.4.4.14
+        // Replacement for indexOf
+        // ECMAScript 5 15.4.4.14
 
         indexOf = function(arr, item, isSorted) {
 
@@ -841,21 +773,21 @@ hAzzle.define('Util', function() {
         map = function(obj, fn, ctx) {
             if (obj) {
                 fn = iterate(fn, ctx);
-                var keys = obj.length !== +obj.length && _keys(obj),
+                var keys = obj.length !== +obj.length && oKeys(obj),
                     length = (keys || obj).length,
                     results = Array(length),
                     currentKey, index = 0;
                 for (; index < length; index++) {
                     currentKey = keys ? keys[index] : index;
-                    results[index] = fn(obj[currentKey], currentKey, obj);
+                    results[index] = fn.call(obj[currentKey], obj[currentKey], currentKey, obj);
                 }
                 return results;
             }
             return [];
         },
 
-        //  Reduces a collection
-        // Replacement for reduce -  ECMAScript 5 15.4.4.21     
+        // Reduces a collection
+        // ECMAScript 5 15.4.4.21     
         reduce = function(collection, fn, accumulator, args) {
 
             if (!collection) {
@@ -864,17 +796,13 @@ hAzzle.define('Util', function() {
 
             fn = createCallback(fn, args, 4);
 
-            var keys = collection.length !== +collection.length && _keys(collection),
+            var keys = collection.length !== +collection.length && oKeys(collection),
                 length = (keys || collection).length,
                 index = 0,
                 currentKey;
 
             if (arguments.length < 3) {
-
-                if (!length) {
-                    hAzzle.err(true, 7, ' no collection length exist in collection.reduce()');
-                }
-
+                hAzzle.err(!length, 7, ' no collection length exist in collection.reduce()');
                 accumulator = collection[keys ? keys[index++] : index++];
             }
             for (; index < length; index++) {
@@ -891,7 +819,7 @@ hAzzle.define('Util', function() {
         },
 
         // Native solution for filtering arrays. 
-        // Replacement for filter - ECMAScript 5 15.4.4.20  
+        // ECMAScript 5 15.4.4.20  
 
         filter = function(arr, fn, ctx) {
             var results = [];
@@ -905,86 +833,12 @@ hAzzle.define('Util', function() {
                 }
             });
             return results;
-        },
-
-        // Bind a function to a ctx, optionally partially applying any
-        // Replacement for bind() - ECMAScript 5 15.3.4.5
-
-        bind = function(fn, ctx) {
-
-            var curryArgs = arguments.length > 2 ?
-                _slice.call(arguments, 2) : [],
-                tmp;
-
-            if (typeof ctx === 'string') {
-
-                tmp = fn[ctx];
-                ctx = fn;
-                fn = tmp;
-            }
-
-            if (typeof fn === 'function' && !(ctx instanceof RegExp)) {
-                return curryArgs.length ? function() {
-                    return arguments.length ?
-                        fn.apply(ctx || this, curryArgs.concat(_slice.call(arguments, 0))) :
-                        fn.apply(ctx || this, curryArgs);
-                } : function() {
-                    return arguments.length ?
-                        fn.apply(ctx || this, arguments) :
-                        fn.call(ctx || this);
-                };
-
-            } else {
-                return ctx;
-            }
-        },
-
-        // extend
-        extend = function(target, source, deep) {
-            var key;
-            for (key in source)
-
-                if (deep && (_types.isPlainObject(source[key]) || _types.isArray(source[key]))) {
-                if (_types.isPlainObject(source[key]) && !_types.isPlainObject(target[key])) {
-                    target[key] = {};
-                }
-                if (_types.isArray(source[key]) && !_types.isArray(target[key])) {
-                    target[key] = [];
-                }
-                extend(target[key], source[key], deep);
-            } else if (source[key] !== undefined) {
-                target[key] = source[key];
-            }
-        },
-        // Check if a element exist in DOM
-        isInDocument = function(el) {
-            if (!el) {
-                return;
-            }
-            for (var pn = el, html = document.body.parentNode; pn;) {
-                if (pn === html) {
-                    return true;
-                }
-                pn = pn.parentNode;
-            }
-            return false;
-        },
-        // Faster 'instanceOf' then the native one
-        instanceOf = function(item, object) {
-            if (item == null) {
-                return false;
-            }
-            var constructor = item.$constructor || item.constructor;
-            while (constructor) {
-                if (constructor === object) {
-                    return true;
-                }
-                constructor = constructor.parent;
-            }
-            return item instanceof object;
         };
 
     return {
+        map: map,
+        some: some,
+        reduce: reduce,
         each: each,
         mixin: mixin,
         makeArray: makeArray,
@@ -992,17 +846,9 @@ hAzzle.define('Util', function() {
         nodeName: nodeName,
         unique: unique,
         indexOf: indexOf,
-        instanceOf: instanceOf,
         filter: filter,
-        map: map,
-        some: some,
-        reduce: reduce,
         now: Date.now,
-        bind: bind,
-        has: has,
-        noop: noop,
-        extend: extend,
-        isInDocument: isInDocument
+        has: has
     };
 });
 // core.js
@@ -1151,6 +997,7 @@ hAzzle.define('Core', function() {
         } : function(a, b) {
             if (b) {
                 while ((b = b.parentElement)) {
+
                     if (b === a) {
                         return true;
                     }
@@ -1288,7 +1135,7 @@ hAzzle.define('Core', function() {
         environment: environment,
         expando: expando,
         addFeature: addFeature,
-        setDocument:setDocument,
+        setDocument: setDocument,
         isXML: isXML,
         isHTML: !isXML(document),
         contains: contains,
@@ -1341,8 +1188,6 @@ hAzzle.define('Collection', function() {
             return result;
         };
 
-    /* ------------- INTERNAL ARRAY METHODS ------------------------------- */
-
     // Convert hAzzle '.elements Array' to a jQuery / Zepto array
     // where 'this' contains the elements. The '.elements Array 
     // will be kept, but it will be possible to run jQuery / Zepto functions
@@ -1359,13 +1204,13 @@ hAzzle.define('Collection', function() {
     // Return an array or a specific DOM element matched by the hAzzle object
 
     this.get = function(index) {
-        var result;
+        var result, els = this.elements;
         if (index === undefined) {
-            result = slice(this.elements, 0);
+            result = slice(els, 0);
         } else if (index < 0) {
-            result = this.elements[this.length + index];
+            result = els[this.length + index];
         } else {
-            result = this.elements[index];
+            result = els[index];
         }
         return result;
     };
@@ -1387,15 +1232,14 @@ hAzzle.define('Collection', function() {
         return hAzzle(_util.map(this.elements, fn, args));
     };
 
-    this.each = function(fn, args, rev) {
+    this.each = function(fn, args, /*reverse*/ rev) {
         _util.each(this.elements, fn, args, rev);
         return this;
     };
 
     this.slice = function(start, end) {
-        return new hAzzle(slice(this.elements, start, end));
+        return hAzzle(slice(this.elements, start, end));
     };
-
 
     // Concatenate two elements lists
 
@@ -1520,13 +1364,13 @@ hAzzle.define('Jiesa', function() {
         _selector = hAzzle.require('selector'),
 
         // RegEx
-        _quickMatch = /^(\w*)(?:#([\w\-]+))?(?:\[([\w\-\=]+)\])?(?:\.([\w\-]+))?$/,
-        _relativeSel = /^\s*[+~]/,
-        _reSpace = /[\n\t\r]/g,
         _idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
         _tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
         _unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
         _rattributeQuotes = /=[\x20\t\r\n\f]*([^\]'"]*?)[\x20\t\r\n\f]*\]/g,
+        _quickMatch = /^(\w*)(?:#([\w\-]+))?(?:\[([\w\-\=]+)\])?(?:\.([\w\-]+))?$/,
+        _relativeSel = /^\s*[+~]/,
+        _reSpace = /[\n\t\r]/g,
 
         pseudos = {
 
@@ -1790,41 +1634,30 @@ hAzzle.define('Jiesa', function() {
             }
         };
 
-    // Find is not the same as 'jiesa', but a optimized version for 
-    // better performance
-
     this.find = function(selector, context, /*internal*/ internal) {
 
-        // Only for use by hAzzle.js module
+        if (!internal) {
 
-        if (internal) {
-            return jiesa(selector, context);
-        }
+            if (typeof selector !== 'string') {
 
-        if (typeof selector === 'string') {
+                var i = 0,
+                    len = this.length,
+                    self = this.elements;
 
-            // Single look-up should always be faster then multiple look-ups
-
-            if (this.length === 1) {
-                return hAzzle(jiesa(selector, this.elements[0]));
-            } else {
-                return _util.reduce(this.elements, function(els, element) {
-                    return hAzzle(els.concat(_collection.slice(jiesa(selector, element))));
-                }, []);
+                return hAzzle(_util.filter(hAzzle(selector).elements, function(node) {
+                    for (; i < len; i++) {
+                        if (_core.contains(self[i], node)) {
+                            return true;
+                        }
+                    }
+                }));
             }
+            return _util.reduce(this.elements, function(els, element) {
+                return hAzzle(els.concat(_collection.slice(jiesa(selector, element))));
+            }, []);
+
         }
-
-        var i = 0,
-            len = this.length,
-            self = this.elements;
-
-        return hAzzle(_util.filter(hAzzle(selector).elements, function(node) {
-            for (; i < len; i++) {
-                if (_core.contains(self[i], node)) {
-                    return true;
-                }
-            }
-        }));
+        return jiesa(selector, context);
     };
 
     // Filter element collection
@@ -1873,19 +1706,6 @@ hAzzle.define('Strings', function() {
 
         sHyphenate = /[A-Z]/g,
 
-        // UnescapeHTML RegExp
-
-        unEscapeFirst = /^#x([\da-fA-F]+)$/,
-
-        // UnescapeHTML RegExp
-
-        unEscapeLast = /^#(\d+)$/,
-
-
-        // escapeHTML regExp
-
-        escHTML = /[&<>"']/g,
-
         // Microsoft RegExp
 
         msPrefix = /^-ms-/,
@@ -1897,16 +1717,6 @@ hAzzle.define('Strings', function() {
         // Cache array for hAzzle.camelize()
 
         camelCache = [],
-
-        escapeMap = {
-            lt: '<',
-            gt: '>',
-            quot: '"',
-            apos: "'",
-            amp: '&'
-        },
-
-        reversedescapeMap = {},
 
         // Used by camelize as callback to replace()
 
@@ -1958,32 +1768,7 @@ hAzzle.define('Strings', function() {
             return str == null ? '' : nTrim ? (typeof str === 'string' ? str.trim() : str) :
                 // Who are still using Android 4.1 ?
                 (str + '').replace(nNTrim, '');
-        },
-
-        escapeHTML = function(str) {
-            return str.replace(escHTML, function(m) {
-                return '&' + reversedescapeMap[m] + ';';
-            });
-        },
-        unescapeHTML = function(str) {
-            return str.replace(/\&([^;]+);/g, function(entity, entityCode) {
-                var m;
-                if (entityCode in escapeMap) {
-                    return escapeMap[entityCode];
-                } else if ((m = entityCode.match(unEscapeFirst))) {
-                    return String.fromCharCode(parseInt(m[1], 16));
-                } else if ((m = entityCode.match(unEscapeLast))) {
-                    return String.fromCharCode(~~m[1]);
-                } else {
-                    return entity;
-                }
-            });
         };
-
-    for (var key in escapeMap) {
-        reversedescapeMap[escapeMap[key]] = key;
-    }
-    reversedescapeMap["'"] = '#39';
 
     return {
 
@@ -1991,9 +1776,7 @@ hAzzle.define('Strings', function() {
         unCapitalize: unCapitalize,
         hyphenate: hyphenate,
         camelize: camelize,
-        trim: trim,
-        escapeHTML: escapeHTML,
-        unescapeHTML: unescapeHTML
+        trim: trim
     };
 });
 
@@ -2536,10 +2319,10 @@ hAzzle.define('Setters', function() {
                 if (notxml) {
 
                     name = name.toLowerCase();
-                hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
-                    getBooleanAttrName(elem, name) ?
-                    boolHooks[value === 'undefined' ?
-                  'get' : 'set'][name] : nodeHooks[value === 'undefined' ? 'get' : 'set'][name];
+                    hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
+                        getBooleanAttrName(elem, name) ?
+                        boolHooks[value === 'undefined' ?
+                            'get' : 'set'][name] : nodeHooks[value === 'undefined' ? 'get' : 'set'][name];
                 }
 
                 // Get attribute
@@ -2558,9 +2341,9 @@ hAzzle.define('Setters', function() {
                         undefined :
                         ret;
                 }
-               
+
                 // Set attribute
-                
+
                 if (!value) {
                     removeAttr(elem, name);
                 } else if (hooks && (ret = hooks.set(elem, value, name)) !== undefined) {
@@ -2581,24 +2364,24 @@ hAzzle.define('Setters', function() {
 
             if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
 
-            if (nodeType !== 1 || _core.isHTML) {
+                if (nodeType !== 1 || _core.isHTML) {
 
-                // Fix name and attach hooks
-                name = propMap[name] || name;
-                hook = value === 'undefined' ? propHooks.get[name] : propHooks.set[name];
-            }
+                    // Fix name and attach hooks
+                    name = propMap[name] || name;
+                    hook = value === 'undefined' ? propHooks.get[name] : propHooks.set[name];
+                }
 
-            if (typeof value !== 'undefined') {
+                if (typeof value !== 'undefined') {
 
-                return hook && (ret = hook.set(elem, value, name)) !== undefined ?
-                    ret : (elem[name] = value);
+                    return hook && (ret = hook.set(elem, value, name)) !== undefined ?
+                        ret : (elem[name] = value);
 
-            } else {
+                } else {
 
-                return hook && (ret = hook(elem, name)) !== null ?
-                    ret :
-                    elem[name];
-            }
+                    return hook && (ret = hook(elem, name)) !== null ?
+                        ret :
+                        elem[name];
+                }
             }
             return '';
         };
@@ -2609,7 +2392,10 @@ hAzzle.define('Setters', function() {
             elem = this.elements[0];
 
         if (!arguments.length) {
-            if (elem) {
+            // In jQuery map() and each() e.g. the 'this' keyword are a reference
+            // to the elements itself. In hAzzle this is a reference to the window
+            // object. To avoid hAzzle throwing errors, check for 'window object'
+            if (elem && elem !== window) {
                 hooks = valHooks.get[elem.type] ||
                     valHooks.get[elem.nodeName.toLowerCase()];
 
@@ -2637,6 +2423,7 @@ hAzzle.define('Setters', function() {
             if (elem.nodeType !== 1) {
                 return;
             }
+
 
             if (isFunction) {
                 val = value.call(elem, index, hAzzle(elem).val());
@@ -2684,14 +2471,14 @@ hAzzle.define('Setters', function() {
         });
     };
 
-  // Toggle properties on DOM elements
+    // Toggle properties on DOM elements
 
     this.toggleProp = function(prop) {
         return this.each(function(elem) {
             return elem.prop(prop, !elem.prop(prop));
         });
     };
-    
+
     this.removeProp = function(name) {
         return this.each(function() {
             delete this[propMap[name] || name];
@@ -2759,7 +2546,6 @@ hAzzle.define('Setters', function() {
 hAzzle.define('attrHooks', function() {
 
     var _util = hAzzle.require('Util'),
-        _support = hAzzle.require('Support'),
         _setters = hAzzle.require('Setters'),
 
         radioValue = (function() {
@@ -2781,7 +2567,7 @@ hAzzle.define('attrHooks', function() {
     _util.mixin(_setters.attrHooks.set, {
 
         'type': function(elem, value) {
-            if (!_support.radioValue && value === 'radio' &&
+            if (!radioValue && value === 'radio' &&
                 _util.nodeName(elem, 'input')) {
                 var val = elem.value;
                 elem.setAttribute('type', value);
@@ -3084,6 +2870,7 @@ hAzzle.define('valHooks', function() {
             l = nodes.length;
 
         if (nodes.length === 1) {
+
             return stringNode(nodes[0]);
         }
 

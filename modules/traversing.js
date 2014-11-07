@@ -136,18 +136,18 @@ hAzzle.define('Traversing', function() {
     // If CSS selector is given, filter results to include only ones matching the selector.
 
     this.parent = function(sel) {
-        var matched = this.filter(function() {
-            var parent = this.parentElement;
-            return parent && parent.nodeType !== 11 ? (sel ? _jiesa.matches(parent, sel) : parent) : null;
-        });
+        var matched = this.map(function(elem) {
+            var parent = elem.parentElement;
+            return parent && parent.nodeType !== 11 ? parent : null;
+        }).filter(sel);
 
-        if (this.length > 1) {
-          // Remove duplicates
-          matched =  _core.uniqueSort(matched.elements);
-          hAzzle(matched)
+       if (this.length > 1) {
+            // Remove duplicates
+           matched = _core.unique(matched.elements);
         }
         return hAzzle(matched);
     };
+
 
     // Returns all parent elements for nodes
     // Optionally takes a query to filter the child elements.
@@ -166,7 +166,7 @@ hAzzle.define('Traversing', function() {
 
         if (this.length > 1) {
             // Remove duplicates
-            _core.uniqueSort(ancestors);
+            _core.unique(ancestors);
             // Reverse order for parents
             ancestors.reverse();
         }
@@ -184,6 +184,7 @@ hAzzle.define('Traversing', function() {
         for (; i < l; i++) {
             for (cur = this.elements[i]; cur && cur !== ctx; cur = cur.parentNode) {
                 // Always skip document fragments
+
                 if (cur.nodeType < 11 &&
                     cur.nodeType === 1 &&
                     _jiesa.matches(cur, selector)) {
@@ -194,7 +195,7 @@ hAzzle.define('Traversing', function() {
             }
         }
 
-        return hAzzle(matched.length > 1 ? _core.uniqueSort(matched) : matched);
+        return hAzzle(matched.length > 1 ? _core.unique(matched) : matched);
     };
 
     // Get immediate children of each element in the current collection.

@@ -58,7 +58,7 @@ hAzzle.define('cssHooks', function() {
         };
     });
 
-    _util.extend(_style.cssHooks.get, {
+    _util.mixin(_style.cssHooks.get, {
         'opacity': function(elem, computed) {
             if (computed) {
                 // We should always get a number back from opacity
