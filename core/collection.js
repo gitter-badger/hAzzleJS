@@ -10,7 +10,7 @@ hAzzle.define('Collection', function() {
         inArray = function(elem, array, i) {
             return array === undefined ? -1 : _arrayProto.indexOf.call(array, elem, i);
         },
-        
+
         makeArray = function(arr, results) {
             var ret = results || [];
             if (arr !== undefined) {
@@ -84,7 +84,7 @@ hAzzle.define('Collection', function() {
         return hAzzle(_util.map(this.elements, fn, args));
     };
 
-    this.each = function(fn, args, /*reverse*/rev) {
+    this.each = function(fn, args, /*reverse*/ rev) {
         _util.each(this.elements, fn, args, rev);
         return this;
     };
@@ -132,7 +132,7 @@ hAzzle.define('Collection', function() {
         return _util.indexOf(els, node instanceof hAzzle ? node.elements[0] : node);
     };
     // Concatenate new elements to the '.elements array
-    // Similar to jQuery / Zepto .add() method
+    // Similar to jQuery / Zepto's .add() method
 
     this.add = function(sel, ctx) {
         var elements = sel;
@@ -157,14 +157,14 @@ hAzzle.define('Collection', function() {
 
     // Return 'even' elements from the '.elements array'
     this.even = function() {
-        return this.filter(function(index) {
-            return index % 2 !== 0;
+        return this.filter(function(i) {
+            return i % 2 !== 0;
         });
     };
     // Return 'odd' elements from the '.elements array'
     this.odd = function() {
-        return this.filter(function(index) {
-            return index % 2 === 0;
+        return this.filter(function(i) {
+            return i % 2 === 0;
         });
     };
 
@@ -174,8 +174,8 @@ hAzzle.define('Collection', function() {
         prev: 'previousElementSibling'
     }, function(value, prop) {
         this[prop] = function(sel) {
-            return this.map(function(elem) {
-                return elem[value];
+            return this.map(function() {
+                return this[value];
             }).filter(sel);
         };
     }.bind(this));
@@ -196,10 +196,9 @@ hAzzle.define('Collection', function() {
         };
     }.bind(this));
 
-
     return {
         makeArray: makeArray,
-        inArray:inArray,
+        inArray: inArray,
         slice: slice
     };
 });

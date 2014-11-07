@@ -1280,7 +1280,7 @@ hAzzle.define('Collection', function() {
         return _util.indexOf(els, node instanceof hAzzle ? node.elements[0] : node);
     };
     // Concatenate new elements to the '.elements array
-    // Similar to jQuery / Zepto .add() method
+    // Similar to jQuery / Zepto's .add() method
 
     this.add = function(sel, ctx) {
         var elements = sel;
@@ -1305,14 +1305,14 @@ hAzzle.define('Collection', function() {
 
     // Return 'even' elements from the '.elements array'
     this.even = function() {
-        return this.filter(function(index) {
-            return index % 2 !== 0;
+        return this.filter(function(i) {
+            return i % 2 !== 0;
         });
     };
     // Return 'odd' elements from the '.elements array'
     this.odd = function() {
-        return this.filter(function(index) {
-            return index % 2 === 0;
+        return this.filter(function(i) {
+            return i % 2 === 0;
         });
     };
 
@@ -1322,8 +1322,8 @@ hAzzle.define('Collection', function() {
         prev: 'previousElementSibling'
     }, function(value, prop) {
         this[prop] = function(sel) {
-            return this.map(function(elem) {
-                return elem[value];
+            return this.map(function() {
+                return this[value];
             }).filter(sel);
         };
     }.bind(this));
@@ -1344,13 +1344,13 @@ hAzzle.define('Collection', function() {
         };
     }.bind(this));
 
-
     return {
         makeArray: makeArray,
         inArray: inArray,
         slice: slice
     };
 });
+
 // jiesa.js
 hAzzle.define('Jiesa', function() {
 
@@ -1909,6 +1909,7 @@ hAzzle.define('Storage', function() {
                     } else {
                         // If a key with the spaces exists, use it.
                         // Otherwise, create an array by matching non-whitespace
+
                         name = camel;
                         name = cache[name] ? [name] : (name.match(_sWhiteRegex) || []);
                     }
@@ -2305,7 +2306,7 @@ hAzzle.define('Setters', function() {
             elem = getElem(elem);
 
             var nodeType = elem ? elem.nodeType : undefined,
-                hooks, ret, notxml;
+                hooks, ret;
 
             if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
 
@@ -2314,9 +2315,7 @@ hAzzle.define('Setters', function() {
                     return prop(elem, name, value);
                 }
 
-                notxml = nodeType !== 1 || !_core.isXML(elem);
-
-                if (notxml) {
+                if (nodeType !== 1 || !_core.isXML(elem)) {
 
                     name = name.toLowerCase();
                     hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
@@ -2337,9 +2336,7 @@ hAzzle.define('Setters', function() {
 
                     ret = elem.getAttribute(name, 2);
                     // Non-existent attributes return null, we normalize to undefined
-                    return ret == null ?
-                        undefined :
-                        ret;
+                    return ret == null ? undefined : ret;
                 }
 
                 // Set attribute
@@ -2392,10 +2389,7 @@ hAzzle.define('Setters', function() {
             elem = this.elements[0];
 
         if (!arguments.length) {
-            // In jQuery map() and each() e.g. the 'this' keyword are a reference
-            // to the elements itself. In hAzzle this is a reference to the window
-            // object. To avoid hAzzle throwing errors, check for 'window object'
-            if (elem && elem !== window) {
+            if (elem) {
                 hooks = valHooks.get[elem.type] ||
                     valHooks.get[elem.nodeName.toLowerCase()];
 
@@ -2423,7 +2417,6 @@ hAzzle.define('Setters', function() {
             if (elem.nodeType !== 1) {
                 return;
             }
-
 
             if (isFunction) {
                 val = value.call(elem, index, hAzzle(elem).val());

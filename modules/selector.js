@@ -5,7 +5,8 @@ var hAzzle = window.hAzzle || (window.hAzzle = {});
 hAzzle.define('selector', function() {
 
     var doc = window.document,
-        _core = hAzzle.require('Core');
+        _core = hAzzle.require('Core'),
+        _types = hAzzle.require('Types');
 
     // Feature / bug detection
 
@@ -35,11 +36,22 @@ hAzzle.define('selector', function() {
     doc.documentElement.removeChild(div);
 
 
-
-    function find() {}
+     //A temporary solution just to test it as a module!
+    var find = function(sel, ctx) {
+        if (!ctx) {
+            ctx = document;
+        }
+        if (_types.isType('Function')(ctx.querySelectorAll)) {
+            return ctx.querySelectorAll(sel);
+        } else {
+            console.log('selector probably needs jiesa for this type of context!');
+        }
+    },
+    matches = function() {}
 
     return {
-        find: find
+        find: find,
+        matches:matches
     };
 
 });

@@ -83,7 +83,7 @@ hAzzle.define('Setters', function() {
             elem = getElem(elem);
 
             var nodeType = elem ? elem.nodeType : undefined,
-                hooks, ret, notxml;
+                hooks, ret;
 
             if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
 
@@ -92,9 +92,7 @@ hAzzle.define('Setters', function() {
                     return prop(elem, name, value);
                 }
 
-                notxml = nodeType !== 1 || !_core.isXML(elem);
-
-                if (notxml) {
+                if (nodeType !== 1 || !_core.isXML(elem)) {
 
                     name = name.toLowerCase();
                     hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
@@ -115,9 +113,7 @@ hAzzle.define('Setters', function() {
 
                     ret = elem.getAttribute(name, 2);
                     // Non-existent attributes return null, we normalize to undefined
-                    return ret == null ?
-                        undefined :
-                        ret;
+                    return ret == null ? undefined : ret;
                 }
 
                 // Set attribute
@@ -170,10 +166,7 @@ hAzzle.define('Setters', function() {
             elem = this.elements[0];
 
         if (!arguments.length) {
-            // In jQuery map() and each() e.g. the 'this' keyword are a reference
-            // to the elements itself. In hAzzle this is a reference to the window
-            // object. To avoid hAzzle throwing errors, check for 'window object'
-            if (elem && elem !== window) {
+            if (elem) {
                 hooks = valHooks.get[elem.type] ||
                     valHooks.get[elem.nodeName.toLowerCase()];
 
