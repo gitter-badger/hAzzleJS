@@ -245,7 +245,6 @@ hAzzle.define('Classes', function() {
     return {
         addClass: addClass,
         removeClass: removeClass,
-        setClass: setClass,
         hasClass: hasClass,
         toggleClass: toggleClass
     };

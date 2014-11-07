@@ -4,8 +4,13 @@ hAzzle.define('cssHooks', function() {
     var _util = hAzzle.require('Util'),
         _has = hAzzle.require('has'),
         _style = hAzzle.require('Style'),
-        _support = hAzzle.require('Support'),
         _curCSS = hAzzle.require('curCSS'),
+        borderRadius = (function() {
+            var div = document.createElement('div'),
+                res = div.style.borderRadius != null;
+            div = null;
+            return res;
+        }()),
 
         padMarg = {
 
@@ -15,7 +20,7 @@ hAzzle.define('cssHooks', function() {
             borderColor: 'borderTopColor borderRightColor borderBottomColor borderLeftColor',
         };
 
-    if (_support.borderRadius) {
+    if (borderRadius) {
         padMarg.borderRadius = 'borderTopLeftRadius borderTopRightRadius borderBottomRightRadius borderBottomLeftRadius';
     }
 
