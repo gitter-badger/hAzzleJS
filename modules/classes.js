@@ -36,11 +36,7 @@ hAzzle.define('Classes', function() {
             return classes;
         },
         getElem = function(elem) {
-
-            if (_util.instanceOf(elem, hAzzle)) {
-                return elem.elements[0];
-            }
-            return elem;
+            return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem : [elem];
         },
         addRemove = function(elem, classes, nativeMethodName, fn, done) {
 
@@ -53,7 +49,6 @@ hAzzle.define('Classes', function() {
                 var length, i, based = false;
 
                 if (nativeMethodName === 'remove' && !classes) {
-
                     elem.className = '';
                 }
                 // use native classList property if possible
@@ -94,8 +89,8 @@ hAzzle.define('Classes', function() {
 
         hasClass = function(elem, classes) {
 
-            elem = getElem(elem);
-            elem = elem.length ? elem : [elem];
+            elem = elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem : [elem];
+
 
             var className = ' ' + classes + ' ',
                 els = elem.length ? elem : [elem],
@@ -122,11 +117,7 @@ hAzzle.define('Classes', function() {
         // Add classes to element collection
 
         addClass = function(elem, classes, /*optional*/ fn) {
-
-            elem = getElem(elem);
-
-            var els = elem.length ? elem : [elem];
-            _util.each(els, function(elem) {
+            _util.each(getElem(elem), function(elem) {
                 return addRemove(elem, classes, 'add', function(elem, cls) {
 
                     var cur = (' ' + elem.className + ' ').replace(_reSpace, ' '),
@@ -149,12 +140,7 @@ hAzzle.define('Classes', function() {
         // Remove classes from element collection
 
         removeClass = function(elem, classes, /*optional*/ fn) {
-
-            elem = getElem(elem);
-
-            var els = elem.length ? elem : [elem];
-
-            _util.each(els, function(elem) {
+            _util.each(getElem(elem), function(elem) {
                 return addRemove(elem, classes, 'remove', function(elem, cls) {
 
                     var cur = (' ' + elem.className + ' ').replace(_reSpace, ' '),
@@ -172,22 +158,15 @@ hAzzle.define('Classes', function() {
                 }, fn);
             });
         },
-        setClass = function(elem, /* classe(s) to be added*/ add, /* classe(s) to be removed*/ remove, fn) {
-            addClass(elem, add, fn);
-            removeClass(elem, remove, fn);
-        },
 
+        // Toggles the presence of CSS class `className` on `element`.
         // NOTE! Use use non-native classList solution for 'toggleClass'
         // because of bugs in IE and some other browsers ( IE10, iOS, Nokia phones e.g.) 
         // One nasty exaple is the fact that IE10+ doesn't support the toggle boolean flag.
 
-        // Toggles the presence of CSS class `className` on `element`.
-
         toggleClass = function(elem, value, condition) {
 
-            elem = getElem(elem);
-
-            var els = elem.length ? elem : [elem],
+            var els = getElem(elem),
                 type = typeof value;
 
             if (typeof condition === 'boolean' && type === 'string') {
@@ -224,8 +203,7 @@ hAzzle.define('Classes', function() {
                         _storage.private.set(elem, '__className__', elem.className);
                     }
                     elem.className = elem.className || value === false ?
-                        '' :
-                        _storage.private.get(this, '__className__') || '';
+                        '' : _storage.private.get(this, '__className__') || '';
                 }
             }
         };
