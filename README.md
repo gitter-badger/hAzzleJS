@@ -309,9 +309,7 @@ Correct module order for the Core if you need to test individual modules:
 Module order (module folder)
 ----------------------------
 
-* modules/support.js
 * modules/features.js
-* modules/units.js
 * modules/selector.js
 * modules/attributes.js
 * modules/style.js
