@@ -112,7 +112,7 @@ or a each example:
 this.each(function(elem) {
 });
 ```
-**NOTE!** From v. 1.01a the **this** keyword is no longer pointing to the window itself in each() and map(), and are now what you are used to from **jQuery** / **Zepto**
+**NOTE!** From v. 1.01a the **this** keyword in the **each()** and **map()** methods are no longer pointing to the window object, but to the element itself. They are now working the same way as you are used to from **jQuery** / **Zepto** / **Mootools** and **Prototype**.
 
 You can still bind the elements to the Window Object as before.
 
