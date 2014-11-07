@@ -2,7 +2,7 @@
 hAzzle.define('Dimensions', function() {
 
     var win = window,
-        doc = window.document,
+        doc = win.document,
         docElem = doc.documentElement,
 
         // Include the modules    
@@ -93,12 +93,7 @@ hAzzle.define('Dimensions', function() {
         // optional cushion amount
 
         rectangle = function(elem, cushion) {
-            if (elem) {
-                if (elem instanceof hAzzle) {
-                    elem = elem.elements[0];
-                } else {
-                    elem = elem.nodeType ? elem : elem[0];
-                }
+            if ((elem = elem instanceof hAzzle ? elem.elements[0] : elem.nodeType ? elem : elem[0])) {
                 if (!elem || elem.nodeType !== 1) {
                     return false;
                 }

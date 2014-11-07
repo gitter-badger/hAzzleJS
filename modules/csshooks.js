@@ -5,6 +5,11 @@ hAzzle.define('cssHooks', function() {
         _has = hAzzle.require('has'),
         _style = hAzzle.require('Style'),
         _curCSS = hAzzle.require('curCSS'),
+
+        // Check if borderRadius are supported
+        // Opera Mini v. 5.0 - 8.0, and older Opera versions 
+        // does not support borderRadius
+
         borderRadius = (function() {
             var div = document.createElement('div'),
                 res = div.style.borderRadius != null;
@@ -13,7 +18,6 @@ hAzzle.define('cssHooks', function() {
         }()),
 
         padMarg = {
-
             padding: 'paddingTop paddingRight paddingBottom paddingLeft',
             margin: 'marginTop marginRight marginBottom marginLeft',
             borderWidth: 'borderTopWidth borderRightWidth borderBottomWidth borderLeftWidth',
@@ -40,15 +44,6 @@ hAzzle.define('cssHooks', function() {
                         return RegExp.$1;
                     }
                 }
-            }
-        };
-    }
-
-    if (_has.has('opera')) {
-        _style.cssHooks.get.textShadow = function(elem) {
-            var val = _curCSS.css(elem, 'textShadow');
-            if (val && val !== 'none') {
-                return val.replace(/(.+)(rgb.+)/, '$2' + ' $1');
             }
         };
     }

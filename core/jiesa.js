@@ -281,41 +281,30 @@ hAzzle.define('Jiesa', function() {
             }
         };
 
-    // Find is not the same as 'jiesa', but a optimized version for 
-    // better performance
-
     this.find = function(selector, context, /*internal*/ internal) {
 
-        // Only for use by hAzzle.js module
+        if (!internal) {
 
-        if (internal) {
-            return jiesa(selector, context);
-        }
+            if (typeof selector !== 'string') {
 
-        if (typeof selector === 'string') {
+                var i = 0,
+                    len = this.length,
+                    self = this.elements;
 
-            // Single look-up should always be faster then multiple look-ups
-
-            if (this.length === 1) {
-                return hAzzle(jiesa(selector, this.elements[0]));
-            } else {
-                return _util.reduce(this.elements, function(els, element) {
-                    return hAzzle(els.concat(_collection.slice(jiesa(selector, element))));
-                }, []);
+                return hAzzle(_util.filter(hAzzle(selector).elements, function(node) {
+                    for (; i < len; i++) {
+                        if (_core.contains(self[i], node)) {
+                            return true;
+                        }
+                    }
+                }));
             }
+            return _util.reduce(this.elements, function(els, element) {
+                return hAzzle(els.concat(_collection.slice(jiesa(selector, element))));
+            }, []);
+
         }
-
-        var i = 0,
-            len = this.length,
-            self = this.elements;
-
-        return hAzzle(_util.filter(hAzzle(selector).elements, function(node) {
-            for (; i < len; i++) {
-                if (_core.contains(self[i], node)) {
-                    return true;
-                }
-            }
-        }));
+        return jiesa(selector, context);
     };
 
     // Filter element collection
