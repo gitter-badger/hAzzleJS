@@ -112,9 +112,9 @@ or a each example:
 this.each(function(elem) {
 });
 ```
-**NOTE!** The **this** keyword pointing to the window itself, and not the element like you may be used to from **jQuery** / **Zepto**
+**NOTE!** From v. 1.01a the **this** keyword is no longer pointing to the window itself in each() and map(), and are now what you are used to from **jQuery** / **Zepto**
 
-This change in internal each() gives you a native Javascript option to bind the elements to the Window object.
+You can still bind the elements to the Window Object as before.
 
 ```javascript
 this.each(function(elem) {
@@ -127,8 +127,7 @@ hAzzle('p').hello();
 
 and it will show you 'Hello!' in the console log
 ```
-For the methods **find()**, **filter()**, **reduce()** e.g. you can use the **this** keyword as a reference to the elemetns
-itself.
+For the methods **find()**, **filter()**, **reduce()** , the  **this** keyword are still a reference to the Window object.
 
 **hAzzle** are more powerfull then this, and you can choose to include and use only the modules you want ( Core need to be loaded on the page first)
 
