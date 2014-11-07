@@ -311,6 +311,7 @@ Module order (module folder)
 ----------------------------
 
 * modules/support.js
+* modules/features.js
 * modules/units.js
 * modules/selector.js
 * modules/attributes.js
