@@ -81,9 +81,9 @@
 
             // Include required module
 
-            var m, els, _util = hAzzle.require('Util'),
+            var m, els, _util = require('Util'),
                // Document ready
-                _ready = hAzzle.require('Ready');
+                _ready = require('Ready');
 
             // DOM ready
 
