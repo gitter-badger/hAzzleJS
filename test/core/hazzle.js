@@ -5,7 +5,7 @@ describe('hAzzle()', function () {
   it('hAzzle(...)', function () {
     expect(hAzzle).to.be.a('function');
   });
-
+/*
   it('hAzzle.version', function () {
     expect(hAzzle.version).to.be.a('string');
     expect(hAzzle.version).to.equal('1.0.0a-rc');
@@ -60,5 +60,5 @@ describe('hAzzle()', function () {
 
     expect(requiredModule).to.equal(testModule);
 
-  });
+  });*/
 });
