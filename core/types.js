@@ -1,25 +1,26 @@
 // types.js
 hAzzle.define('Types', function() {
 
-    var i,
-        oString = Object.prototype.toString,
+    var oString = Object.prototype.toString,
         isArray = Array.isArray,
-        twinClasses = {},
-
-        positive = ('Arguments Array Boolean Date Error Function Map Number Object RegExp Set String' +
-            'WeakMap ArrayBuffer Float32Array Float64Array Int8Array Int16Array Int32Array' +
-            'Uint8Array Uint8ClampedArray Uint16Array Uint32Array').split(' '),
-
-        negative = ('ArrayBuffer Float32Array Float64Array Int8Array Int16Array Int32Array ' +
-            'Uint8Array Uint8ClampedArray Uint16Array Uint32Array').split(' '),
 
         isString = function(value) {
             return typeof value === 'string';
         },
 
-        isArrayLike = function(value) {
-            return (value && typeof value === 'object' && typeof value.length === 'number' &&
-                twinClasses[oString.call(value)]) || false;
+        isArrayLike = function(obj) {
+            if (obj == null || isWindow(obj)) {
+                return false;
+            }
+
+            var length = obj.length;
+
+            if (obj.nodeType === 1 && length) {
+                return true;
+            }
+
+            return isString(obj) || isArray(obj) || length === 0 ||
+                typeof length === 'number' && length > 0 && (length - 1) in obj;
         },
         isNumber = function(value) {
             return typeof value === 'number';
@@ -52,9 +53,11 @@ hAzzle.define('Types', function() {
             // `NaN` as a primitive is the only value that is not equal to itself
             return isNumber(value) && value != +value;
         },
+        // Determines if a reference is undefined
         isUndefined = function(value) {
             return typeof value === 'undefined';
         },
+        // Determines if a reference is defined
         isDefined = function(value) {
             return typeof value !== 'undefined';
         },
@@ -65,6 +68,7 @@ hAzzle.define('Types', function() {
             }
             return true;
         },
+        // Checks if `obj` is a window object
         isWindow = function(obj) {
             return obj && obj.window === obj;
         },
@@ -77,9 +81,13 @@ hAzzle.define('Types', function() {
                 return oString.call(arg) === '[object ' + type + ']';
             } : function() {};
         },
+        
+        // Determines if a reference is an `Object`. Unlike `typeof` in JavaScript, `null`s are not
+        // considered to be objects. Note that JavaScript arrays are objects.
 
         isObject = function(value) {
-            return value != null && typeof value === 'object';
+             // http://jsperf.com/isobject4
+           return value !== null && typeof value === 'object';
         },
 
         isPlainObject = function(obj) {
@@ -108,18 +116,6 @@ hAzzle.define('Types', function() {
         };
 
     this.isNodeList = isNodeList;
-
-    i = positive.length;
-
-    while (i--) {
-        twinClasses['[object ' + positive[i] + ']'] = true;
-    }
-
-    i = negative.length;
-    while (i--) {
-
-        twinClasses['[object ' + negative[i] + ']'] = false;
-    }
 
     return {
 

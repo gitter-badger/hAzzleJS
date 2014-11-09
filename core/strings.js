@@ -1,13 +1,6 @@
 // strings.js
 hAzzle.define('Strings', function() {
     var
-    // Aliasing to the native function
-
-        nTrim = String.prototype.trim,
-
-        // Support: Android<4.1
-
-        nNTrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,
 
         // Hyphenate RegExp
 
@@ -72,9 +65,18 @@ hAzzle.define('Strings', function() {
         // Remove leading and trailing whitespaces of the specified string.
 
         trim = function(str) {
-            return str == null ? '' : nTrim ? (typeof str === 'string' ? str.trim() : str) :
-                // Who are still using Android 4.1 ?
-                (str + '').replace(nNTrim, '');
+            return typeof str === 'string' ? str.trim() : str;
+        },
+
+        // Converts the specified string to lowercase.
+
+        lowercase = function(str) {
+            return typeof str === 'string' ? str.toLowerCase() : str;
+        },
+
+        // Converts the specified string to uppercase
+        uppercase = function(str) {
+            return typeof str === 'string' ? str.toUpperCase() : str;
         };
 
     return {
@@ -83,6 +85,8 @@ hAzzle.define('Strings', function() {
         unCapitalize: unCapitalize,
         hyphenate: hyphenate,
         camelize: camelize,
-        trim: trim
+        trim: trim,
+        lowercase: lowercase,
+        uppercase: uppercase
     };
 });

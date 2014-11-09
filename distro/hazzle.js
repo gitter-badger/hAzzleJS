@@ -267,25 +267,26 @@ hAzzle.define('has', function() {
 // types.js
 hAzzle.define('Types', function() {
 
-    var i,
-        oString = Object.prototype.toString,
+    var oString = Object.prototype.toString,
         isArray = Array.isArray,
-        twinClasses = {},
-
-        positive = ('Arguments Array Boolean Date Error Function Map Number Object RegExp Set String' +
-            'WeakMap ArrayBuffer Float32Array Float64Array Int8Array Int16Array Int32Array' +
-            'Uint8Array Uint8ClampedArray Uint16Array Uint32Array').split(' '),
-
-        negative = ('ArrayBuffer Float32Array Float64Array Int8Array Int16Array Int32Array ' +
-            'Uint8Array Uint8ClampedArray Uint16Array Uint32Array').split(' '),
 
         isString = function(value) {
             return typeof value === 'string';
         },
 
-        isArrayLike = function(value) {
-            return (value && typeof value === 'object' && typeof value.length === 'number' &&
-                twinClasses[oString.call(value)]) || false;
+        isArrayLike = function(obj) {
+            if (obj == null || isWindow(obj)) {
+                return false;
+            }
+
+            var length = obj.length;
+
+            if (obj.nodeType === 1 && length) {
+                return true;
+            }
+
+            return isString(obj) || isArray(obj) || length === 0 ||
+                typeof length === 'number' && length > 0 && (length - 1) in obj;
         },
         isNumber = function(value) {
             return typeof value === 'number';
@@ -318,9 +319,11 @@ hAzzle.define('Types', function() {
             // `NaN` as a primitive is the only value that is not equal to itself
             return isNumber(value) && value != +value;
         },
+        // Determines if a reference is undefined
         isUndefined = function(value) {
             return typeof value === 'undefined';
         },
+        // Determines if a reference is defined
         isDefined = function(value) {
             return typeof value !== 'undefined';
         },
@@ -331,6 +334,7 @@ hAzzle.define('Types', function() {
             }
             return true;
         },
+        // Checks if `obj` is a window object
         isWindow = function(obj) {
             return obj && obj.window === obj;
         },
@@ -343,9 +347,13 @@ hAzzle.define('Types', function() {
                 return oString.call(arg) === '[object ' + type + ']';
             } : function() {};
         },
+        
+        // Determines if a reference is an `Object`. Unlike `typeof` in JavaScript, `null`s are not
+        // considered to be objects. Note that JavaScript arrays are objects.
 
         isObject = function(value) {
-            return value != null && typeof value === 'object';
+             // http://jsperf.com/isobject4
+           return value !== null && typeof value === 'object';
         },
 
         isPlainObject = function(obj) {
@@ -374,18 +382,6 @@ hAzzle.define('Types', function() {
         };
 
     this.isNodeList = isNodeList;
-
-    i = positive.length;
-
-    while (i--) {
-        twinClasses['[object ' + positive[i] + ']'] = true;
-    }
-
-    i = negative.length;
-    while (i--) {
-
-        twinClasses['[object ' + negative[i] + ']'] = false;
-    }
 
     return {
 
@@ -449,7 +445,7 @@ hAzzle.define('Text', function() {
 hAzzle.define('Util', function() {
 
     var // Modules
-
+        slice = Array.prototype.slice,
         types = hAzzle.require('Types'),
         oKeys = Object.keys,
 
@@ -819,6 +815,38 @@ hAzzle.define('Util', function() {
                 }
             });
             return results;
+        },
+        // Bind a function to a ctx, optionally partially applying any
+        // Replacement for bind() - ECMAScript 5 15.3.4.5
+
+        bind = function(fn, ctx) {
+
+            var curryArgs = arguments.length > 2 ?
+                slice.call(arguments, 2) : [],
+                tmp;
+
+            if (typeof ctx === 'string') {
+
+                tmp = fn[ctx];
+                ctx = fn;
+                fn = tmp;
+            }
+
+            if (typeof fn === 'function' && !(ctx instanceof RegExp)) {
+
+                return curryArgs.length ? function() {
+                    return arguments.length ?
+                        fn.apply(ctx || this, curryArgs.concat(slice.call(arguments, 0))) :
+                        fn.apply(ctx || this, curryArgs);
+                } : function() {
+                    return arguments.length ?
+                        fn.apply(ctx || this, arguments) :
+                        fn.call(ctx || this);
+                };
+
+            } else {
+                return ctx;
+            }
         };
 
     return {
@@ -834,10 +862,10 @@ hAzzle.define('Util', function() {
         indexOf: indexOf,
         filter: filter,
         now: Date.now,
-        has: has
+        has: has,
+        bind: bind
     };
-});
-// core.js
+});// core.js
 hAzzle.define('Core', function() {
     var docset = 1,
         document = window.document,
@@ -1141,6 +1169,9 @@ hAzzle.define('Collection', function() {
         _concat = _arrayProto.concat,
         _push = _arrayProto.push,
 
+        includes = function(array, obj) {
+            return _arrayProto.indexOf.call(array, obj) != -1;
+        },
         inArray = function(elem, array, i) {
             return array === undefined ? -1 : _arrayProto.indexOf.call(array, elem, i);
         },
@@ -1333,7 +1364,8 @@ hAzzle.define('Collection', function() {
     return {
         makeArray: makeArray,
         inArray: inArray,
-        slice: slice
+        slice: slice,
+        includes: includes
     };
 });
 
@@ -1680,13 +1712,6 @@ hAzzle.define('Jiesa', function() {
 // strings.js
 hAzzle.define('Strings', function() {
     var
-    // Aliasing to the native function
-
-        nTrim = String.prototype.trim,
-
-        // Support: Android<4.1
-
-        nNTrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,
 
         // Hyphenate RegExp
 
@@ -1751,9 +1776,18 @@ hAzzle.define('Strings', function() {
         // Remove leading and trailing whitespaces of the specified string.
 
         trim = function(str) {
-            return str == null ? '' : nTrim ? (typeof str === 'string' ? str.trim() : str) :
-                // Who are still using Android 4.1 ?
-                (str + '').replace(nNTrim, '');
+            return typeof str === 'string' ? str.trim() : str;
+        },
+
+        // Converts the specified string to lowercase.
+
+        lowercase = function(str) {
+            return typeof str === 'string' ? str.toLowerCase() : str;
+        },
+
+        // Converts the specified string to uppercase
+        uppercase = function(str) {
+            return typeof str === 'string' ? str.toUpperCase() : str;
         };
 
     return {
@@ -1762,7 +1796,9 @@ hAzzle.define('Strings', function() {
         unCapitalize: unCapitalize,
         hyphenate: hyphenate,
         camelize: camelize,
-        trim: trim
+        trim: trim,
+        lowercase: lowercase,
+        uppercase: uppercase
     };
 });
 

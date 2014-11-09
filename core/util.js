@@ -2,7 +2,7 @@
 hAzzle.define('Util', function() {
 
     var // Modules
-
+        slice = Array.prototype.slice,
         types = hAzzle.require('Types'),
         oKeys = Object.keys,
 
@@ -372,6 +372,38 @@ hAzzle.define('Util', function() {
                 }
             });
             return results;
+        },
+        // Bind a function to a ctx, optionally partially applying any
+        // Replacement for bind() - ECMAScript 5 15.3.4.5
+
+        bind = function(fn, ctx) {
+
+            var curryArgs = arguments.length > 2 ?
+                slice.call(arguments, 2) : [],
+                tmp;
+
+            if (typeof ctx === 'string') {
+
+                tmp = fn[ctx];
+                ctx = fn;
+                fn = tmp;
+            }
+
+            if (typeof fn === 'function' && !(ctx instanceof RegExp)) {
+
+                return curryArgs.length ? function() {
+                    return arguments.length ?
+                        fn.apply(ctx || this, curryArgs.concat(slice.call(arguments, 0))) :
+                        fn.apply(ctx || this, curryArgs);
+                } : function() {
+                    return arguments.length ?
+                        fn.apply(ctx || this, arguments) :
+                        fn.call(ctx || this);
+                };
+
+            } else {
+                return ctx;
+            }
         };
 
     return {
@@ -387,6 +419,7 @@ hAzzle.define('Util', function() {
         indexOf: indexOf,
         filter: filter,
         now: Date.now,
-        has: has
+        has: has,
+        bind: bind
     };
 });

@@ -7,10 +7,19 @@ hAzzle.define('Collection', function() {
         _concat = _arrayProto.concat,
         _push = _arrayProto.push,
 
+        includes = function(array, obj) {
+            return _arrayProto.indexOf.call(array, obj) != -1;
+        },
         inArray = function(elem, array, i) {
             return array === undefined ? -1 : _arrayProto.indexOf.call(array, elem, i);
         },
-
+        
+        arrayRemove = function(array, value) {
+  var index = array.indexOf(value);
+  if (index >= 0)
+    array.splice(index, 1);
+  return value;
+},
         makeArray = function(arr, results) {
             var ret = results || [];
             if (arr !== undefined) {
@@ -199,6 +208,8 @@ hAzzle.define('Collection', function() {
     return {
         makeArray: makeArray,
         inArray: inArray,
-        slice: slice
+        slice: slice,
+        includes: includes,
+        arrayRemove:arrayRemove
     };
 });
