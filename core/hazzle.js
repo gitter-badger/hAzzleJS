@@ -29,10 +29,12 @@
 
         // Throws an error if `condition` is `true`.
 
-        err = function(condition, code, message) {
-          if(condition) {
-               throw new Error('[hAzzle-' + code + '] ' + message);
-               }
+         err = function(condition, code, message) {
+            if (condition) {
+                var e = new Error('[hAzzle-' + code + '] ' + message);
+                e.code = code;
+                throw e;
+            }
         },
         
         // Lower case 
