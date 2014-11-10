@@ -231,9 +231,6 @@ hAzzle.define('Manipulation', function() {
 
             hAzzle.err(!hAzzle.installed.events, 17, 'events.js module are not installed');
 
-
-
-
             var elem = getElem(elems),
                 el, i = 0;
 
@@ -339,6 +336,7 @@ hAzzle.define('Manipulation', function() {
             }
         },
         //  Remove all child nodes of the set of matched elements from the DOM
+
         empty = function(elem) {
             elem = getElem(elem)[0];
             if (elem) {
@@ -348,13 +346,6 @@ hAzzle.define('Manipulation', function() {
                 while (elem.firstChild) {
                     elem.removeChild(elem.firstChild);
                 }
-            }
-        },
-        remove = function(elem) {
-            elem = getElem(elem)[0];
-            deepEach(clearData);
-            if (elem.parentElement) {
-                elem.parentElement.removeChild(elem);
             }
         },
         replace = function(elem, html) {
@@ -540,7 +531,6 @@ hAzzle.define('Manipulation', function() {
         before: before,
         after: after,
         empty: empty,
-        remove: remove,
         html: html,
         text: text,
         clearData: clearData,
