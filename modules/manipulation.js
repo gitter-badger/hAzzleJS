@@ -4,31 +4,47 @@ var hAzzle = window.hAzzle || (window.hAzzle = {});
 hAzzle.define('Manipulation', function() {
 
     var _doc = window.document,
+
+        // Dependencies
+
         _util = hAzzle.require('Util'),
         _core = hAzzle.require('Core'),
         _events = hAzzle.require('Events'),
         _types = hAzzle.require('Types'),
         _text = hAzzle.require('Text'),
-        _rcheckableType = (/^(?:checkbox|radio)$/i),
+
+        // RegExp
+
+        checkradioRegExp = (/^(?:checkbox|radio)$/i),
         htmlRegexp = /<|&#?\w+;/,
         tagRegExp = /<([\w:]+)/,
         xhtmlRegxp = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
+
+        // HTML stuff
+
+        table = [1, '<table>', '</table>'],
+        td = [3, '<table><tbody><tr>', '</tr></tbody></table>'],
+        option = [1, '<select multiple="multiple">', '</select>'],
+        noop = [0, '', ''],
         wrapMap = {
-            'option': [1, '<select multiple="multiple">', '</select>'],
-            'thead': [1, '<table>', '</table>'],
             'col': [2, '<table><colgroup>', '</colgroup></table>'],
             'tr': [2, '<table><tbody>', '</tbody></table>'],
-            'td': [3, '<table><tbody><tr>', '</tr></tbody></table>'],
-            '_default': [0, "", ""]
-        };
-
-    wrapMap.optgroup = wrapMap.option;
-    wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
-    wrapMap.th = wrapMap.td;
-
-    var
+            'thead': table,
+            'tbody': table,
+            'tfoot': table,
+            'colgroup': table,
+            'caption': table,
+            'option': option,
+            'optgroup': option,
+            'td': td,
+            'th': td
+        },
 
         imcHTML = (function() {
+
+            // Because this technology's specification has not stabilized, and not all browsers support 
+            // it yet, we need to check for createHTMLDocument existent
+            // https://developer.mozilla.org/en-US/docs/Web/API/DOMImplementation.createHTMLDocument
 
             if (typeof _doc.implementation.createHTMLDocument === 'function') {
                 return true;
@@ -58,7 +74,6 @@ hAzzle.define('Manipulation', function() {
             return res;
         }()),
 
-        // Internal method !!
         getElem = function(elem) {
             return elem instanceof hAzzle ? elem.elements : [elem];
         },
@@ -67,7 +82,7 @@ hAzzle.define('Manipulation', function() {
             var nodeName = dest.nodeName.toLowerCase();
 
             // Fails to persist the checked state of a cloned checkbox or radio button.
-            if (nodeName === 'input' && _rcheckableType.test(src.type)) {
+            if (nodeName === 'input' && checkradioRegExp.test(src.type)) {
                 dest.checked = src.checked;
 
                 // Fails to return the selected option to the default selected state when cloning options
@@ -82,6 +97,7 @@ hAzzle.define('Manipulation', function() {
         cloneElem = function(elem, deep, evtName) {
 
             if (elem === null || elem === undefined) {
+
                 return elem;
             }
 
@@ -148,7 +164,7 @@ hAzzle.define('Manipulation', function() {
                     // Convert html into DOM nodes
                     tmp = tmp || fragment.appendChild(context.createElement('div'));
                     tag = (tagRegExp.exec(html) || ['', ''])[1].toLowerCase();
-                    wrap = wrapMap[tag] || wrapMap._default;
+                    wrap = wrapMap[tag] || noop;
                     tmp.innerHTML = wrap[1] + html.replace(xhtmlRegxp, '<$1></$2>') + wrap[2];
 
                     // Descend through wrappers to the right content
@@ -254,31 +270,43 @@ hAzzle.define('Manipulation', function() {
             }
             return node;
         },
-        inject = function(elem, content, method, state) {
 
-            elem = getElem(elem)[0];
-
-            // Normalize content
-
-            var node = normalize(content, state ? state : 0),
+        inject = function(elem, content, pos, fn) {
+            var node = normalize(content, pos ? pos : 0),
                 i = 0,
                 l = node.length;
             // 'Normal' iteration faster then internal 'each'
             for (; i < l; i++) {
-                elem[method](node[i]); // DOM Level 4
+                fn(node[i]);
             }
         },
-        prepend = function(elem, content) {
-            inject(elem, content, 'appeend');
-        },
         append = function(elem, content) {
-            inject(elem, content, 'prepend');
+            _util.each(getElem(elem), function(elem, pos) {
+                inject(elem, content, pos, function(node) {
+                    elem.append(node); // DOM Level 4
+                });
+            });
+        },
+        prepend = function(elem, content) {
+            _util.each(getElem(elem), function(elem, pos) {
+                inject(elem, content, pos, function(node) {
+                    elem.prepend(node); // DOM Level 4
+                });
+            });
         },
         before = function(elem, content) {
-            inject(elem, content, 'before');
+            _util.each(getElem(elem), function(elem, pos) {
+                inject(elem, content, pos, function(node) {
+                    elem.before(node); // DOM Level 4
+                });
+            });
         },
         after = function(elem, content) {
-            inject(elem, content, 'after');
+            _util.each(getElem(elem), function(elem, pos) {
+                inject(elem, content, pos, function(node) {
+                    elem.after(node); // DOM Level 4
+                });
+            });
         },
         html = function(elem, value) {
 
@@ -515,7 +543,11 @@ hAzzle.define('Manipulation', function() {
                 if (nodeType !== 1 && nodeType !== 9 && nodeType !== 11) {
                     return;
                 }
-                inject(elem, content, prop, state);
+                _util.each(getElem(elem), function(elem, pos) {
+                    inject(elem, content, pos, function(node) {
+                        elem[prop](node); // DOM Level 4
+                    });
+                });
             });
         };
 
