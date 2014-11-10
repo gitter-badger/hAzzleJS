@@ -101,7 +101,7 @@ hAzzle.define('Manipulation', function() {
                 return elem;
             }
 
-            elem = getElem(elem);
+            elem = getElem(elem)[0];
 
             var source = elem.nodeType && elem.cloneNode(true),
                 destElements,
@@ -122,7 +122,7 @@ hAzzle.define('Manipulation', function() {
 
                 // Clone events if the Events.js module are installed
 
-                if (hAzzle.installed.Events && deep && (source.nodeType === 1 || source.nodeType === 9)) {
+                if (hAzzle.installed.events && deep && (source.nodeType === 1 || source.nodeType === 9)) {
                     // Copy the events from the original to the clone
                     destElements = grab(source);
                     srcElements = grab(elem);
@@ -231,6 +231,9 @@ hAzzle.define('Manipulation', function() {
 
             hAzzle.err(!hAzzle.installed.events, 17, 'events.js module are not installed');
 
+
+
+
             var elem = getElem(elems),
                 el, i = 0;
 
@@ -242,21 +245,19 @@ hAzzle.define('Manipulation', function() {
                 hAzzle(el).off();
             }
         },
-
         normalize = function(node, clone) {
 
-            var i = 0,
-                l, ret;
+            var i, l, ret;
 
             if (typeof node === 'string') {
                 return create(node);
             }
-            node = getElem(node);
 
+            node = getElem(node);
             if (clone) {
                 ret = []; // Don't change original array
 
-                for (l = node.length; i < l; i++) {
+                for (i = 0, l = node.length; i < l; i++) {
                     ret[i] = cloneElem(node[i], true);
                 }
                 return ret;
@@ -337,7 +338,6 @@ hAzzle.define('Manipulation', function() {
                 elem.textContent = value;
             }
         },
-
         //  Remove all child nodes of the set of matched elements from the DOM
         empty = function(elem) {
             elem = getElem(elem)[0];
@@ -359,6 +359,7 @@ hAzzle.define('Manipulation', function() {
         },
         replace = function(elem, html) {
             elem = getElem(elem);
+            elem = elem.length ? elem : [elem];
             _util.each(elem, function(el, i) {
                 _util.each(normalize(html, i), function(i) {
                     el.replace(i); // DOM Level 4
@@ -381,12 +382,10 @@ hAzzle.define('Manipulation', function() {
     };
 
     this.domManip = function(content, fn, /*reverse */ rev) {
-
         var i = 0,
             r = [],
             self = this.elements,
             elems, nodes = hAzzle(content);
-
         // Start the iteration and loop through the content
 
         _util.each(normalize(nodes), function(elem, index) {
@@ -398,9 +397,7 @@ hAzzle.define('Manipulation', function() {
             }, null, rev);
 
         }, this, rev);
-
-
-        this.length = i;
+        self.length = i;
         _util.each(r, function(e) {
             self[--i] = e;
         }, null, !rev);
