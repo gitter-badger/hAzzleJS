@@ -18,6 +18,7 @@ hAzzle.define('Manipulation', function() {
         checkradioRegExp = (/^(?:checkbox|radio)$/i),
         htmlRegexp = /<|&#?\w+;/,
         tagRegExp = /<([\w:]+)/,
+        scriptRegExp = /<(?:script|style|link)/i,
         xhtmlRegxp = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
 
         // HTML stuff
@@ -205,7 +206,7 @@ hAzzle.define('Manipulation', function() {
                 return [context.createElement(parsed[1])];
             }
 
-            if ((parsed = buildFragment(html, document))) {
+            if ((parsed = buildFragment(html, defaultContext))) {
                 return parsed.childNodes;
             }
 
@@ -244,12 +245,13 @@ hAzzle.define('Manipulation', function() {
 
         normalize = function(node, clone) {
 
-            var i = 0, l, ret;
+            var i = 0,
+                l, ret;
 
             if (typeof node === 'string') {
                 return create(node);
             }
-               node = getElem(node);
+            node = getElem(node);
 
             if (clone) {
                 ret = []; // Don't change original array
@@ -261,42 +263,35 @@ hAzzle.define('Manipulation', function() {
             }
             return node;
         },
-
-        inject = function(elem, content, pos, fn) {
+        // Private method for inject HTML content for the global scope
+        inject = function(elem, content, pos, method) {
             var node = normalize(content, pos ? pos : 0),
                 i = 0,
                 l = node.length;
+
             // 'Normal' iteration faster then internal 'each'
             for (; i < l; i++) {
-                fn(node[i]);
+                elem[method](node[i]); // DOM Level 4
             }
         },
         append = function(elem, content) {
             _util.each(getElem(elem), function(elem, pos) {
-                inject(elem, content, pos, function(node) {
-                    elem.append(node); // DOM Level 4
-                });
+                inject(elem, content, pos, 'append');
             });
         },
         prepend = function(elem, content) {
             _util.each(getElem(elem), function(elem, pos) {
-                inject(elem, content, pos, function(node) {
-                    elem.prepend(node); // DOM Level 4
-                });
+                inject(elem, content, pos, 'prepend');
             });
         },
         before = function(elem, content) {
             _util.each(getElem(elem), function(elem, pos) {
-                inject(elem, content, pos, function(node) {
-                    elem.before(node); // DOM Level 4
-                });
+                inject(elem, content, pos, 'before');
             });
         },
         after = function(elem, content) {
             _util.each(getElem(elem), function(elem, pos) {
-                inject(elem, content, pos, function(node) {
-                    elem.after(node); // DOM Level 4
-                });
+                inject(elem, content, pos, 'after');
             });
         },
         html = function(elem, value) {
@@ -309,8 +304,8 @@ hAzzle.define('Manipulation', function() {
                 updateElement = function(el, i) {
                     try {
 
-                        if (el.nodeType === 1 && typeof value === 'string' && !/<(?:script|style|link)/i.test(value) &&
-                            !wrapMap[(/<([\w:]+)/.exec(value) || ['', ''])[1].toLowerCase()]) {
+                        if (el.nodeType === 1 && typeof value === 'string' && !scriptRegExp.test(value) &&
+                            !wrapMap[(tagRegExp.exec(value) || ['', ''])[1].toLowerCase()]) {
                             // Remove element nodes and prevent memory leaks
                             clearData(grab(el, false));
                             elem.innerHTML = value;
@@ -529,15 +524,13 @@ hAzzle.define('Manipulation', function() {
 
     }, function(iah, prop) {
         this[prop] = function(content) {
-            return this.iAHMethod(iah, content, function(elem, state) {
+            return this.iAHMethod(iah, content, function(elem) {
                 var nodeType = elem.nodeType;
                 if (nodeType !== 1 && nodeType !== 9 && nodeType !== 11) {
                     return;
                 }
                 _util.each(getElem(elem), function(elem, pos) {
-                    inject(elem, content, pos, function(node) {
-                        elem[prop](node); // DOM Level 4
-                    });
+                    inject(elem, content, pos, prop);
                 });
             });
         };
