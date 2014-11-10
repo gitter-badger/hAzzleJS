@@ -1,61 +1,60 @@
 /*!
  * hAzzle.js
  * Copyright (c) 2014 Kenny Flashlight
- * Version: 1.0.1b Release Candidate
+ * Version: 1.0.1c Release Candidate
  * Released under the MIT License.
  *
- * Date: 2014-11-10
+ * Date: 2014-11-11
  */
- 
 (function() {
 
     var
 
-        // Container for all modules
+    // Container for all modules
 
         modules = {},
 
         // Container for installed modules
 
         installed = {},
-       
+
         // Version
-        
+
         version = '1.0.1b',
 
-       // Codename
-       
-       codename = 'new-age',
+        // Codename
+
+        codename = 'new-age',
 
         // Throws an error if `condition` is `true`.
 
-         err = function(condition, code, message) {
+        err = function(condition, code, message) {
             if (condition) {
-               throw new Error('[hAzzle-' + code + '] ' + message);
+                throw new Error('[hAzzle-' + code + '] ' + message);
             }
         },
-        
+
         // Lower case 
-        
+
         tlc = function(str) {
-          return str.toLowerCase();
+            return str.toLowerCase();
         },
-        
+
         // Require a module
 
         require = function(name) {
-          if(name && typeof name === 'string') {
-            return modules[tlc(name)];
-          }  
+            if (name && typeof name === 'string') {
+                return modules[tlc(name)];
+            }
         },
 
         // Defines a module
 
         define = function(name, fn) {
-         if(typeof name === 'string' && typeof fn === 'function' && !modules[name]) {
-            installed[tlc(name)] = true;
-            modules[tlc(name)] = fn.call(hAzzle.prototype);
-           } 
+            if (typeof name === 'string' && typeof fn === 'function' && !modules[name]) {
+                installed[tlc(name)] = true;
+                modules[tlc(name)] = fn.call(hAzzle.prototype);
+            }
         },
 
         validTypes = function(elem) {
@@ -79,30 +78,36 @@
                 return sel;
             }
 
-            // Include required module
-
-            var m, els, _util = require('Util'),
-               // Document ready
-                _ready = require('Ready');
+            var els, util = require('Util');
 
             // DOM ready
 
             if (typeof sel === 'function') {
-                if (installed.Ready) {
-                    _ready.ready(sel);
+                if (installed.ready) {
+                    require('ready').ready(sel);
                 } else {
                     err(true, 6, 'ready.js module not installed');
                 }
             }
 
             if (typeof sel === 'string') {
+                if (installed.manipulation &&
+                    sel[0] === '<' &&
+                    sel[sel.length - 1] === '>' &&
+                    sel.length >= 3) {
+                    els = require('manipulation').create(
+                        sel,
+                        ctx && ctx.nodeType ? ctx.ownerDocument || ctx : document
+                    );
+                } else {
                     els = this.find(sel, ctx, true);
+                }
                 // hAzzle([dom]) 
-            } else if (sel instanceof Array) {
-                els = _util.unique(_util.filter(sel, validTypes));
+            } else if (Array.isArray(sel)) {
+                els = util.unique( util.filter(sel, validTypes));
                 // hAzzle(dom)
             } else if (this.isNodeList(sel)) {
-                els = _util.filter(_util.makeArray(sel), validTypes);
+                els = util.filter( util.makeArray(sel), validTypes);
                 // hAzzle(dom)
             } else if (sel.nodeType) {
                 // If it's a html fragment, create nodes from it
@@ -310,8 +315,10 @@ hAzzle.define('Types', function() {
             return true;
         },
 
-        isElement = function(value) {
-            return !!(value && value.nodeType === 1);
+        isElement = function(node) {
+            return !!(node && 
+              node.nodeName // we are a direct element
+            );
         },
         isNaN = function(value) {
             // `NaN` as a primitive is the only value that is not equal to itself
@@ -355,7 +362,7 @@ hAzzle.define('Types', function() {
         },
 
         isPlainObject = function(obj) {
-            return isType(obj) !== 'object' && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype;
+            return isType('Object')(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype;
         },
 
         isNode = function(elem) {

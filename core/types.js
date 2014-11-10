@@ -46,8 +46,10 @@ hAzzle.define('Types', function() {
             return true;
         },
 
-        isElement = function(value) {
-            return !!(value && value.nodeType === 1);
+        isElement = function(node) {
+            return !!(node && 
+              node.nodeName // we are a direct element
+            );
         },
         isNaN = function(value) {
             // `NaN` as a primitive is the only value that is not equal to itself
@@ -91,7 +93,7 @@ hAzzle.define('Types', function() {
         },
 
         isPlainObject = function(obj) {
-            return isType(obj) !== 'object' && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype;
+            return isType('Object')(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype;
         },
 
         isNode = function(elem) {
