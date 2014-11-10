@@ -16,10 +16,8 @@ hAzzle.define('traversing', function() {
                 _types.isNumber(sel) ? sel : _types.isNumber(index) ? index : null;
         },
         gather = function(els, fn) {
-            var ret = [],
-                res, i = 0,
-                j, len = els.length,
-                f;
+            var ret = [], res, i = 0,
+                j, len = els.length, f;
             for (; i < len;) {
                 for (j = 0, f = (res = fn(els[i], i++)).length; j < f;) {
                     ret.push(res[j++]);
@@ -30,13 +28,16 @@ hAzzle.define('traversing', function() {
         traverse = function(els, method, sel, index) {
             index = inVal(sel, index);
             return gather(els, function(el) {
-                var matches, i = index || 0,
+                var i = index || 0,
                     ret = [],
                     elem = el[method];
                 while (elem && (index === null || i >= 0)) {
-                    matches = _jiesa.matches(elem, typeof sel === 'string' ? sel : '*');
-                    if (_types.isElement(elem) && matches && (index === null || i-- === 0)) {
-                        if (index === null && method !== 'nextElementSibling' && method !== 'parentElement') {
+                    if (_types.isElement(elem) &&
+                        _jiesa.matches(elem, typeof sel === 'string' ? sel : '*') &&
+                        (index === null || i-- === 0)) {
+                        if (index === null &&
+                            method !== 'nextElementSibling' &&
+                            method !== 'parentElement') {
                             ret.unshift(elem);
                         } else {
                             ret.push(elem);
@@ -52,16 +53,10 @@ hAzzle.define('traversing', function() {
     // Optionally takes a query to filter the sibling elements.
 
     this.siblings = function(selector) {
-
-        var ret = [],
-            i, nodes;
-
+        var ret = [], i, nodes;
         this.each(function(element) {
-
             nodes = element.parentElement.children;
-
             i = nodes.length;
-
             while (i--) {
                 if (nodes[i] !== element) {
                     ret.push(nodes[i]);
