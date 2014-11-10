@@ -97,7 +97,6 @@ hAzzle.define('Manipulation', function() {
         cloneElem = function(elem, deep, evtName) {
 
             if (elem === null || elem === undefined) {
-
                 return elem;
             }
 
@@ -140,7 +139,6 @@ hAzzle.define('Manipulation', function() {
                 while (index--) {
                     if (_types.isNode(array[index])) {
                         deepEach(array[index].children, fn, context);
-
                         fn.call(context || array[index], array[index], index, array);
                     }
                 }
@@ -246,24 +244,17 @@ hAzzle.define('Manipulation', function() {
 
         normalize = function(node, clone) {
 
-            var i, l, ret;
+            var i = 0, l, ret;
 
             if (typeof node === 'string') {
                 return create(node);
             }
-
-            if (node instanceof hAzzle) {
-                node = node.elements;
-            }
-
-            if (_types.isNode(node)) {
-                node = [node];
-            }
+               node = getElem(node);
 
             if (clone) {
                 ret = []; // Don't change original array
 
-                for (i = 0, l = node.length; i < l; i++) {
+                for (l = node.length; i < l; i++) {
                     ret[i] = cloneElem(node[i], true);
                 }
                 return ret;
