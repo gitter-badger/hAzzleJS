@@ -1557,7 +1557,7 @@ hAzzle.define('Jiesa', function() {
                             // we can use the native qSA
                             ret = ctx.querySelectorAll(sel);
                         }
-                        return ret;
+                       return _collection.slice(ret);
                     } catch (e) {}
                 }
             }
