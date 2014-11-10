@@ -121,11 +121,10 @@ hAzzle.define('Manipulation', function() {
             return array;
         },
 
-        create = function(html, context) {
-
-            context = context || document;
+        buildFragment = function(html, context) {
 
             var tmp, tag, wrap,
+                elem,
                 fragment = context.createDocumentFragment(),
                 nodes = [],
                 i;
@@ -157,8 +156,31 @@ hAzzle.define('Manipulation', function() {
                 fragment.textContent = '';
                 fragment.innerHTML = ''; // Clear inner HTML
 
-                return nodes;
+                // Faster then internal each method
+                
+                i = 0;
+                
+                while ((elem = nodes[i++])) {
+                    fragment.appendChild(elem);
+
+                }
+                return fragment;
             }
+        },
+
+        create = function(html, context) {
+            context = context || document;
+            var parsed;
+
+            if ((parsed = /^<(\w+)\s*\/?>(?:<\/\1>|)$/.exec(html))) {
+                return [context.createElement(parsed[1])];
+            }
+
+            if ((parsed = buildFragment(html, context))) {
+                return parsed.childNodes;
+            }
+
+            return [];
         },
 
         // Grab childnodes
@@ -326,7 +348,7 @@ hAzzle.define('Manipulation', function() {
 
     this.iAHMethod = function(method, html, fn) {
         return this.each(function(elem, index) {
-            if (typeof html === 'string' &&
+            if (typeof html !== 'string' &&
                 _core.isHTML &&
                 elem.parentElement && elem.parentElement.nodeType === 1) {
                 elem.insertAdjacentHTML(method, html.replace(xhtmlRegxp, '<$1></$2>'));
@@ -339,21 +361,9 @@ hAzzle.define('Manipulation', function() {
     this.domManip = function(content, fn, /*reverse */ rev) {
 
         var i = 0,
-            r = [];
-
-        // Nasty looking code, but this has to be fast
-
-        var self = this.elements,
-            elems, nodes;
-
-        if (typeof content === 'string' &&
-            content[0] === '<' &&
-            content[content.length - 1] === '>' &&
-            content.length >= 3) {
-            nodes = content;
-        } else {
-            nodes = hAzzle(content);
-        }
+            r = [],
+            self = this.elements,
+            elems, nodes = hAzzle(content);
 
         // Start the iteration and loop through the content
 
@@ -366,7 +376,9 @@ hAzzle.define('Manipulation', function() {
             }, null, rev);
 
         }, this, rev);
-        self.length = i;
+
+
+        this.length = i;
         _util.each(r, function(e) {
             self[--i] = e;
         }, null, !rev);
@@ -399,8 +411,6 @@ hAzzle.define('Manipulation', function() {
                 element.parentNode.appendChild(node);
         }, 1);
     };
-
-    // Same as 'ReplaceWith' in jQuery
 
     this.replaceWith = function(html) {
         return replace(this.elements, html);
@@ -504,17 +514,19 @@ hAzzle.define('Manipulation', function() {
     }.bind(this));
 
     return {
-        clearData: clearData,
-        create: create,
-        clone: cloneElem,
-        replace: replace,
+        prepend: prepend,
+        append: append,
+        before: before,
+        after: after,
         empty: empty,
         remove: remove,
         html: html,
         text: text,
-        prepend: prepend,
-        append: append,
-        before: before,
-        after: after
+        clearData: clearData,
+        buildFragment: buildFragment,
+        create: create,
+        clone: cloneElem,
+        replace: replace
+
     };
 });
