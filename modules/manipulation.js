@@ -10,7 +10,7 @@ hAzzle.define('Manipulation', function() {
         _types = hAzzle.require('Types'),
         _text = hAzzle.require('Text'),
         _rcheckableType = (/^(?:checkbox|radio)$/i),
-        htmlRegexp = !/<|&#?\w+;/,
+        htmlRegexp = /<|&#?\w+;/,
         tagRegExp = /<([\w:]+)/,
         xhtmlRegxp = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
         wrapMap = {
@@ -46,6 +46,11 @@ hAzzle.define('Manipulation', function() {
             div = null;
             return res;
         }()),
+
+        // Internal method !!
+        getElem = function(elem) {
+            return elem instanceof hAzzle ? elem.elements : elem;
+        },
 
         fixInput = function(src, dest) {
             var nodeName = dest.nodeName.toLowerCase();
@@ -217,15 +222,31 @@ hAzzle.define('Manipulation', function() {
             }
             return node;
         },
-        insertMethod = function(elem, content, method, state) {
+        inject = function(elem, content, method, state) {
+
             elem = getElem(elem);
-            _util.each(normalize(content, state ? state : 0), function(relatedNode) {
-                elem[method](relatedNode); // DOM Level 4
-            });
+
+            // Normalize content
+
+            var node = normalize(content, state ? state : 0),
+                i = 0,
+                l = node.length;
+            // 'Normal' iteration faster then internal 'each'
+            for (; i < l; i++) {
+                elem[method](node[i]); // DOM Level 4
+            }
         },
-        // Internal method !!
-        getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements : elem;
+        prepend = function(elem, content) {
+            inject(elem, content, 'appeend');
+        },
+        append = function(elem, content) {
+            inject(elem, content, 'prepend');
+        },
+        before = function(elem, content) {
+            inject(elem, content, 'before');
+        },
+        after = function(elem, content) {
+            inject(elem, content, 'after');
         },
         html = function(elem, value) {
 
@@ -472,11 +493,11 @@ hAzzle.define('Manipulation', function() {
     }, function(iah, prop) {
         this[prop] = function(content) {
             return this.iAHMethod(iah, content, function(elem, state) {
-                var nodeType = elem ? elem.nodeType : undefined;
-                if (nodeType && (nodeType === 1 || nodeType === 11 || nodeType === 9)) {
-                    insertMethod(elem, content, prop, state);
+                var nodeType = elem.nodeType;
+                if (nodeType !== 1 && nodeType !== 9 && nodeType !== 11) {
+                    return;
                 }
-
+                inject(elem, content, prop, state);
             });
         };
 
@@ -486,11 +507,14 @@ hAzzle.define('Manipulation', function() {
         clearData: clearData,
         create: create,
         clone: cloneElem,
-        insert: insertMethod,
         replace: replace,
         empty: empty,
         remove: remove,
         html: html,
-        text: text
+        text: text,
+        prepend: prepend,
+        append: append,
+        before: before,
+        after: after
     };
 });
