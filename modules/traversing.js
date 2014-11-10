@@ -1,7 +1,7 @@
 // traversing.js
 var hAzzle = window.hAzzle || (window.hAzzle = {});
 
-hAzzle.define('Traversing', function() {
+hAzzle.define('traversing', function() {
 
     var _jiesa = hAzzle.require('Jiesa'),
         _collection = hAzzle.require('Collection'),
@@ -46,67 +46,6 @@ hAzzle.define('Traversing', function() {
                 }
                 return ret;
             });
-        },
-
-        walkElements = function(prop, elem, expression) {
-            var i = 0,
-                isIndex = typeof expression === 'number';
-            if (typeof expression === 'undefined') {
-                isIndex = true;
-                expression = 0;
-            }
-            while ((elem = elem[prop])) {
-                if (elem.nodeType !== 1) {
-                    continue;
-                }
-                if (isIndex) {
-                    ++i;
-                    if (i === expression) {
-                        return elem;
-                    }
-                } else if (_jiesa.matches(elem, expression)) {
-                    return elem;
-                }
-            }
-            return null;
-        },
-        up = function(elem, expression) {
-            return walkElements('parentElement', elem, expression);
-        },
-        next = function(elem, expression) {
-            return walkElements('nextElementSibling', elem, expression);
-        },
-        prev = function(elem, expression) {
-            return walkElements('previousElementSibling', elem, expression);
-        },
-
-        down = function(elem, expression) {
-            var isIndex = typeof expression === 'number',
-                descendants, index, descendant;
-
-            if (expression === null) {
-                elem = elem.firstChild;
-                while (elem && elem.nodeType !== 1) {
-                    elem = elem.nextElementSibling;
-                }
-                return elem;
-            }
-            if (!isIndex && _jiesa.matches(elem, expression) || isIndex && expression === 0) {
-                return elem;
-            }
-
-            descendants = _jiesa.find('*', elem);
-
-            if (isIndex) {
-                return descendants[expression] || null;
-            }
-
-            index = 0;
-
-            while ((descendant = descendants[index]) && !_jiesa.matches(descendant, expression)) {
-                ++index;
-            }
-            return descendant || null;
         };
 
     // Returns all sibling elements for nodes
@@ -141,9 +80,9 @@ hAzzle.define('Traversing', function() {
             return parent && parent.nodeType !== 11 ? parent : null;
         }).filter(sel);
 
-       if (this.length > 1) {
+        if (this.length > 1) {
             // Remove duplicates
-           matched = _core.unique(matched.elements);
+            matched = _core.unique(matched.elements);
         }
         return hAzzle(matched);
     };
@@ -173,7 +112,9 @@ hAzzle.define('Traversing', function() {
         return selector === undefined ? hAzzle(ancestors) : hAzzle(ancestors).filter(selector);
     };
 
-    // Return the closest parent of an element based on a selector
+    // For each element in the set, get the first element that matches the 
+    // selector by testing the element itself and traversing up through its 
+    // ancestors in the DOM tree.
 
     this.closest = function(selector, ctx) {
         var cur,
@@ -274,10 +215,5 @@ hAzzle.define('Traversing', function() {
         };
     }.bind(this));
 
-    return {
-        up: up,
-        next: next,
-        prev: prev,
-        down: down
-    };
+    return {};
 });
