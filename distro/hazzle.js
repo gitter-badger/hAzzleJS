@@ -1,10 +1,10 @@
 /*!
  * hAzzle.js
  * Copyright (c) 2014 Kenny Flashlight
- * Version: 1.0.0d Release Candidate
+ * Version: 1.0.1b Release Candidate
  * Released under the MIT License.
  *
- * Date: 2014-11-09
+ * Date: 2014-11-10
  */
  
 (function() {
@@ -21,7 +21,7 @@
        
         // Version
         
-        version = '1.0.0a-rc',
+        version = '1.0.1b',
 
        // Codename
        
@@ -31,9 +31,7 @@
 
          err = function(condition, code, message) {
             if (condition) {
-                var e = new Error('[hAzzle-' + code + '] ' + message);
-                e.code = code;
-                throw e;
+               throw new Error('[hAzzle-' + code + '] ' + message);
             }
         },
         
@@ -865,7 +863,9 @@ hAzzle.define('Util', function() {
         has: has,
         bind: bind
     };
-});// core.js
+});
+
+// core.js
 hAzzle.define('Core', function() {
     var docset = 1,
         document = window.document,
@@ -1713,17 +1713,17 @@ hAzzle.define('Jiesa', function() {
 hAzzle.define('Strings', function() {
     var
 
-        // Hyphenate RegExp
+    // Hyphenate RegExp
 
         sHyphenate = /[A-Z]/g,
 
-        // Microsoft RegExp
-
-        msPrefix = /^-ms-/,
-
         // camlize RegExp
 
-        dashAlpha = /-([\da-z])/gi,
+        specialChars = /([\:\-\_]+(.))/g,
+
+        // Firefox RegExp
+
+        mozPrefix = /^moz([A-Z])/,
 
         // Cache array for hAzzle.camelize()
 
@@ -1731,8 +1731,8 @@ hAzzle.define('Strings', function() {
 
         // Used by camelize as callback to replace()
 
-        fcamelize = function(all, letter) {
-            return letter.toUpperCase();
+        fcamelize = function(_, separator, letter, offset) {
+            return offset ? letter.toUpperCase() : letter;
         },
         // Used by hyphenate as callback to replace()
 
@@ -1761,16 +1761,11 @@ hAzzle.define('Strings', function() {
         },
 
         // Convert a string to camel case notation.
-        // Support: IE9-11+
         camelize = function(str) {
-            if (str && typeof str === 'string') {
-
-                return camelCache[str] ? camelCache[str] :
-                    // Remove data- prefix and convert remaining dashed string to camelCase
-                    camelCache[str] = str.replace(msPrefix, "ms-").replace(dashAlpha, fcamelize); // -a to A
-            }
-            // Deal with 'number' and 'boolean'
-            return typeof str === 'number' || typeof str === 'boolean' ? '' + str : str;
+            return camelCache[str] ? camelCache[str] :
+                camelCache[str] = str.
+            replace(specialChars, fcamelize).
+            replace(mozPrefix, 'Moz$1');
         },
 
         // Remove leading and trailing whitespaces of the specified string.

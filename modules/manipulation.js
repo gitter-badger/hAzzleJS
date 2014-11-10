@@ -9,41 +9,26 @@ hAzzle.define('Manipulation', function() {
         _events = hAzzle.require('Events'),
         _types = hAzzle.require('Types'),
         _text = hAzzle.require('Text'),
-        _scriptStyle = /<(?:script|style|link)/i,
-        _tagName = /<([\w:]+)/,
-        _htmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
         _rcheckableType = (/^(?:checkbox|radio)$/i),
-        _whitespace = /^\s*<([^\s>]+)/,
-        _scriptTag = /\s*<script +src=['"]([^'"]+)['"]>/,
-        table = ['<table>', '</table>', 1],
-        td = ['<table><tbody><tr>', '</tr></tbody></table>', 3],
-        option = ['<select>', '</select>', 1],
-        noscope = ['_', '', 0, 1],
+        htmlRegexp = !/<|&#?\w+;/,
+        tagRegExp = /<([\w:]+)/,
+        xhtmlRegxp = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
+        wrapMap = {
+            'option': [1, '<select multiple="multiple">', '</select>'],
+            'thead': [1, '<table>', '</table>'],
+            'col': [2, '<table><colgroup>', '</colgroup></table>'],
+            'tr': [2, '<table><tbody>', '</tbody></table>'],
+            'td': [3, '<table><tbody><tr>', '</tr></tbody></table>'],
+            '_default': [0, "", ""]
+        };
 
-        tagMap = {
-            tr: ['<table><tbody>', '</tbody></table>', 2],
-            col: ['<table><colgroup>', '</colgroup></table>', 2],
-            fieldset: ['<form>', '</form>', 1],
-            legend: ['<form><fieldset>', '</fieldset></form>', 2],
-            th: td,
-            td: td,
-            style: table,
-            table: table,
-            thead: table,
-            tbody: table,
-            tfoot: table,
-            colgroup: table,
-            caption: table,
-            option: option,
-            optgroup: option,
-            script: noscope,
-            link: noscope,
-            param: noscope,
-            base: noscope
-        },
-        // Support: IE<=11+
-        // Make sure textarea (and checkbox) defaultValue is properly cloned
-        cloneChecked = (function() {
+    wrapMap.optgroup = wrapMap.option;
+    wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
+    wrapMap.th = wrapMap.td;
+
+    // Support: IE<=11+
+    // Make sure textarea (and checkbox) defaultValue is properly cloned
+    var cloneChecked = (function() {
 
             var div = _doc.createElement('div'),
                 res,
@@ -61,18 +46,6 @@ hAzzle.define('Manipulation', function() {
             div = null;
             return res;
         }()),
-
-        imcHTML = (function() {
-
-            if (typeof _doc.implementation.createHTMLDocument === 'function') {
-                return true;
-            }
-            return false;
-        })(),
-
-        createHTML = function(html, context) {
-            return hAzzle(create(html, context));
-        },
 
         fixInput = function(src, dest) {
             var nodeName = dest.nodeName.toLowerCase();
@@ -129,13 +102,6 @@ hAzzle.define('Manipulation', function() {
             }
         },
 
-        createScriptFromHtml = function(html, context) {
-            var scriptEl = context.createElement('script'),
-                matches = html.match(_scriptTag);
-            scriptEl.src = matches[1];
-            return scriptEl;
-        },
-
         deepEach = function(array, fn, context) {
             if (array) {
                 var index = array.length;
@@ -150,67 +116,43 @@ hAzzle.define('Manipulation', function() {
             return array;
         },
 
-        create = function(node, context) {
-            if (node) {
-                // Mitigate XSS vulnerability
+        create = function(html, context) {
 
-                var defaultContext = imcHTML ?
-                    _doc.implementation.createHTMLDocument() :
-                    _doc,
-                    ctx = context || defaultContext,
-                    fragment = ctx.createDocumentFragment();
+            context = context || document;
 
-                if (typeof node === 'string' && node !== '') {
+            var tmp, tag, wrap,
+                fragment = context.createDocumentFragment(),
+                nodes = [],
+                i;
+            if (typeof html === 'string' && html !== '') {
+                if (!htmlRegexp.test(html)) {
+                    // Convert non-html into a text node
+                    nodes.push(context.createTextNode(html));
+                } else {
 
-                    /* Check for 'script tags' (e.g <script type="text/javascript" src="doml4.js"></script>, and
-                       create it if match 
-                     */
-                    if (_scriptTag.test(node)) {
-                        return [createScriptFromHtml(node, context)];
+                    // Convert html into DOM nodes
+                    tmp = tmp || fragment.appendChild(context.createElement('div'));
+                    tag = (tagRegExp.exec(html) || ['', ''])[1].toLowerCase();
+                    wrap = wrapMap[tag] || wrapMap._default;
+                    tmp.innerHTML = wrap[1] + html.replace(xhtmlRegxp, '<$1></$2>') + wrap[2];
+
+                    // Descend through wrappers to the right content
+                    i = wrap[0];
+                    while (i--) {
+                        tmp = tmp.lastChild;
                     }
 
-                    // Deserialize a standard representation
+                    nodes = _util.merge(nodes, tmp.childNodes);
 
-                    var i, tag = node.match(_whitespace),
-                        sandbox = fragment.appendChild(ctx.createElement('div')),
-                        els = [],
-                        map = tag ? tagMap[tag[1].toLowerCase()] : null,
-                        dep = map ? map[2] + 1 : 1,
-                        noScoop = map && map[3];
-
-                    if (map) {
-                        sandbox.innerHTML = (map[0] + node + map[1]);
-                    } else {
-                        sandbox.innerHTML = node;
-                    }
-
-                    while (dep--) {
-                        sandbox = sandbox.firstChild;
-                    }
-
-                    // for IE NoScope, we may insert cruft at the begining just to get it to work
-
-                    if (noScoop && sandbox && sandbox.nodeType !== 1) {
-                        sandbox = sandbox.nextSibling;
-                    }
-
-                    do {
-                        if (!tag || sandbox.nodeType === 1) {
-                            els.push(sandbox);
-                        }
-                    } while (sandbox = sandbox.nextSibling);
-
-                    for (i in els) {
-                        if (els[i].parentNode) {
-                            els[i].parentNode.removeChild(els[i]);
-                        }
-                    }
-
-                    return els;
-
-                } else if (_util.isNode(node)) {
-                    return [node.cloneNode(true)];
+                    tmp = fragment.firstChild;
+                    tmp.textContent = '';
                 }
+
+                // Remove wrapper from fragment
+                fragment.textContent = '';
+                fragment.innerHTML = ''; // Clear inner HTML
+
+                return nodes;
             }
         },
 
@@ -230,7 +172,7 @@ hAzzle.define('Manipulation', function() {
             // No point to continue clearing events if the events.js module
             // are not installed
 
-            hAzzle.err(!hAzzle.installed.Events, 17, 'events.js module are not installed');
+            hAzzle.err(!hAzzle.installed.events, 17, 'events.js module are not installed');
 
             var elem, i = 0;
 
@@ -283,22 +225,68 @@ hAzzle.define('Manipulation', function() {
         },
         // Internal method !!
         getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements[0] : elem;
+            return elem instanceof hAzzle ? elem.elements : elem;
         },
+        html = function(elem, value) {
+
+            elem = elem instanceof hAzzle ? elem.elements : elem.length ? elem : [elem];
+
+            var append = function(el, i) {
+                    _util.each(normalize(value, elem, i), function(node) {
+                        el.append(node); // DOM Level 4
+                    });
+                },
+                updateElement = function(el, i) {
+                    try {
+
+                        if (el.nodeType === 1 && typeof value === 'string' && !/<(?:script|style|link)/i.test(value) &&
+                            !wrapMap[(/<([\w:]+)/.exec(value) || ['', ''])[1].toLowerCase()]) {
+                            // Remove element nodes and prevent memory leaks
+                            clearData(grab(el, false));
+                            elem.innerHTML = value;
+                        }
+                    } catch (e) {}
+                    append(el, i);
+                };
+
+            if (value === undefined && elem[0].nodeType === 1) {
+                return elem[0] ? elem[0].innerHTML : '';
+            }
+
+            // Remove child nodes to avoid memory leaks
+
+            empty(elem);
+
+            // Update each element with new content
+
+            return _util.each(elem, updateElement);
+        },
+
+        text = function(elem, value) {
+
+            elem = (elem instanceof hAzzle ? elem.elements : elem.length ? elem : [elem])[0];
+
+            var nodeType = elem ? elem.nodeType : undefined;
+
+            if (nodeType === 1 || nodeType === 11 || nodeType === 9) {
+                elem.textContent = value;
+            }
+        },
+
         //  Remove all child nodes of the set of matched elements from the DOM
         empty = function(elem) {
-            elem = getElem(elem);
-           if(elem) {
-            // Do a 'deep each' and clear all listeners if any 
-            deepEach(elem.children, clearData);
-            // Remove children
-            while (elem.firstChild) {
-                elem.removeChild(elem.firstChild);
-            }
+            elem = getElem(elem)[0];
+            if (elem) {
+                // Do a 'deep each' and clear all listeners if any 
+                deepEach(elem.children, clearData);
+                // Remove children
+                while (elem.firstChild) {
+                    elem.removeChild(elem.firstChild);
+                }
             }
         },
         remove = function(elem) {
-            elem = getElem(elem);
+            elem = getElem(elem)[0];
             deepEach(clearData);
             if (elem.parentElement) {
                 elem.parentElement.removeChild(elem);
@@ -306,7 +294,6 @@ hAzzle.define('Manipulation', function() {
         },
         replace = function(elem, html) {
             elem = getElem(elem);
-            elem = elem.length ? elem : [elem];
             _util.each(elem, function(el, i) {
                 _util.each(normalize(html, i), function(i) {
                     el.replace(i); // DOM Level 4
@@ -321,7 +308,7 @@ hAzzle.define('Manipulation', function() {
             if (typeof html === 'string' &&
                 _core.isHTML &&
                 elem.parentElement && elem.parentElement.nodeType === 1) {
-                elem.insertAdjacentHTML(method, html.replace(_htmlTag, '<$1></$2>'));
+                elem.insertAdjacentHTML(method, html.replace(xhtmlRegxp, '<$1></$2>'));
             } else {
                 fn(elem, index);
             }
@@ -403,58 +390,21 @@ hAzzle.define('Manipulation', function() {
     this.text = function(value) {
         return value === undefined ?
             _text.getText(this.elements) :
-            this.empty().each(function(elem) {
-                if(elem != null) {
-                if (elem.nodeType === 1 ||
-                    elem.nodeType === 11 ||
-                    elem.nodeType === 9) {
-                    elem.textContent = value;
+            this.each(function(elem) {
+                if (elem !== null) {
+                    text(elem, value);
                 }
-               } 
             });
     };
 
     // HTML
 
     this.html = function(value) {
-
-        var els = this.elements,
-            elem = els[0],
-            i = 0,
-            l = this.length;
-
-        if (value === undefined && elem.nodeType === 1) {
-            return elem.innerHTML;
-        }
-        // See if we can take a shortcut and just use innerHTML
-
-        if (typeof value === 'string' && !_scriptStyle.test(value) &&
-            !tagMap[(_tagName.exec(value) || ['', ''])[1].toLowerCase()]) {
-
-            value = value.replace(_htmlTag, '<$1></$2>'); // DOM Level 4
-
-            try {
-
-                for (; i < l; i++) {
-
-                    elem = els[i] || {};
-
-                    // Remove element nodes and prevent memory leaks
-                    if (elem.nodeType === 1) {
-                        clearData(grab(elem, false));
-                        elem.innerHTML = value;
-                    }
-                }
-
-                elem = 0;
-
-                // If using innerHTML throws an exception, use the fallback method
-            } catch (e) {}
-        }
-
-        if (elem) {
-            return this.empty().append(value);
-        }
+        return value === undefined && this.elements[0].nodeType === 1 ?
+            this.elements[0].innerHTML :
+            this.each(function() {
+                return html(this, value);
+            });
     };
 
     this.deepEach = function(fn, scope) {
@@ -526,6 +476,7 @@ hAzzle.define('Manipulation', function() {
                 if (nodeType && (nodeType === 1 || nodeType === 11 || nodeType === 9)) {
                     insertMethod(elem, content, prop, state);
                 }
+
             });
         };
 
@@ -534,11 +485,12 @@ hAzzle.define('Manipulation', function() {
     return {
         clearData: clearData,
         create: create,
-        createHTML: createHTML,
         clone: cloneElem,
         insert: insertMethod,
         replace: replace,
         empty: empty,
-        remove: remove
+        remove: remove,
+        html: html,
+        text: text
     };
 });

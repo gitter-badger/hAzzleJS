@@ -4,7 +4,7 @@
  * Version: 1.0.0d Release Candidate
  * Released under the MIT License.
  *
- * Date: 2014-11-09
+ * Date: 2014-11-10
  */
  
 (function() {
@@ -31,9 +31,7 @@
 
          err = function(condition, code, message) {
             if (condition) {
-                var e = new Error('[hAzzle-' + code + '] ' + message);
-                e.code = code;
-                throw e;
+               throw new Error('[hAzzle-' + code + '] ' + message);
             }
         },
         
