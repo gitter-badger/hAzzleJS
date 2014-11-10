@@ -26,9 +26,20 @@ hAzzle.define('Manipulation', function() {
     wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
     wrapMap.th = wrapMap.td;
 
-    // Support: IE<=11+
-    // Make sure textarea (and checkbox) defaultValue is properly cloned
-    var cloneChecked = (function() {
+    var
+
+        imcHTML = (function() {
+
+            if (typeof _doc.implementation.createHTMLDocument === 'function') {
+                return true;
+            }
+            return false;
+        })(),
+
+        // Support: IE<=11+
+        // Make sure textarea (and checkbox) defaultValue is properly cloned
+
+        cloneChecked = (function() {
 
             var div = _doc.createElement('div'),
                 res,
@@ -49,7 +60,7 @@ hAzzle.define('Manipulation', function() {
 
         // Internal method !!
         getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements : elem;
+            return elem instanceof hAzzle ? elem.elements : [elem];
         },
 
         fixInput = function(src, dest) {
@@ -157,9 +168,9 @@ hAzzle.define('Manipulation', function() {
                 fragment.innerHTML = ''; // Clear inner HTML
 
                 // Faster then internal each method
-                
+
                 i = 0;
-                
+
                 while ((elem = nodes[i++])) {
                     fragment.appendChild(elem);
 
@@ -169,14 +180,18 @@ hAzzle.define('Manipulation', function() {
         },
 
         create = function(html, context) {
-            context = context || document;
-            var parsed;
+
+            // Mitigate XSS vulnerability
+
+            var parsed, defaultContext = imcHTML ?
+                _doc.implementation.createHTMLDocument() :
+                _doc;
 
             if ((parsed = /^<(\w+)\s*\/?>(?:<\/\1>|)$/.exec(html))) {
                 return [context.createElement(parsed[1])];
             }
 
-            if ((parsed = buildFragment(html, context))) {
+            if ((parsed = buildFragment(html, document))) {
                 return parsed.childNodes;
             }
 
@@ -196,25 +211,20 @@ hAzzle.define('Manipulation', function() {
 
         clearData = function(elems) {
 
-            // No point to continue clearing events if the events.js module
-            // are not installed
+            // Check if the events.js module are installed, and clear events
+            // if it is, to prevent memory leaks
 
             hAzzle.err(!hAzzle.installed.events, 17, 'events.js module are not installed');
 
-            var elem, i = 0;
+            var elem = getElem(elems),
+                el, i = 0;
 
             // If instanceof hAzzle...
 
-            if (elems instanceof hAzzle) {
-                elems = [elems.elements[0]];
-            } else {
-                elems = elems.length ? elems : [elems];
-            }
-
             for (;
-                (elem = elems[i]) !== undefined; i++) {
+                (el = elem[i]) !== undefined; i++) {
                 // Remove all eventListeners
-                hAzzle(elem).off();
+                hAzzle(el).off();
             }
         },
 
@@ -246,7 +256,7 @@ hAzzle.define('Manipulation', function() {
         },
         inject = function(elem, content, method, state) {
 
-            elem = getElem(elem);
+            elem = getElem(elem)[0];
 
             // Normalize content
 
@@ -272,10 +282,8 @@ hAzzle.define('Manipulation', function() {
         },
         html = function(elem, value) {
 
-            elem = elem instanceof hAzzle ? elem.elements : elem.length ? elem : [elem];
-
             var append = function(el, i) {
-                    _util.each(normalize(value, elem, i), function(node) {
+                    _util.each(normalize(value, getElem(elem), i), function(node) {
                         el.append(node); // DOM Level 4
                     });
                 },
