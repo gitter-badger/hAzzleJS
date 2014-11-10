@@ -362,7 +362,7 @@ hAzzle.define('Manipulation', function() {
 
     this.iAHMethod = function(method, html, fn) {
         return this.each(function(elem, index) {
-            if (typeof html !== 'string' &&
+            if (typeof html === 'string' &&
                 _core.isHTML &&
                 elem.parentElement && elem.parentElement.nodeType === 1) {
                 elem.insertAdjacentHTML(method, html.replace(xhtmlRegxp, '<$1></$2>'));
