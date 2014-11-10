@@ -533,11 +533,9 @@ hAzzle.define('Manipulation', function() {
         empty: empty,
         html: html,
         text: text,
-        clearData: clearData,
-        buildFragment: buildFragment,
         create: create,
         clone: cloneElem,
-        replace: replace
-
+        replace: replace,
+        buildFragment: buildFragment
     };
 });
