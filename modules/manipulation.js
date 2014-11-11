@@ -1,17 +1,13 @@
 // manipulation.js
 var hAzzle = window.hAzzle || (window.hAzzle = {});
 
-hAzzle.define('Manipulation', function() {
+hAzzle.define('manipulation', function() {
 
     var _doc = window.document,
 
         // Dependencies
 
-        _util = hAzzle.require('Util'),
-        _core = hAzzle.require('Core'),
-        _events = hAzzle.require('Events'),
-        _types = hAzzle.require('Types'),
-        _text = hAzzle.require('Text'),
+        util = hAzzle.require('util'),
 
         // RegExp
 
@@ -110,7 +106,7 @@ hAzzle.define('Manipulation', function() {
             if (source) {
                 // Fix IE cloning issues
                 if (!cloneChecked && (elem.nodeType === 1 || elem.nodeType === 11) &&
-                    !_core.isXML(elem)) {
+                    !hAzzle.require('core').isXML(elem)) {
 
                     destElements = grab(source);
                     srcElements = grab(elem);
@@ -127,7 +123,7 @@ hAzzle.define('Manipulation', function() {
                     destElements = grab(source);
                     srcElements = grab(elem);
                     for (i = 0; i < srcElements.length; i++) {
-                        _events.clone(destElements[i], srcElements[i], evtName);
+                        hAzzle.require('events').clone(destElements[i], srcElements[i], evtName);
                     }
                 }
                 return source;
@@ -138,7 +134,7 @@ hAzzle.define('Manipulation', function() {
             if (array) {
                 var index = array.length;
                 while (index--) {
-                    if (_types.isNode(array[index])) {
+                    if (hAzzle.require('types').isNode(array[index])) {
                         deepEach(array[index].children, fn, context);
                         fn.call(context || array[index], array[index], index, array);
                     }
@@ -172,7 +168,7 @@ hAzzle.define('Manipulation', function() {
                         tmp = tmp.lastChild;
                     }
 
-                    nodes = _util.merge(nodes, tmp.childNodes);
+                    nodes = util.merge(nodes, tmp.childNodes);
 
                     tmp = fragment.firstChild;
                     tmp.textContent = '';
@@ -207,7 +203,7 @@ hAzzle.define('Manipulation', function() {
             }
 
             if ((parsed = buildFragment(html, defaultContext))) {
-                return parsed.childNodes;
+                 return hAzzle.require('collection').slice(parsed.childNodes);
             }
 
             return [];
@@ -217,8 +213,8 @@ hAzzle.define('Manipulation', function() {
 
         grab = function(context, tag) {
             var ret = context.getElementsByTagName(tag || '*');
-            return tag === undefined || tag && _util.nodeName(context, tag) ?
-                _util.merge([context], ret) :
+            return tag === undefined || tag && util.nodeName(context, tag) ?
+                util.merge([context], ret) :
                 ret;
         },
 
@@ -251,6 +247,7 @@ hAzzle.define('Manipulation', function() {
             }
 
             node = getElem(node);
+            
             if (clone) {
                 ret = []; // Don't change original array
 
@@ -273,29 +270,29 @@ hAzzle.define('Manipulation', function() {
             }
         },
         append = function(elem, content) {
-            _util.each(getElem(elem), function(elem, pos) {
+            util.each(getElem(elem), function(elem, pos) {
                 inject(elem, content, pos, 'append');
             });
         },
         prepend = function(elem, content) {
-            _util.each(getElem(elem), function(elem, pos) {
+            util.each(getElem(elem), function(elem, pos) {
                 inject(elem, content, pos, 'prepend');
             });
         },
         before = function(elem, content) {
-            _util.each(getElem(elem), function(elem, pos) {
+            util.each(getElem(elem), function(elem, pos) {
                 inject(elem, content, pos, 'before');
             });
         },
         after = function(elem, content) {
-            _util.each(getElem(elem), function(elem, pos) {
+            util.each(getElem(elem), function(elem, pos) {
                 inject(elem, content, pos, 'after');
             });
         },
         html = function(elem, value) {
 
             var append = function(el, i) {
-                    _util.each(normalize(value, getElem(elem), i), function(node) {
+                    util.each(normalize(value, getElem(elem), i), function(node) {
                         el.append(node); // DOM Level 4
                     });
                 },
@@ -322,13 +319,17 @@ hAzzle.define('Manipulation', function() {
 
             // Update each element with new content
 
-            return _util.each(elem, updateElement);
+            return util.each(elem, updateElement);
         },
 
         text = function(elem, value) {
 
-            elem = (elem instanceof hAzzle ? elem.elements : elem.length ? elem : [elem])[0];
-
+            elem = getElem(elem)[0];
+          
+          if(value === undefined) {
+           return hAzzle.require('text').getText(elem);
+          }
+        
             var nodeType = elem ? elem.nodeType : undefined;
 
             if (nodeType === 1 || nodeType === 11 || nodeType === 9) {
@@ -354,7 +355,7 @@ hAzzle.define('Manipulation', function() {
     this.iAHMethod = function(method, html, fn) {
         return this.each(function(elem, index) {
             if (typeof html === 'string' &&
-                _core.isHTML &&
+                hAzzle.require('core').isHTML &&
                 elem.parentElement && elem.parentElement.nodeType === 1) {
                 elem.insertAdjacentHTML(method, html.replace(xhtmlRegxp, '<$1></$2>'));
             } else {
@@ -370,8 +371,8 @@ hAzzle.define('Manipulation', function() {
             elems, nodes = hAzzle(content);
         // Start the iteration and loop through the content
 
-        _util.each(normalize(nodes), function(elem, index) {
-            _util.each(self, function(el) {
+        util.each(normalize(nodes), function(elem, index) {
+            util.each(self, function(el) {
                 elems = index > 0 ? el.cloneNode(true) : el;
                 if (elem) {
                     fn(elem, elems);
@@ -380,7 +381,7 @@ hAzzle.define('Manipulation', function() {
 
         }, this, rev);
         self.length = i;
-        _util.each(r, function(e) {
+        util.each(r, function(e) {
             self[--i] = e;
         }, null, !rev);
         return self;
@@ -418,7 +419,7 @@ hAzzle.define('Manipulation', function() {
 
     this.replaceWith = function(node) {
         return this.each(function (el, index) {
-          _util.each(normalize(node, index), function (content) {
+          util.each(normalize(node, index), function (content) {
               el.replace(content); // DOM Level 4
           })
         })
@@ -428,7 +429,7 @@ hAzzle.define('Manipulation', function() {
 
     this.text = function(value) {
         return value === undefined ?
-            _text.getText(this.elements) :
+            hAzzle.require('text').getText(this.elements) :
             this.each(function(elem) {
                 if (elem !== null) {
                     text(elem, value);
@@ -486,7 +487,7 @@ hAzzle.define('Manipulation', function() {
         return hAzzle(ret);
     };
 
-    _util.each({
+    util.each({
 
         // Insert content, specified by the parameter, to the end of 
         // each element in the set of matched elements.
@@ -515,7 +516,7 @@ hAzzle.define('Manipulation', function() {
                 if (nodeType !== 1 && nodeType !== 9 && nodeType !== 11) {
                     return;
                 }
-                _util.each(getElem(elem), function(elem, pos) {
+                util.each(getElem(elem), function(elem, pos) {
                     inject(elem, content, pos, prop);
                 });
             });

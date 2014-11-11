@@ -1,7 +1,7 @@
 /*!
  * hAzzle.js
  * Copyright (c) 2014 Kenny Flashlight
- * Version: 1.0.1c Release Candidate
+ * Version: 1.0.1c
  * Released under the MIT License.
  *
  * Date: 2014-11-11

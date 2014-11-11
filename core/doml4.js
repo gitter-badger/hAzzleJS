@@ -12,7 +12,6 @@
  * - matches
  * - customEvent
  */
- 
 (function(window) {
 
     'use strict';
@@ -28,21 +27,25 @@
         properties = [
             'append',
             function append() {
-                this.appendChild(
-                    applyToFragment(arguments)
-                );
-            },
-            'prepend',
-            function prepend() {
-                if (this.firstChild) {
-                    this.insertBefore(
-                        applyToFragment(arguments), this.firstChild
-                    );
-                } else {
+                try {
                     this.appendChild(
                         applyToFragment(arguments)
                     );
-                }
+                } catch (e) {}
+            },
+            'prepend',
+            function prepend() {
+                try {
+                    if (this.firstChild) {
+                        this.insertBefore(
+                            applyToFragment(arguments), this.firstChild
+                        );
+                    } else {
+                        this.appendChild(
+                            applyToFragment(arguments)
+                        );
+                    }
+                } catch (e) {}
             },
             'before',
             function before() {
@@ -135,13 +138,13 @@
 
         return fragment;
     }
-    
+
     // CUSTOM EVENT
     // -------------
-    
+
     try { // Native, working customEvent()
         new window.CustomEvent('?');
-    } catch (e) { 
+    } catch (e) {
         window.CustomEvent = function(
             eventName,
             defaultInitDict

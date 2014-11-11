@@ -13,13 +13,13 @@ hAzzle.define('Collection', function() {
         inArray = function(elem, array, i) {
             return array === undefined ? -1 : _arrayProto.indexOf.call(array, elem, i);
         },
-        
+
         arrayRemove = function(array, value) {
-  var index = array.indexOf(value);
-  if (index >= 0)
-    array.splice(index, 1);
-  return value;
-},
+            var index = array.indexOf(value);
+            if (index >= 0)
+                array.splice(index, 1);
+            return value;
+        },
         makeArray = function(arr, results) {
             var ret = results || [];
             if (arr !== undefined) {
@@ -109,6 +109,15 @@ hAzzle.define('Collection', function() {
             return arr instanceof hAzzle ? arr.elements : arr;
         });
         return hAzzle(_concat.apply(this.elements, args));
+    };
+
+    // Get the children of each element in the set of matched elements, 
+    // including text and comment nodes.
+
+    this.contents = function() {
+        return this.map(function() {
+            return this.contentDocument || slice(this.childNodes)
+        });
     };
 
     // Check the current matched set of elements against a selector, element, or 
@@ -210,6 +219,6 @@ hAzzle.define('Collection', function() {
         inArray: inArray,
         slice: slice,
         includes: includes,
-        arrayRemove:arrayRemove
+        arrayRemove: arrayRemove
     };
 });

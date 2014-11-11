@@ -2793,6 +2793,20 @@ hAzzle.define('valHooks', function() {
  * - customEvent
  */
 
+/**
+ * DOM 4 shim / pollify for hAzzle
+ *
+ * This pollify covers:
+ *
+ * - append
+ * - prepend
+ * - before
+ * - after
+ * - replace
+ * - remove
+ * - matches
+ * - customEvent
+ */
 (function(window) {
 
     'use strict';
@@ -2808,21 +2822,25 @@ hAzzle.define('valHooks', function() {
         properties = [
             'append',
             function append() {
-                this.appendChild(
-                    applyToFragment(arguments)
-                );
-            },
-            'prepend',
-            function prepend() {
-                if (this.firstChild) {
-                    this.insertBefore(
-                        applyToFragment(arguments), this.firstChild
-                    );
-                } else {
+                try {
                     this.appendChild(
                         applyToFragment(arguments)
                     );
-                }
+                } catch (e) {}
+            },
+            'prepend',
+            function prepend() {
+                try {
+                    if (this.firstChild) {
+                        this.insertBefore(
+                            applyToFragment(arguments), this.firstChild
+                        );
+                    } else {
+                        this.appendChild(
+                            applyToFragment(arguments)
+                        );
+                    }
+                } catch (e) {}
             },
             'before',
             function before() {
@@ -2903,7 +2921,6 @@ hAzzle.define('valHooks', function() {
             l = nodes.length;
 
         if (nodes.length === 1) {
-
             return stringNode(nodes[0]);
         }
 
@@ -2918,6 +2935,7 @@ hAzzle.define('valHooks', function() {
     }
 
     // CUSTOM EVENT
+    // -------------
 
     try { // Native, working customEvent()
         new window.CustomEvent('?');
