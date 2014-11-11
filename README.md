@@ -58,7 +58,9 @@ As most of the developers are accustomed to using jQuery, hAzzle supports some o
 Your modules
 --------------
 
-You can develop your own modules for **hAzzle**. If you do so, upload them to the **public folder** with a sub-directory that has the same name as your plugin.
+You can develop your own modules for **hAzzle**. If you do so, upload them to the **example folder** with a sub-directory that has the same name as your plugin.
+
+This folder contains various 3rd party modules as an example on how to use *hAzzle*.
 
 **Important!!** Don't forget to add a **dependency list** document in the root of your directory so other developers know what **hAzzle modules** to include together with the **Core** to get your module to work.
 
