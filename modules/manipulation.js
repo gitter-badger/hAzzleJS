@@ -347,15 +347,6 @@ hAzzle.define('Manipulation', function() {
                     elem.removeChild(elem.firstChild);
                 }
             }
-        },
-        replace = function(elem, html) {
-            elem = getElem(elem);
-            elem = elem.length ? elem : [elem];
-            _util.each(elem, function(el, i) {
-                _util.each(normalize(html, i), function(i) {
-                    el.replace(i); // DOM Level 4
-                });
-            });
         };
 
     // insertAdjacentHTML method for append, prepend, before and after
@@ -422,8 +413,15 @@ hAzzle.define('Manipulation', function() {
         }, 1);
     };
 
-    this.replaceWith = function(html) {
-        return replace(this.elements, html);
+    // Replace each element in the set of matched elements with the 
+    // provided new content and return the set of elements that was removed
+
+    this.replaceWith = function(node) {
+        return this.each(function (el, index) {
+          _util.each(normalize(node, index), function (content) {
+              el.replace(content); // DOM Level 4
+          })
+        })
     };
 
     // Text
@@ -535,7 +533,6 @@ hAzzle.define('Manipulation', function() {
         text: text,
         create: create,
         clone: cloneElem,
-        replace: replace,
         buildFragment: buildFragment
     };
 });
