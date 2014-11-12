@@ -165,7 +165,7 @@ hAzzle.define('Dimensions', function() {
             }
 
             if (_types.isType('function')(opts)) {
-                opts = opts.call(elem, i, curOffset);
+                opts = opts.call( elem, i, _util.mixing( {}, curOffset ) );
             }
 
             if (opts.top != null) {
