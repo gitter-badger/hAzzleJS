@@ -1,7 +1,7 @@
 var expect = chai.expect;
 
 describe('hAzzle()', function () {
-/*
+
   it('hAzzle(...)', function () {
     expect(hAzzle).to.be.a('function');
   });
@@ -60,5 +60,5 @@ describe('hAzzle()', function () {
 
     expect(requiredModule).to.equal(testModule);
 
-  });*/
+  });
 });
