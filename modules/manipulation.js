@@ -440,8 +440,11 @@ hAzzle.define('manipulation', function() {
     // HTML
 
     this.html = function(value) {
-console.log(this)
-
+        return this.elements[0] && (value === undefined && this.elements[0].nodeType === 1 ?
+            this.elements[0].innerHTML :
+            this.each(function() {
+                return html(this, value);
+            }));
     };
 
     this.deepEach = function(fn, scope) {
