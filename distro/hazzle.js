@@ -1,10 +1,10 @@
 /*!
  * hAzzle.js
  * Copyright (c) 2014 Kenny Flashlight
- * Version: 1.0.1c Release Candidate
+ * Version: 1.0.1d
  * Released under the MIT License.
  *
- * Date: 2014-11-11
+ * Date: 2014-11-14
  */
 (function() {
 
@@ -2136,15 +2136,19 @@ hAzzle.define('Storage', function() {
 // curcss.js
 hAzzle.define('curcss', function() {
 
-    var  // Dependencies
-    
+    var // Dependencies
+
         storage = hAzzle.require('Storage'),
         feature = hAzzle.require('has'),
-        
+
+        // Inline values for tagName
+
+        inline = ('b big i small abbr acronym cite code dfn em kbd strong samp var a bdo br img map' +
+            'object q script span sub button input label select textarea').split(' '),
+
         // Various Regexes
-        
+
         widthheight = /^(width|height)$/,
-        inline = /^(b|big|i|small|tt|abbr|acronym|cite|code|dfn|em|kbd|strong|samp|var|a|bdo|br|img|map|object|q|script|span|sub|sup|button|input|label|select|textarea)$/i,
         listitem = /^(li)$/i,
         tablerow = /^(tr)$/i,
         table = /^(table)$/i,
@@ -2185,19 +2189,28 @@ hAzzle.define('curcss', function() {
             // to round for integer pixels.
             return parseFloat(value) || 0;
         },
-        getDisplayType = function(element) {
-            var tagName = element && element.tagName.toString().toLowerCase();
-            if (inline.test(tagName)) {
-                return 'inline';
-            } else if (listitem.test(tagName)) {
-                return 'list-item';
-            } else if (tablerow.test(tagName)) {
-                return 'table-row';
-            } else if (table.test(tagName)) {
-                return 'table';
-            } else {
-                return 'block';
+        getDisplay = function(elem) {
+            if (elem) {
+                var tagName = elem.tagName.toLowerCase();
+
+                if (tagName in inline) {
+                    return 'inline';
+                }
+
+                if (listitem.test(tagName)) {
+                    return 'list-item';
+                }
+
+                if (tablerow.test(tagName)) {
+                    return 'table-row';
+                }
+
+                if (table.test(tagName)) {
+                    return 'table';
+                }
             }
+            return 'block';
+
         },
 
         css = function(elem, prop, force) {
@@ -2208,7 +2221,7 @@ hAzzle.define('curcss', function() {
 
             if (widthheight.test(prop) && css(elem, 'display') === 0) {
                 elem.style.display = 'none';
-                elem.style.display = getDisplayType(elem);
+                elem.style.display = getDisplay(elem);
             }
 
             if (feature.has('ie') && prop === 'auto') {
@@ -2272,7 +2285,7 @@ hAzzle.define('curcss', function() {
 
                     if (units.test(ret) && margin.test(name)) {
 
-                        var width, minWidth, maxWidth, ret,
+                        var width, minWidth, maxWidth,
                             style = elem.style;
                         // Remember the original values
                         width = style.width;
@@ -2295,6 +2308,7 @@ hAzzle.define('curcss', function() {
 
     return {
         computed: computed,
+        display: getDisplay,
         styles: getStyles,
         css: css
     };
