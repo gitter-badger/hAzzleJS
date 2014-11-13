@@ -14,12 +14,17 @@ hAzzle.define('Storage', function() {
     }
 
     Storage.accepts = function(owner) {
-        return owner.nodeType === 1 || owner.nodeType === 9 || !(+owner.nodeType);
+        if (owner) {
+            return owner.nodeType === 1 || owner.nodeType === 9 || !(+owner.nodeType);
+        }
     };
 
     Storage.prototype = {
 
         register: function(owner, initial) {
+
+            hAzzle.err(!_types.isObject(owner), 22, 'no valid DOM element in storage.js')
+
             var descriptor = {};
 
             // Secure cache in a non-enumerable, configurable, writable property
@@ -65,25 +70,26 @@ hAzzle.define('Storage', function() {
             if (owner) {
                 var prop,
                     cache = this.cache(owner);
+                if (cache) {
+                    // Handle: [ owner, key, value ] args
+                    if (typeof data === 'string') {
+                        cache[data] = value;
 
-                // Handle: [ owner, key, value ] args
-                if (typeof data === 'string') {
-                    cache[data] = value;
-
-                    // Handle: [ owner, { properties } ] args
-                } else {
-                    // Fresh assignments by object are shallow copied
-                    if (_types.isEmptyObject(cache)) {
-
-                        _util.mixin(cache, data);
-                        // Otherwise, copy the properties one-by-one to the cache object
+                        // Handle: [ owner, { properties } ] args
                     } else {
-                        for (prop in data) {
-                            cache[prop] = data[prop];
+                        // Fresh assignments by object are shallow copied
+                        if (_types.isEmptyObject(cache)) {
+
+                            _util.mixin(cache, data);
+                            // Otherwise, copy the properties one-by-one to the cache object
+                        } else {
+                            for (prop in data) {
+                                cache[prop] = data[prop];
+                            }
                         }
                     }
+                    return cache;
                 }
-                return cache;
             }
         },
         access: function(owner, key, value) {
@@ -106,7 +112,9 @@ hAzzle.define('Storage', function() {
         },
         get: function(owner, key) {
             var cache = this.cache(owner);
-            return cache !== undefined && key === undefined ? cache : cache[key];
+            if (cache) {
+                return cache !== undefined && key === undefined ? cache : cache[key];
+            }
         },
         release: function(owner, key) {
             var i, name, camel,

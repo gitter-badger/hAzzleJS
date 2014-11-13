@@ -1,14 +1,20 @@
 // curcss.js
-hAzzle.define('curCSS', function() {
+hAzzle.define('curcss', function() {
 
-    var _storage = hAzzle.require('Storage'),
-        _core = hAzzle.require('Core'),
-        _feature = hAzzle.require('has'),
-        _widthheight = /^(width|height)$/,
-        _inline = /^(b|big|i|small|tt|abbr|acronym|cite|code|dfn|em|kbd|strong|samp|var|a|bdo|br|img|map|object|q|script|span|sub|sup|button|input|label|select|textarea)$/i,
-        _listitem = /^(li)$/i,
-        _tablerow = /^(tr)$/i,
-        _table = /^(_table)$/i,
+    var  // Dependencies
+    
+        storage = hAzzle.require('Storage'),
+        feature = hAzzle.require('has'),
+        
+        // Various Regexes
+        
+        widthheight = /^(width|height)$/,
+        inline = /^(b|big|i|small|tt|abbr|acronym|cite|code|dfn|em|kbd|strong|samp|var|a|bdo|br|img|map|object|q|script|span|sub|sup|button|input|label|select|textarea)$/i,
+        listitem = /^(li)$/i,
+        tablerow = /^(tr)$/i,
+        table = /^(table)$/i,
+        margin = (/^margin/),
+        units = /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i,
 
         computedValues = function(elem) {
             if (elem && elem.ownerDocument !== null) {
@@ -25,12 +31,12 @@ hAzzle.define('curCSS', function() {
         },
         computed = function(elem) {
             if (elem) {
-                if (_storage.private.get(elem, 'computed') === undefined) {
-                    _storage.private.access(elem, 'computed', {
+                if (storage.private.get(elem, 'css') === undefined) {
+                    storage.private.access(elem, 'css', {
                         computedStyle: null
                     });
                 }
-                return _storage.private.get(elem, 'computed');
+                return storage.private.get(elem, 'css');
             }
         },
         getStyles = function(elem) {
@@ -46,13 +52,13 @@ hAzzle.define('curCSS', function() {
         },
         getDisplayType = function(element) {
             var tagName = element && element.tagName.toString().toLowerCase();
-            if (_inline.test(tagName)) {
+            if (inline.test(tagName)) {
                 return 'inline';
-            } else if (_listitem.test(tagName)) {
+            } else if (listitem.test(tagName)) {
                 return 'list-item';
-            } else if (_tablerow.test(tagName)) {
+            } else if (tablerow.test(tagName)) {
                 return 'table-row';
-            } else if (_table.test(tagName)) {
+            } else if (table.test(tagName)) {
                 return 'table';
             } else {
                 return 'block';
@@ -65,12 +71,12 @@ hAzzle.define('curCSS', function() {
 
             var ret = 0;
 
-            if (_widthheight.test(prop) && css(elem, 'display') === 0) {
+            if (widthheight.test(prop) && css(elem, 'display') === 0) {
                 elem.style.display = 'none';
                 elem.style.display = getDisplayType(elem);
             }
 
-            if (_feature.has('ie') && prop === 'auto') {
+            if (feature.has('ie') && prop === 'auto') {
                 if (prop === 'height') {
                     return elem.offsetHeight;
                 }
@@ -106,14 +112,14 @@ hAzzle.define('curCSS', function() {
                 // IE and Firefox do not return a value for the generic borderColor -- they only return 
                 // individual values for each border side's color.
 
-                if ((_feature.ie || _feature.has('firefox')) && prop === 'borderColor') {
+                if ((feature.ie || feature.has('firefox')) && prop === 'borderColor') {
                     prop = 'borderTopColor';
                 }
 
                 // Support: IE9
                 // getPropertyValue is only needed for .css('filter')
 
-                if (_feature.ie === 9 && prop === 'filter') {
+                if (feature.ie === 9 && prop === 'filter') {
                     ret = computedStyle.getPropertyValue(prop);
                 } else {
                     ret = computedStyle[prop];
@@ -121,8 +127,32 @@ hAzzle.define('curCSS', function() {
 
                 // Fall back to the property's style value (if defined) when 'ret' returns nothing
 
-                if (ret === '' && !_core.contains(elem.ownerDocument, elem)) {
+                if (ret === '' && !hAzzle.require('Core').contains(elem.ownerDocument, elem)) {
                     ret = elem.style[prop];
+                }
+
+                // Support: Android 4.0-4.3
+
+                if (feature.has('mobile') && feature.has('android')) {
+
+                    if (units.test(ret) && margin.test(name)) {
+
+                        var width, minWidth, maxWidth, ret,
+                            style = elem.style;
+                        // Remember the original values
+                        width = style.width;
+                        minWidth = style.minWidth;
+                        maxWidth = style.maxWidth;
+
+                        // Put in the new values to get a computed value out
+                        style.minWidth = style.maxWidth = style.width = ret;
+                        ret = computed.width;
+
+                        // Revert the changed values
+                        style.width = width;
+                        style.minWidth = minWidth;
+                        style.maxWidth = maxWidth;
+                    }
                 }
             }
             return ret !== undefined ? ret + '' : ret;
