@@ -1,17 +1,15 @@
 // dimensions.js
-hAzzle.define('Dimensions', function() {
+hAzzle.define('dimensions', function() {
 
     var win = window,
         doc = win.document,
         docElem = doc.documentElement,
 
-        // Include the modules    
+        // Dependencies
 
-        _util = hAzzle.require('Util'),
-        _types = hAzzle.require('Types'),
-        _style = hAzzle.require('Style'),
-        _core = hAzzle.require('Core'),
-        _curcss = hAzzle.require('curCSS'),
+        util = hAzzle.require('util'),
+        types = hAzzle.require('types'),
+        css = hAzzle.require('css'),
 
         _matchMedia = win.matchMedia || win.msMatchMedia,
         mq = _matchMedia ? function(q) {
@@ -37,7 +35,7 @@ hAzzle.define('Dimensions', function() {
         },
 
         getWindow = function(elem) {
-            return _types.isWindow(elem) ? elem : elem.nodeType === 9 && elem.defaultView;
+            return types.isWindow(elem) ? elem : elem.nodeType === 9 && elem.defaultView;
         },
         // scrollLeft
         scrollLeft = function(elem, val) {
@@ -59,10 +57,7 @@ hAzzle.define('Dimensions', function() {
         },
         // Test if a media query is active   
         mediaQuery = function() {
-            if (!mq) {
-                hAzzle.err(true, 15, 'matchMedia are not supported by this browser!');
-                return false;
-            }
+            hAzzle.err(!mq, 15, 'matchMedia are not supported by this browser!');
             return true;
         },
 
@@ -107,8 +102,8 @@ hAzzle.define('Dimensions', function() {
             opt = !null ? viewport() : opt.nodeType === 1 ? rectangle(opt) : opt;
             var h = opt.height,
                 w = opt.width;
-            h = _types.isType('Function')(h) ? h.call(opt) : h;
-            w = _types.isType('Function')(w) ? w.call(opt) : w;
+            h = types.isType('Function')(h) ? h.call(opt) : h;
+            w = types.isType('Function')(w) ? w.call(opt) : w;
             return w / h;
         },
         // Test if an element is in the same x-axis section as the viewport.
@@ -137,7 +132,7 @@ hAzzle.define('Dimensions', function() {
         },
         setOffset = function(elem, opts, i) {
             var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft, calculatePosition,
-                position = _curcss.css(elem, 'position'),
+                position = css.css(elem, 'position'),
                 curElem = hAzzle(elem),
                 props = {};
 
@@ -147,8 +142,8 @@ hAzzle.define('Dimensions', function() {
             }
 
             curOffset = curElem.offset();
-            curCSSTop = _curcss.css(elem, 'top');
-            curCSSLeft = _curcss.css(elem, 'left');
+            curCSSTop = css.css(elem, 'top');
+            curCSSLeft = css.css(elem, 'left');
             calculatePosition = (position === 'absolute' || position === 'fixed') &&
                 (curCSSTop + curCSSLeft).indexOf('auto') > -1;
 
@@ -164,8 +159,8 @@ hAzzle.define('Dimensions', function() {
                 curLeft = parseFloat(curCSSLeft) || 0;
             }
 
-            if (_types.isType('function')(opts)) {
-                opts = opts.call( elem, i, _util.mixing( {}, curOffset ) );
+            if (types.isType('function')(opts)) {
+                opts = opts.call(elem, i, util.mixing({}, curOffset));
             }
 
             if (opts.top != null) {
@@ -208,7 +203,7 @@ hAzzle.define('Dimensions', function() {
         docElem = doc.documentElement;
 
         // Make sure it's not a disconnected DOM node
-        if (!_core.contains(docElem, elem)) {
+        if (!hAzzle.require('Core').contains(docElem, elem)) {
             return {
                 top: 0,
                 left: 0
@@ -218,8 +213,8 @@ hAzzle.define('Dimensions', function() {
         // need for a workaround
 
         var bcr = elem.getBoundingClientRect(),
-            isFixed = (_curcss.css(elem, 'position') === 'fixed'),
-            win = _types.isWindow(doc) ? doc : doc.nodeType === 9 && doc.defaultView;
+            isFixed = (css.css(elem, 'position') === 'fixed'),
+            win = types.isWindow(doc) ? doc : doc.nodeType === 9 && doc.defaultView;
         return {
             top: bcr.top + elem.parentNode.scrollTop + ((isFixed) ? 0 : win.pageYOffset) - docElem.clientTop,
             left: bcr.left + elem.parentNode.scrollLeft + ((isFixed) ? 0 : win.pageXOffset) - docElem.clientLeft
@@ -245,7 +240,7 @@ hAzzle.define('Dimensions', function() {
 
         elem = elem.parentNode;
 
-        if (!_util.nodeName(elem, 'html')) {
+        if (!util.nodeName(elem, 'html')) {
             scroll.top += elem.scrollLeft;
             scroll.left += elem.scrollTop;
         }
@@ -257,8 +252,8 @@ hAzzle.define('Dimensions', function() {
         if (relative && (relative = hAzzle(relative))) {
             var relativePosition = relative.getPosition();
             return {
-                top: position.top - relativePosition.top - parseInt(_curcss.css(relative, 'borderLeftWidth')) || 0,
-                left: position.left - relativePosition.left - parseInt(_curcss.css(relative, 'borderTopWidth')) || 0
+                top: position.top - relativePosition.top - parseInt(css.css(relative, 'borderLeftWidth')) || 0,
+                left: position.left - relativePosition.left - parseInt(css.css(relative, 'borderTopWidth')) || 0
             };
         }
         return position;
@@ -268,8 +263,8 @@ hAzzle.define('Dimensions', function() {
         return this.map(function(elem) {
             var offsetParent = elem.offsetParent || docElem;
 
-            while (offsetParent && (!_util.nodeName(offsetParent, 'html') &&
-                    _curcss.css(offsetParent, 'position') === 'static')) {
+            while (offsetParent && (!util.nodeName(offsetParent, 'html') &&
+                    css.css(offsetParent, 'position') === 'static')) {
                 offsetParent = offsetParent.offsetParent;
             }
 
@@ -279,7 +274,7 @@ hAzzle.define('Dimensions', function() {
 
     // 'this' height and width
 
-    _util.each({
+    util.each({
         height: 'Height',
         width: 'Width'
     }, function(val, prop) {
@@ -288,7 +283,7 @@ hAzzle.define('Dimensions', function() {
             var elem = this.elements[0],
                 doc;
 
-            if (_types.isWindow(elem)) {
+            if (types.isWindow(elem)) {
                 return elem.document.documentElement['client' + val];
             }
 
@@ -302,19 +297,19 @@ hAzzle.define('Dimensions', function() {
                 );
             }
             return value === undefined ?
-                _curcss.css(this.elements[0], 'width', /*force*/ true) :
-                _style.setCSS(this.elements[0], 'height', val);
+                css.css(this.elements[0], 'width', /*force*/ true) :
+                hAzzle.require('Style').setCSS(this.elements[0], 'height', val);
         };
         // innerHeight / innerWidth
         this['inner' + val] = function() {
-                return this.elements[0]['client' + val];
-            };
-            // outerHeight / outerWidth
+            return this.elements[0]['client' + val];
+        };
+        // outerHeight / outerWidth
         this['outer' + val] = function(margin) {
             var elem = this.elements[0];
             return margin ? (elem['offset' + val] +
-                (parseInt(_curcss.css(elem, prop === 'height' ? 'marginTop' : 'marginLeft'), 10) || 0) +
-                (parseInt(_curcss.css(elem, prop === 'height' ? 'marginBottom' : 'marginRight'), 10) || 0)) : elem['offset' + val];
+                (parseInt(css.css(elem, prop === 'height' ? 'marginTop' : 'marginLeft'), 10) || 0) +
+                (parseInt(css.css(elem, prop === 'height' ? 'marginBottom' : 'marginRight'), 10) || 0)) : elem['offset' + val];
 
         };
     }.bind(this));

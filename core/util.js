@@ -1,9 +1,9 @@
 // util.js
-hAzzle.define('Util', function() {
+hAzzle.define('util', function() {
 
     var // Modules
-        slice = Array.prototype.slice,
-        types = hAzzle.require('Types'),
+        aSlice = Array.prototype.slice,
+        types = hAzzle.require('types'),
         oKeys = Object.keys,
 
         // Short cut for `hasOwnProperty`.
@@ -379,7 +379,7 @@ hAzzle.define('Util', function() {
         bind = function(fn, ctx) {
 
             var curryArgs = arguments.length > 2 ?
-                slice.call(arguments, 2) : [],
+                aSlice.call(arguments, 2) : [],
                 tmp;
 
             if (typeof ctx === 'string') {
@@ -393,7 +393,7 @@ hAzzle.define('Util', function() {
 
                 return curryArgs.length ? function() {
                     return arguments.length ?
-                        fn.apply(ctx || this, curryArgs.concat(slice.call(arguments, 0))) :
+                        fn.apply(ctx || this, curryArgs.concat(aSlice.call(arguments, 0))) :
                         fn.apply(ctx || this, curryArgs);
                 } : function() {
                     return arguments.length ?

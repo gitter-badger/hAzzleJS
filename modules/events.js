@@ -1,17 +1,17 @@
 var hAzzle = window.hAzzle || (window.hAzzle = {});
 
-hAzzle.define('Events', function() {
+hAzzle.define('events', function() {
 
     var win = window,
         doc = window.document || {},
 
         // Include needed modules
-        _util = hAzzle.require('Util'),
-        _core = hAzzle.require('Core'),
-        _collection = hAzzle.require('Collection'),
-        _has = hAzzle.require('has'),
-        _types = hAzzle.require('Types'),
-        _jiesa = hAzzle.require('Jiesa'),
+        util = hAzzle.require('util'),
+        core = hAzzle.require('core'),
+        collection = hAzzle.require('collection'),
+        features = hAzzle.require('has'),
+        types = hAzzle.require('types'),
+        jiesa = hAzzle.require('jiesa'),
 
         evwhite = (/\S+/g),
         mouseEvent = /^click|mouse(?!(.*wheel|scroll))|menu|pointer|contextmenu|drag|drop/i,
@@ -45,13 +45,13 @@ hAzzle.define('Events', function() {
         stateProps = ('state').split(' ');
 
     // Firefox specific eventTypes
-    if (_has.has('firefox')) {
+    if (features.has('firefox')) {
         commonProps.concat('mozMovementY mozMovementX'.split(' '));
     }
     // WebKit eventTypes
     // Support: Chrome / Opera
 
-    if (_has.has('webkit')) {
+    if (features.has('webkit')) {
         commonProps.concat(('webkitMovementY webkitMovementX').split(' '));
     }
 
@@ -78,7 +78,7 @@ hAzzle.define('Events', function() {
 
             // Types can be a map of types/handlers
 
-            if (_types.isType('Object')(events)) {
+            if (types.isType('Object')(events)) {
                 for (type in events) {
                     fn = events[type];
                     if (selector === undefined) {
@@ -92,12 +92,12 @@ hAzzle.define('Events', function() {
 
             // Event delegation
 
-            if (!_types.isType('Function')(selector)) {
+            if (!types.isType('Function')(selector)) {
                 original = fn;
-                args = _collection.slice(arguments, 4);
+                args = collection.slice(arguments, 4);
                 fn = delegate(selector, original);
             } else {
-                args = _collection.slice(arguments, 3);
+                args = collection.slice(arguments, 3);
                 fn = original = selector;
             }
 
@@ -173,7 +173,7 @@ hAzzle.define('Events', function() {
             }
 
             // removeEvent(el, 't1 t2 t3', fn) or off(el, 't1 t2 t3')
-            if (typeof types === 'string' && _collection.inArray(types, ' ') > 0) {
+            if (typeof types === 'string' && collection.inArray(types, ' ') > 0) {
 
                 // Once for each type.namespace in types; type may be omitted
                 types = (types || '').match(evwhite) || [''];
@@ -472,7 +472,7 @@ hAzzle.define('Events', function() {
             // Make sure the 'target' has a nodeType, and don't process clicks on disabled elements
             if (cur.nodeType && (!event.button || event.type !== 'click') && cur.disabled !== true) {
                 if (cur !== ctx) {
-                    return _jiesa.matches(cur, sel, /* third arg (from/root/refNode) */ ctx) ? cur : false;
+                    return jiesa.matches(cur, sel, /* third arg (from/root/refNode) */ ctx) ? cur : false;
                 }
             }
             return false;
@@ -504,7 +504,7 @@ hAzzle.define('Events', function() {
                         if (event) {
                             event.currentTarget = target;
                         }
-                        return fn.apply(element, args ? _collection.slice(arguments).concat(args) : arguments);
+                        return fn.apply(element, args ? collection.slice(arguments).concat(args) : arguments);
                     }
                 } : function(event) {
 
@@ -514,7 +514,7 @@ hAzzle.define('Events', function() {
                         event = event.clone(getTarget(event));
                     }
 
-                    return fn.apply(element, args ? _collection.slice(arguments).concat(args) : arguments);
+                    return fn.apply(element, args ? collection.slice(arguments).concat(args) : arguments);
                 };
             handler.__kfx2rcf = fn.__kfx2rcf;
             return handler;
@@ -816,9 +816,9 @@ hAzzle.define('Events', function() {
 
     this.customEvent = function(eventName, detail, bubble, cancel) {
         var event = new CustomEvent(eventName, {
-            detail: _types.isType('Object')(detail) ? detail : {},
-            bubbles: _types.isBoolean(bubble) ? bubble : false,
-            cancelable: _types.isBoolean(cancel) ? cancel : false
+            detail: types.isType('Object')(detail) ? detail : {},
+            bubbles: types.isBoolean(bubble) ? bubble : false,
+            cancelable: types.isBoolean(cancel) ? cancel : false
         });
         this.elements[0].dispatchEvent(event);
     };
@@ -827,7 +827,7 @@ hAzzle.define('Events', function() {
         this.elements[0].addEventListener('DOMContentLoaded', callback, false);
     };
 
-    _util.each(('blur focus focusin focusout load resize scroll unload click dblclick ' +
+    util.each(('blur focus focusin focusout load resize scroll unload click dblclick ' +
         'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
         'change select submit keydown keypress keyup error contextmenu').split(' '), function(prop) {
 
@@ -848,7 +848,7 @@ hAzzle.define('Events', function() {
 
     // Populate the custom event list
 
-    _util.each({
+    util.each({
         mouseenter: 'mouseover',
         mouseleave: 'mouseout',
         pointerenter: 'pointerover',
@@ -867,7 +867,7 @@ hAzzle.define('Events', function() {
                     return false;
                 }
                 // For mousenter/leave call the handler if related is outside the target.
-                return (related !== target && related.prefix !== 'xul' && !/document/.test(target.toString()) !== 'document' && !_core.contains(target, related));
+                return (related !== target && related.prefix !== 'xul' && !/document/.test(target.toString()) !== 'document' && !core.contains(target, related));
             }
         };
     });

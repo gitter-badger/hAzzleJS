@@ -3,17 +3,17 @@ var hAzzle = window.hAzzle || (window.hAzzle = {});
 
 hAzzle.define('traversing', function() {
 
-    var _jiesa = hAzzle.require('Jiesa'),
-        _collection = hAzzle.require('Collection'),
-        _types = hAzzle.require('Types'),
-        _core = hAzzle.require('Core'),
-        _util = hAzzle.require('Util'),
+    var jiesa = hAzzle.require('jiesa'),
+        collection = hAzzle.require('collection'),
+        types = hAzzle.require('types'),
+        core = hAzzle.require('core'),
+        util = hAzzle.require('util'),
 
         // Return correct index value
 
         inVal = function(sel, index) {
-            return typeof sel === 'undefined' && !_types.isNumber(index) ? 0 :
-                _types.isNumber(sel) ? sel : _types.isNumber(index) ? index : null;
+            return typeof sel === 'undefined' && !types.isNumber(index) ? 0 :
+                types.isNumber(sel) ? sel : types.isNumber(index) ? index : null;
         },
         gather = function(els, fn) {
             var ret = [], res, i = 0,
@@ -32,8 +32,8 @@ hAzzle.define('traversing', function() {
                     ret = [],
                     elem = el[method];
                 while (elem && (index === null || i >= 0)) {
-                    if (_types.isElement(elem) &&
-                        _jiesa.matches(elem, typeof sel === 'string' ? sel : '*') &&
+                    if (types.isElement(elem) &&
+                        jiesa.matches(elem, typeof sel === 'string' ? sel : '*') &&
                         (index === null || i-- === 0)) {
                         if (index === null &&
                             method !== 'nextElementSibling' &&
@@ -77,7 +77,7 @@ hAzzle.define('traversing', function() {
 
         if (this.length > 1) {
             // Remove duplicates
-            matched = _core.unique(matched.elements);
+            matched = core.unique(matched.elements);
         }
         return hAzzle(matched);
     };
@@ -90,7 +90,7 @@ hAzzle.define('traversing', function() {
         var ancestors = [],
             elements = this.elements;
         while (elements.length > 0 && elements[0] !== undefined) {
-            elements = _util.map(elements, function(elem) {
+            elements = util.map(elements, function(elem) {
                 if (elem && (elem = elem.parentElement) && elem.nodeType !== 9) {
                     ancestors.push(elem);
                     return elem;
@@ -100,7 +100,7 @@ hAzzle.define('traversing', function() {
 
         if (this.length > 1) {
             // Remove duplicates
-            _core.unique(ancestors);
+            core.unique(ancestors);
             // Reverse order for parents
             ancestors.reverse();
         }
@@ -123,7 +123,7 @@ hAzzle.define('traversing', function() {
 
                 if (cur.nodeType < 11 &&
                     cur.nodeType === 1 &&
-                    _jiesa.matches(cur, selector)) {
+                    jiesa.matches(cur, selector)) {
 
                     matched.push(cur);
                     break;
@@ -131,7 +131,7 @@ hAzzle.define('traversing', function() {
             }
         }
 
-        return hAzzle(matched.length > 1 ? _core.unique(matched) : matched);
+        return hAzzle(matched.length > 1 ? core.unique(matched) : matched);
     };
 
     // Get immediate children of each element in the current collection.
@@ -140,7 +140,7 @@ hAzzle.define('traversing', function() {
     this.children = function(selector) {
         var children = [];
         this.each(function(elem) {
-            _util.each(_collection.slice(elem.children), function(value) {
+            util.each(collection.slice(elem.children), function(value) {
                 children.push(value);
             });
         });
@@ -151,8 +151,8 @@ hAzzle.define('traversing', function() {
 
     this.contains = function(selector) {
         var matches;
-        return new hAzzle(_collection.reduce(this.elements, function(elements, element) {
-            matches = _jiesa.find(element, selector);
+        return new hAzzle(collection.reduce(this.elements, function(elements, element) {
+            matches = jiesa.find(element, selector);
             return elements.concat(matches.length ? element : null);
         }, []));
     };
@@ -161,12 +161,12 @@ hAzzle.define('traversing', function() {
     //selector or DOM element.
 
     this.has = function(sel) {
-        return hAzzle(_util.filter(
+        return hAzzle(util.filter(
             this.elements,
-            _util.isElement(sel) ? function(el) {
-                return _core.contains(sel, el);
+            util.isElement(sel) ? function(el) {
+                return core.contains(sel, el);
             } : typeof sel === 'string' && sel.length ? function(el) {
-                return _jiesa.find(sel, el).length;
+                return jiesa.find(sel, el).length;
             } : function() {
                 return false;
             }
@@ -186,7 +186,7 @@ hAzzle.define('traversing', function() {
     this.down = function(sel, index) {
         index = inVal(sel, index);
         return hAzzle(gather(this.elements, function(elem) {
-            var jf = _jiesa.find(typeof sel === 'string' ? sel : '*', elem);
+            var jf = jiesa.find(typeof sel === 'string' ? sel : '*', elem);
             return index === null ? jf : ([jf[index]] || []);
         }));
     };
@@ -195,7 +195,7 @@ hAzzle.define('traversing', function() {
     // included in the Core, and add extra features.
     // E.g hAzzle('test').next('nav', 4) or hAzzle('test').prev('nav') 
 
-    _util.each({
+    util.each({
         next: 'nextElementSibling',
         prev: 'previousElementSibling'
     }, function(value, prop) {

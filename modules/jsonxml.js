@@ -1,5 +1,5 @@
 // jsonxml.js
-hAzzle.define('Jsonxml', function() {
+hAzzle.define('jsonxml', function() {
 
     // Parse JSON    
 
@@ -13,7 +13,7 @@ hAzzle.define('Jsonxml', function() {
 
         parseXML = function(data) {
 
-            var xml, tmp;
+            var xml;
 
             // If no string, return null 
 
@@ -24,8 +24,7 @@ hAzzle.define('Jsonxml', function() {
             // Support: IE9
             try {
 
-                tmp = new DOMParser();
-                xml = tmp.parseFromString(data, 'text/xml');
+                xml = (new DOMParser()).parseFromString( data, "text/xml" );
 
             } catch (e) {
 

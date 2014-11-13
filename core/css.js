@@ -1,9 +1,9 @@
-// curcss.js
-hAzzle.define('curcss', function() {
+// css.js
+hAzzle.define('css', function() {
 
     var // Dependencies
 
-        storage = hAzzle.require('Storage'),
+        storage = hAzzle.require('storage'),
         feature = hAzzle.require('has'),
 
         // Inline values for tagName

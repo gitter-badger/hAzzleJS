@@ -3,21 +3,20 @@ hAzzle.define('Jiesa', function() {
 
     var // Dependencies    
 
-        _util = hAzzle.require('Util'),
-        _core = hAzzle.require('Core'),
-        _collection = hAzzle.require('Collection'),
-        _types = hAzzle.require('Types'),
-        _has = hAzzle.require('has'),
-        _selector = hAzzle.require('selector'),
+        util = hAzzle.require('util'),
+        core = hAzzle.require('core'),
+        collection = hAzzle.require('collection'),
+        types = hAzzle.require('types'),
+        features = hAzzle.require('has')
 
         // RegEx
-        _idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
-        _tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
-        _unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
-        _rattributeQuotes = /=[\x20\t\r\n\f]*([^\]'"]*?)[\x20\t\r\n\f]*\]/g,
-        _quickMatch = /^(\w*)(?:#([\w\-]+))?(?:\[([\w\-\=]+)\])?(?:\.([\w\-]+))?$/,
-        _relativeSel = /^\s*[+~]/,
-        _reSpace = /[\n\t\r]/g,
+        idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
+        tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
+        unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
+        rattributeQuotes = /=[\x20\t\r\n\f]*([^\]'"]*?)[\x20\t\r\n\f]*\]/g,
+        quickMatch = /^(\w*)(?:#([\w\-]+))?(?:\[([\w\-\=]+)\])?(?:\.([\w\-]+))?$/,
+        relativeSel = /^\s*[+~]/,
+        reSpace = /[\n\t\r]/g,
 
         pseudos = {
 
@@ -58,7 +57,7 @@ hAzzle.define('Jiesa', function() {
                 old = context.getAttribute('id'),
                 nid = old || '__hAzzle__',
                 hasParent = context.parentNode,
-                relativeHierarchySelector = _relativeSel.test(query);
+                relativeHierarchySelector = relativeSel.test(query);
 
             if (relativeHierarchySelector && !hasParent) {
                 return [];
@@ -71,7 +70,7 @@ hAzzle.define('Jiesa', function() {
             if (relativeHierarchySelector && hasParent) {
                 context = context.parentNode;
             }
-            var selectors = query.match(_unionSplit);
+            var selectors = query.match(unionSplit);
             for (var i = 0; i < selectors.length; i++) {
                 selectors[i] = "[id='" + nid + "'] " + selectors[i];
             }
@@ -104,10 +103,10 @@ hAzzle.define('Jiesa', function() {
         // Uses the `classList` api if it's supported.
 
         containsClass = function(el, cls) {
-            if (_has.has('classList')) {
+            if (features.has('classList')) {
                 return el.classList.contains(cls);
             } else {
-                return (' ' + el.className + ' ').replace(_reSpace, ' ').indexOf(cls) >= 0;
+                return (' ' + el.className + ' ').replace(reSpace, ' ').indexOf(cls) >= 0;
             }
         },
 
@@ -118,7 +117,7 @@ hAzzle.define('Jiesa', function() {
             if (typeof root === 'string') {
                 return jiesa(root);
             }
-            if (!root.nodeType && _types.isArrayLike(root)) {
+            if (!root.nodeType && types.isArrayLike(root)) {
                 return root[0];
             }
             return root;
@@ -139,9 +138,9 @@ hAzzle.define('Jiesa', function() {
                 return [];
             }
 
-            if (_core.isHTML) {
+            if (core.isHTML) {
 
-                if ((m = _idClassTagNameExp.exec(sel))) {
+                if ((m = idClassTagNameExp.exec(sel))) {
                     if ((sel = m[1])) {
                         if (nodeType === 9) {
                             elem = ctx.getElementById(sel);
@@ -153,7 +152,7 @@ hAzzle.define('Jiesa', function() {
                         } else {
                             // Context is not a document
                             if (ctx.ownerDocument && (elem = ctx.ownerDocument.getElementById(sel)) &&
-                                _core.contains(ctx, elem) && elem.id === m) {
+                                core.contains(ctx, elem) && elem.id === m) {
                                 return [elem];
                             }
                         }
@@ -162,13 +161,13 @@ hAzzle.define('Jiesa', function() {
                     } else if ((sel = m[3])) {
                         ret = ctx.getElementsByTagName(sel);
                     }
-                    return _collection.slice(ret);
+                    return collection.slice(ret);
                     // E.g. hAzzle( 'span.selected' )  
-                } else if ((m = _tagNameAndOrIdAndOrClassExp.exec(sel))) {
+                } else if ((m = tagNameAndOrIdAndOrClassExp.exec(sel))) {
                     var result = ctx.getElementsByTagName(m[1]),
                         id = m[2],
                         className = m[3];
-                    _util.each(result, function(el) {
+                    util.each(result, function(el) {
                         if (el.id === id || containsClass(el, className)) {
                             results.push(el);
                         }
@@ -178,7 +177,7 @@ hAzzle.define('Jiesa', function() {
                 // Fallback to QSA if the native selector engine are not installed
                 // Fixme! Check for installed selector engine will be set to false soon
 
-                if (hAzzle.installed.selector && _core.qsa && (!_core.QSABugs || !_core.QSABugs.test(sel))) {
+                if (hAzzle.installed.selector && core.qsa && (!core.QSABugs || !core.QSABugs.test(sel))) {
                     try {
                         if (ctx.nodeType === 1) {
                             ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
@@ -186,7 +185,7 @@ hAzzle.define('Jiesa', function() {
                             // we can use the native qSA
                             ret = ctx.querySelectorAll(sel);
                         }
-                        return _collection.slice(ret);
+                        return collection.slice(ret);
                     } catch (e) {}
                 }
             }
@@ -194,9 +193,9 @@ hAzzle.define('Jiesa', function() {
             // We are dealing with HTML / XML documents, so check if the native selector engine are installed 
             // To avoid bloating the hAzzle Core - the main selector engine are a separate module            
 
-            hAzzle.err(!hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
+            hAzzle.err(hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
 
-            return _selector.find(sel, ctx);
+//            return engine.find(sel, ctx);
         },
 
         // Speeding up matches
@@ -210,16 +209,16 @@ hAzzle.define('Jiesa', function() {
             }
             // Set document vars if needed
             if ((elem.ownerDocument || elem) !== document) {
-                _core.setDocument(elem);
+                core.setDocument(elem);
             }
 
             // Make sure that attribute selectors are quoted
-            sel = typeof sel === 'string' ? sel.replace(_rattributeQuotes, "='$1']") : sel;
+            sel = typeof sel === 'string' ? sel.replace(rattributeQuotes, "='$1']") : sel;
 
             // If instance of hAzzle
 
             if (sel instanceof hAzzle) {
-                return _util.some(sel.elements, function(sel) {
+                return util.some(sel.elements, function(sel) {
                     return matches(elem, sel);
                 });
             }
@@ -228,7 +227,7 @@ hAzzle.define('Jiesa', function() {
                 return false;
             }
 
-            var quick = _quickMatch.exec(sel);
+            var quick = quickMatch.exec(sel);
 
             if (quick) {
                 //   0  1    2   3          4
@@ -257,15 +256,15 @@ hAzzle.define('Jiesa', function() {
                     return !!m(elem);
                 } else {
 
-                    if (_core.matches && _core.isHTML &&
-                        (!_core.rbuggyMatches || !_core.rbuggyMatches.test(sel)) &&
-                        (!_core.QSABugs || !_core.QSABugs.test(sel))) {
+                    if (core.matches && core.isHTML &&
+                        (!core.rbuggyMatches || !core.rbuggyMatches.test(sel)) &&
+                        (!core.QSABugs || !core.QSABugs.test(sel))) {
 
                         try {
                             var ret = matchesSelector(elem, sel, ctx);
 
                             // IE 9's matchesSelector returns false on disconnected nodes
-                            if (ret || _core.disconMatch ||
+                            if (ret || core.disconMatch ||
 
                                 // As well, disconnected nodes are said to be in a document
                                 // fragment in IE 9
@@ -275,7 +274,7 @@ hAzzle.define('Jiesa', function() {
                         } catch (e) {}
                     } else {
                         hAzzle.err(!hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
-                        return _selector.matches(sel, elem, sel);
+//                        return engine.matches(sel, elem, sel);
                     }
                 }
             }
@@ -291,16 +290,16 @@ hAzzle.define('Jiesa', function() {
                     len = this.length,
                     self = this.elements;
 
-                return hAzzle(_util.filter(hAzzle(selector).elements, function(node) {
+                return hAzzle(util.filter(hAzzle(selector).elements, function(node) {
                     for (; i < len; i++) {
-                        if (_core.contains(self[i], node)) {
+                        if (core.contains(self[i], node)) {
                             return true;
                         }
                     }
                 }));
             }
-            return _util.reduce(this.elements, function(els, element) {
-                return hAzzle(els.concat(_collection.slice(jiesa(selector, element))));
+            return util.reduce(this.elements, function(els, element) {
+                return hAzzle(els.concat(collection.slice(jiesa(selector, element))));
             }, []);
 
         }

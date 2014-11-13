@@ -1,12 +1,12 @@
 // boolhooks.js
-hAzzle.define('boolHooks', function() {
+hAzzle.define('boolhooks', function() {
 
-    var _setters = hAzzle.require('Setters');
+    var setters = hAzzle.require('setters');
 
-    _setters.boolHooks.set = function(elem, value, name) {
+    setters.boolHooks.set = function(elem, value, name) {
         // If value is false, remove the attribute
         if (value === false) {
-            _setters.removeAttr(elem, name);
+            setters.removeAttr(elem, name);
         } else {
             elem.setAttribute(name, name);
         }

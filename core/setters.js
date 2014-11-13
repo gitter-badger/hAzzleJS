@@ -1,11 +1,11 @@
 // setters.js
-hAzzle.define('Setters', function() {
+hAzzle.define('setters', function() {
 
-    var _util = hAzzle.require('Util'),
-        _core = hAzzle.require('Core'),
-        _types = hAzzle.require('Types'),
-        _whiteSpace = /\S+/g,
-        _wreturn = /\r/g,
+    var util = hAzzle.require('util'),
+        core = hAzzle.require('core'),
+        types = hAzzle.require('types'),
+        whiteSpace = /\S+/g,
+        wreturn = /\r/g,
 
         boolElemArray = ('input select option textarea button form details').split(' '),
         boolAttrArray = ('multiple selected checked disabled readonly required ' +
@@ -59,7 +59,7 @@ hAzzle.define('Setters', function() {
             elem = getElem(elem);
             var name, propName,
                 i = 0,
-                attrNames = value && value.match(_whiteSpace);
+                attrNames = value && value.match(whiteSpace);
 
             if (attrNames && elem.nodeType === 1) {
                 while ((name = attrNames[i++])) {
@@ -92,7 +92,7 @@ hAzzle.define('Setters', function() {
                     return prop(elem, name, value);
                 }
 
-                if (nodeType !== 1 || !_core.isXML(elem)) {
+                if (nodeType !== 1 || !core.isXML(elem)) {
 
                     name = name.toLowerCase();
                     hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
@@ -138,7 +138,7 @@ hAzzle.define('Setters', function() {
 
             if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
 
-                if (nodeType !== 1 || _core.isHTML) {
+                if (nodeType !== 1 || core.isHTML) {
 
                     // Fix name and attach hooks
                     name = propMap[name] || name;
@@ -178,7 +178,7 @@ hAzzle.define('Setters', function() {
 
                 return typeof ret === 'string' ?
                     // Handle most common string cases
-                    ret.replace(_wreturn, '') :
+                    ret.replace(wreturn, '') :
                     // Handle cases where value is null/undef or number
                     ret == null ? '' : ret;
             }
@@ -186,7 +186,7 @@ hAzzle.define('Setters', function() {
             return;
         }
 
-        isFunction = _types.isType('Function')(value);
+        isFunction = types.isType('Function')(value);
 
         return this.each(function(elem, index) {
             var val;
@@ -206,8 +206,8 @@ hAzzle.define('Setters', function() {
                 val = '';
             } else if (typeof val === 'number') {
                 val += '';
-            } else if (_types.isArray(val)) {
-                val = _util.map(val, function(value) {
+            } else if (types.isArray(val)) {
+                val = util.map(val, function(value) {
                     return value == null ? '' : value + '';
                 });
             }
@@ -225,7 +225,7 @@ hAzzle.define('Setters', function() {
         var elem = this.elements;
         if (typeof name === 'object') {
             return this.each(function(elem) {
-                _util.each(name, function(value, key) {
+                util.each(name, function(value, key) {
                     prop(elem, key, value);
                 });
             });
@@ -267,7 +267,7 @@ hAzzle.define('Setters', function() {
 
         if (typeof name === 'object') {
             return this.each(function(elem) {
-                _util.each(name, function(value, key) {
+                util.each(name, function(value, key) {
                     attr(elem, key, value);
                 });
             });
@@ -279,16 +279,16 @@ hAzzle.define('Setters', function() {
             });
     };
 
-    _util.each(boolAttrArray, function(prop) {
+    util.each(boolAttrArray, function(prop) {
         boolAttr[boolAttrArray[prop]] = boolAttrArray[prop];
     });
 
-    _util.each(boolElemArray, function(prop) {
+    util.each(boolElemArray, function(prop) {
         boolElem[prop.toUpperCase()] = true;
     });
 
     // Populate propMap - all properties are written as camelCase
-    _util.each(['cellPadding', 'cellSpacing', 'maxLength', 'rowSpan',
+    util.each(['cellPadding', 'cellSpacing', 'maxLength', 'rowSpan',
         'colSpan', 'useMap', 'frameBorder', 'contentEditable', 'textContent', 'valueType',
         'tabIndex', 'readOnly', 'type', 'accessKey', 'tabIndex', 'dropZone', 'spellCheck',
         'hrefLang', 'isMap', 'srcDoc', 'mediaGroup', 'autoComplete', 'noValidate',

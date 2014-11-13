@@ -2,11 +2,11 @@
 
 var hAzzle = window.hAzzle || (window.hAzzle = {});
 
-hAzzle.define('Visibility', function() {
+hAzzle.define('visibility', function() {
 
-    var _ccs = hAzzle.require('curCSS'),
-        _core = hAzzle.require('Core'),
-        _storage = hAzzle.require('Storage'),
+    var ccs = hAzzle.require('css'),
+        core = hAzzle.require('core'),
+        storage = hAzzle.require('storage'),
         iframe, doc,
         elemdisplay = {
             HTML: 'block',
@@ -14,7 +14,7 @@ hAzzle.define('Visibility', function() {
         },
 
         isHidden = function(elem) {
-            return _ccs.css(elem, 'display') === 'none' || !_core.contains(elem.ownerDocument, elem);
+            return ccs.css(elem, 'display') === 'none' || !core.contains(elem.ownerDocument, elem);
         },
 
         showHide = function(elements, show) {
@@ -31,7 +31,7 @@ hAzzle.define('Visibility', function() {
                     continue;
                 }
 
-                values[index] = _storage.private.access(elem, 'cssDisplay');
+                values[index] = storage.private.access(elem, 'cssDisplay');
                 display = elem.style.display;
                 if (show) {
                     if (!values[index] && display === 'none') {
@@ -40,12 +40,12 @@ hAzzle.define('Visibility', function() {
 
                     if (elem.style.display === '' && isHidden(elem)) {
 
-                        values[index] = _storage.private.access(elem, 'cssDisplay', getDisplay(elem.nodeName));
+                        values[index] = storage.private.access(elem, 'cssDisplay', getDisplay(elem.nodeName));
                     }
                 } else {
                     hidden = isHidden(elem);
                     if (display && display !== 'none' || !hidden) {
-                        _storage.private.set(elem, 'cssDisplay', hidden ? display : _ccs.css(elem, 'display'));
+                        storage.private.set(elem, 'cssDisplay', hidden ? display : ccs.css(elem, 'display'));
                     }
                 }
             }
@@ -99,7 +99,7 @@ hAzzle.define('Visibility', function() {
 
                     doc.body.appendChild(elem);
 
-                    display = _ccs.css(elem, 'display');
+                    display = ccs.css(elem, 'display');
                     body.removeChild(iframe);
                 }
 

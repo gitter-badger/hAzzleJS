@@ -1,17 +1,17 @@
 // collection.js
 hAzzle.define('Collection', function() {
 
-    var _util = hAzzle.require('Util'),
-        _types = hAzzle.require('Types'),
-        _arrayProto = Array.prototype,
-        _concat = _arrayProto.concat,
-        _push = _arrayProto.push,
+    var util = hAzzle.require('util'),
+        types = hAzzle.require('types'),
+        arrayProto = Array.prototype,
+        aConcat = arrayProto.concat,
+        aPush = arrayProto.push,
 
         includes = function(array, obj) {
-            return _arrayProto.indexOf.call(array, obj) != -1;
+            return arrayProto.indexOf.call(array, obj) != -1;
         },
         inArray = function(elem, array, i) {
-            return array === undefined ? -1 : _arrayProto.indexOf.call(array, elem, i);
+            return array === undefined ? -1 : arrayProto.indexOf.call(array, elem, i);
         },
 
         arrayRemove = function(array, value) {
@@ -23,10 +23,10 @@ hAzzle.define('Collection', function() {
         makeArray = function(arr, results) {
             var ret = results || [];
             if (arr !== undefined) {
-                if (_types.isArrayLike(Object(arr))) {
-                    _util.merge(ret, _types.isString(arr) ? [arr] : arr);
+                if (types.isArrayLike(Object(arr))) {
+                    util.merge(ret, types.isString(arr) ? [arr] : arr);
                 } else {
-                    _push.call(ret, arr);
+                    aPush.call(ret, arr);
                 }
             }
 
@@ -82,19 +82,19 @@ hAzzle.define('Collection', function() {
     };
 
     this.reduce = function(fn, accumulator, args) {
-        return _util.reduce(this.elements, fn, accumulator, args);
+        return util.reduce(this.elements, fn, accumulator, args);
     };
 
     this.indexOf = function(elem, arr, i) {
-        return arr == null ? -1 : _arrayProto.indexOf.call(arr, elem, i);
+        return arr == null ? -1 : arrayProto.indexOf.call(arr, elem, i);
     };
 
     this.map = function(fn, args) {
-        return hAzzle(_util.map(this.elements, fn, args));
+        return hAzzle(util.map(this.elements, fn, args));
     };
 
     this.each = function(fn, args, /*reverse*/ rev) {
-        _util.each(this.elements, fn, args, rev);
+        util.each(this.elements, fn, args, rev);
         return this;
     };
 
@@ -105,10 +105,10 @@ hAzzle.define('Collection', function() {
     // Concatenate two elements lists
 
     this.concat = function() {
-        var args = _util.map(slice(arguments), function(arr) {
+        var args = util.map(slice(arguments), function(arr) {
             return arr instanceof hAzzle ? arr.elements : arr;
         });
-        return hAzzle(_concat.apply(this.elements, args));
+        return hAzzle(aConcat.apply(this.elements, args));
     };
 
     // Get the children of each element in the set of matched elements, 
@@ -116,7 +116,7 @@ hAzzle.define('Collection', function() {
 
     this.contents = function() {
         return this.map(function() {
-            return this.contentDocument || slice(this.childNodes)
+            return this.contentDocument || slice(this.childNodes);
         });
     };
 
@@ -143,11 +143,11 @@ hAzzle.define('Collection', function() {
 
         // Index in selector
         if (typeof node === 'string') {
-            return _util.indexOf(hAzzle(node).elements, els[0]);
+            return util.indexOf(hAzzle(node).elements, els[0]);
         }
 
         // Locate the position of the desired element
-        return _util.indexOf(els, node instanceof hAzzle ? node.elements[0] : node);
+        return util.indexOf(els, node instanceof hAzzle ? node.elements[0] : node);
     };
     // Concatenate new elements to the '.elements array
     // Similar to jQuery / Zepto's .add() method
@@ -187,7 +187,7 @@ hAzzle.define('Collection', function() {
     };
 
     // First() and prev()
-    _util.each({
+    util.each({
         next: 'nextElementSibling',
         prev: 'previousElementSibling'
     }, function(value, prop) {
@@ -199,7 +199,7 @@ hAzzle.define('Collection', function() {
     }.bind(this));
 
     // prevAll() and nextAll()
-    _util.each({
+    util.each({
         prevAll: 'previousElementSibling',
         nextAll: 'nextElementSibling'
     }, function(value, prop) {

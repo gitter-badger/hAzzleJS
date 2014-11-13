@@ -1,11 +1,12 @@
 /*!
  * hAzzle.js
  * Copyright (c) 2014 Kenny Flashlight
- * Version: 1.0.1d
+ * Version: 1.0.2a
  * Released under the MIT License.
  *
  * Date: 2014-11-14
  */
+ 
 (function() {
 
     var
@@ -411,7 +412,7 @@ hAzzle.define('Types', function() {
 });
 
 // text.js
-hAzzle.define('Text', function() {
+hAzzle.define('text', function() {
 
     var getText = function(elem) {
 
@@ -447,11 +448,11 @@ hAzzle.define('Text', function() {
 });
 
 // util.js
-hAzzle.define('Util', function() {
+hAzzle.define('util', function() {
 
     var // Modules
-        slice = Array.prototype.slice,
-        types = hAzzle.require('Types'),
+        aSlice = Array.prototype.slice,
+        types = hAzzle.require('types'),
         oKeys = Object.keys,
 
         // Short cut for `hasOwnProperty`.
@@ -827,7 +828,7 @@ hAzzle.define('Util', function() {
         bind = function(fn, ctx) {
 
             var curryArgs = arguments.length > 2 ?
-                slice.call(arguments, 2) : [],
+                aSlice.call(arguments, 2) : [],
                 tmp;
 
             if (typeof ctx === 'string') {
@@ -841,7 +842,7 @@ hAzzle.define('Util', function() {
 
                 return curryArgs.length ? function() {
                     return arguments.length ?
-                        fn.apply(ctx || this, curryArgs.concat(slice.call(arguments, 0))) :
+                        fn.apply(ctx || this, curryArgs.concat(aSlice.call(arguments, 0))) :
                         fn.apply(ctx || this, curryArgs);
                 } : function() {
                     return arguments.length ?
@@ -1170,17 +1171,17 @@ hAzzle.define('Core', function() {
 // collection.js
 hAzzle.define('Collection', function() {
 
-    var _util = hAzzle.require('Util'),
-        _types = hAzzle.require('Types'),
-        _arrayProto = Array.prototype,
-        _concat = _arrayProto.concat,
-        _push = _arrayProto.push,
+    var util = hAzzle.require('util'),
+        types = hAzzle.require('types'),
+        arrayProto = Array.prototype,
+        aConcat = arrayProto.concat,
+        aPush = arrayProto.push,
 
         includes = function(array, obj) {
-            return _arrayProto.indexOf.call(array, obj) != -1;
+            return arrayProto.indexOf.call(array, obj) != -1;
         },
         inArray = function(elem, array, i) {
-            return array === undefined ? -1 : _arrayProto.indexOf.call(array, elem, i);
+            return array === undefined ? -1 : arrayProto.indexOf.call(array, elem, i);
         },
 
         arrayRemove = function(array, value) {
@@ -1192,10 +1193,10 @@ hAzzle.define('Collection', function() {
         makeArray = function(arr, results) {
             var ret = results || [];
             if (arr !== undefined) {
-                if (_types.isArrayLike(Object(arr))) {
-                    _util.merge(ret, _types.isString(arr) ? [arr] : arr);
+                if (types.isArrayLike(Object(arr))) {
+                    util.merge(ret, types.isString(arr) ? [arr] : arr);
                 } else {
-                    _push.call(ret, arr);
+                    aPush.call(ret, arr);
                 }
             }
 
@@ -1251,19 +1252,19 @@ hAzzle.define('Collection', function() {
     };
 
     this.reduce = function(fn, accumulator, args) {
-        return _util.reduce(this.elements, fn, accumulator, args);
+        return util.reduce(this.elements, fn, accumulator, args);
     };
 
     this.indexOf = function(elem, arr, i) {
-        return arr == null ? -1 : _arrayProto.indexOf.call(arr, elem, i);
+        return arr == null ? -1 : arrayProto.indexOf.call(arr, elem, i);
     };
 
     this.map = function(fn, args) {
-        return hAzzle(_util.map(this.elements, fn, args));
+        return hAzzle(util.map(this.elements, fn, args));
     };
 
     this.each = function(fn, args, /*reverse*/ rev) {
-        _util.each(this.elements, fn, args, rev);
+        util.each(this.elements, fn, args, rev);
         return this;
     };
 
@@ -1274,10 +1275,10 @@ hAzzle.define('Collection', function() {
     // Concatenate two elements lists
 
     this.concat = function() {
-        var args = _util.map(slice(arguments), function(arr) {
+        var args = util.map(slice(arguments), function(arr) {
             return arr instanceof hAzzle ? arr.elements : arr;
         });
-        return hAzzle(_concat.apply(this.elements, args));
+        return hAzzle(aConcat.apply(this.elements, args));
     };
 
     // Get the children of each element in the set of matched elements, 
@@ -1285,7 +1286,7 @@ hAzzle.define('Collection', function() {
 
     this.contents = function() {
         return this.map(function() {
-            return this.contentDocument || slice(this.childNodes)
+            return this.contentDocument || slice(this.childNodes);
         });
     };
 
@@ -1312,11 +1313,11 @@ hAzzle.define('Collection', function() {
 
         // Index in selector
         if (typeof node === 'string') {
-            return _util.indexOf(hAzzle(node).elements, els[0]);
+            return util.indexOf(hAzzle(node).elements, els[0]);
         }
 
         // Locate the position of the desired element
-        return _util.indexOf(els, node instanceof hAzzle ? node.elements[0] : node);
+        return util.indexOf(els, node instanceof hAzzle ? node.elements[0] : node);
     };
     // Concatenate new elements to the '.elements array
     // Similar to jQuery / Zepto's .add() method
@@ -1356,7 +1357,7 @@ hAzzle.define('Collection', function() {
     };
 
     // First() and prev()
-    _util.each({
+    util.each({
         next: 'nextElementSibling',
         prev: 'previousElementSibling'
     }, function(value, prop) {
@@ -1368,7 +1369,7 @@ hAzzle.define('Collection', function() {
     }.bind(this));
 
     // prevAll() and nextAll()
-    _util.each({
+    util.each({
         prevAll: 'previousElementSibling',
         nextAll: 'nextElementSibling'
     }, function(value, prop) {
@@ -1397,21 +1398,21 @@ hAzzle.define('Jiesa', function() {
 
     var // Dependencies    
 
-        _util = hAzzle.require('Util'),
-        _core = hAzzle.require('Core'),
-        _collection = hAzzle.require('Collection'),
-        _types = hAzzle.require('Types'),
-        _has = hAzzle.require('has'),
-        _selector = hAzzle.require('selector'),
+        util = hAzzle.require('util'),
+        core = hAzzle.require('core'),
+        collection = hAzzle.require('collection'),
+        types = hAzzle.require('types'),
+        features = hAzzle.require('has'),
+        engine = hAzzle.require('selector'),
 
         // RegEx
-        _idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
-        _tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
-        _unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
-        _rattributeQuotes = /=[\x20\t\r\n\f]*([^\]'"]*?)[\x20\t\r\n\f]*\]/g,
-        _quickMatch = /^(\w*)(?:#([\w\-]+))?(?:\[([\w\-\=]+)\])?(?:\.([\w\-]+))?$/,
-        _relativeSel = /^\s*[+~]/,
-        _reSpace = /[\n\t\r]/g,
+        idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
+        tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
+        unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
+        rattributeQuotes = /=[\x20\t\r\n\f]*([^\]'"]*?)[\x20\t\r\n\f]*\]/g,
+        quickMatch = /^(\w*)(?:#([\w\-]+))?(?:\[([\w\-\=]+)\])?(?:\.([\w\-]+))?$/,
+        relativeSel = /^\s*[+~]/,
+        reSpace = /[\n\t\r]/g,
 
         pseudos = {
 
@@ -1452,7 +1453,7 @@ hAzzle.define('Jiesa', function() {
                 old = context.getAttribute('id'),
                 nid = old || '__hAzzle__',
                 hasParent = context.parentNode,
-                relativeHierarchySelector = _relativeSel.test(query);
+                relativeHierarchySelector = relativeSel.test(query);
 
             if (relativeHierarchySelector && !hasParent) {
                 return [];
@@ -1465,7 +1466,7 @@ hAzzle.define('Jiesa', function() {
             if (relativeHierarchySelector && hasParent) {
                 context = context.parentNode;
             }
-            var selectors = query.match(_unionSplit);
+            var selectors = query.match(unionSplit);
             for (var i = 0; i < selectors.length; i++) {
                 selectors[i] = "[id='" + nid + "'] " + selectors[i];
             }
@@ -1498,10 +1499,10 @@ hAzzle.define('Jiesa', function() {
         // Uses the `classList` api if it's supported.
 
         containsClass = function(el, cls) {
-            if (_has.has('classList')) {
+            if (features.has('classList')) {
                 return el.classList.contains(cls);
             } else {
-                return (' ' + el.className + ' ').replace(_reSpace, ' ').indexOf(cls) >= 0;
+                return (' ' + el.className + ' ').replace(reSpace, ' ').indexOf(cls) >= 0;
             }
         },
 
@@ -1512,7 +1513,7 @@ hAzzle.define('Jiesa', function() {
             if (typeof root === 'string') {
                 return jiesa(root);
             }
-            if (!root.nodeType && _types.isArrayLike(root)) {
+            if (!root.nodeType && types.isArrayLike(root)) {
                 return root[0];
             }
             return root;
@@ -1533,9 +1534,9 @@ hAzzle.define('Jiesa', function() {
                 return [];
             }
 
-            if (_core.isHTML) {
+            if (core.isHTML) {
 
-                if ((m = _idClassTagNameExp.exec(sel))) {
+                if ((m = idClassTagNameExp.exec(sel))) {
                     if ((sel = m[1])) {
                         if (nodeType === 9) {
                             elem = ctx.getElementById(sel);
@@ -1547,7 +1548,7 @@ hAzzle.define('Jiesa', function() {
                         } else {
                             // Context is not a document
                             if (ctx.ownerDocument && (elem = ctx.ownerDocument.getElementById(sel)) &&
-                                _core.contains(ctx, elem) && elem.id === m) {
+                                core.contains(ctx, elem) && elem.id === m) {
                                 return [elem];
                             }
                         }
@@ -1556,13 +1557,13 @@ hAzzle.define('Jiesa', function() {
                     } else if ((sel = m[3])) {
                         ret = ctx.getElementsByTagName(sel);
                     }
-                    return _collection.slice(ret);
+                    return collection.slice(ret);
                     // E.g. hAzzle( 'span.selected' )  
-                } else if ((m = _tagNameAndOrIdAndOrClassExp.exec(sel))) {
+                } else if ((m = tagNameAndOrIdAndOrClassExp.exec(sel))) {
                     var result = ctx.getElementsByTagName(m[1]),
                         id = m[2],
                         className = m[3];
-                    _util.each(result, function(el) {
+                    util.each(result, function(el) {
                         if (el.id === id || containsClass(el, className)) {
                             results.push(el);
                         }
@@ -1572,7 +1573,7 @@ hAzzle.define('Jiesa', function() {
                 // Fallback to QSA if the native selector engine are not installed
                 // Fixme! Check for installed selector engine will be set to false soon
 
-                if (hAzzle.installed.selector && _core.qsa && (!_core.QSABugs || !_core.QSABugs.test(sel))) {
+                if (hAzzle.installed.selector && core.qsa && (!core.QSABugs || !core.QSABugs.test(sel))) {
                     try {
                         if (ctx.nodeType === 1) {
                             ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
@@ -1580,7 +1581,7 @@ hAzzle.define('Jiesa', function() {
                             // we can use the native qSA
                             ret = ctx.querySelectorAll(sel);
                         }
-                       return _collection.slice(ret);
+                        return collection.slice(ret);
                     } catch (e) {}
                 }
             }
@@ -1590,7 +1591,7 @@ hAzzle.define('Jiesa', function() {
 
             hAzzle.err(!hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
 
-            return _selector.find(sel, ctx);
+            return engine.find(sel, ctx);
         },
 
         // Speeding up matches
@@ -1604,16 +1605,16 @@ hAzzle.define('Jiesa', function() {
             }
             // Set document vars if needed
             if ((elem.ownerDocument || elem) !== document) {
-                _core.setDocument(elem);
+                core.setDocument(elem);
             }
 
             // Make sure that attribute selectors are quoted
-            sel = typeof sel === 'string' ? sel.replace(_rattributeQuotes, "='$1']") : sel;
+            sel = typeof sel === 'string' ? sel.replace(rattributeQuotes, "='$1']") : sel;
 
             // If instance of hAzzle
 
             if (sel instanceof hAzzle) {
-                return _util.some(sel.elements, function(sel) {
+                return util.some(sel.elements, function(sel) {
                     return matches(elem, sel);
                 });
             }
@@ -1622,7 +1623,7 @@ hAzzle.define('Jiesa', function() {
                 return false;
             }
 
-            var quick = _quickMatch.exec(sel);
+            var quick = quickMatch.exec(sel);
 
             if (quick) {
                 //   0  1    2   3          4
@@ -1651,15 +1652,15 @@ hAzzle.define('Jiesa', function() {
                     return !!m(elem);
                 } else {
 
-                    if (_core.matches && _core.isHTML &&
-                        (!_core.rbuggyMatches || !_core.rbuggyMatches.test(sel)) &&
-                        (!_core.QSABugs || !_core.QSABugs.test(sel))) {
+                    if (core.matches && core.isHTML &&
+                        (!core.rbuggyMatches || !core.rbuggyMatches.test(sel)) &&
+                        (!core.QSABugs || !core.QSABugs.test(sel))) {
 
                         try {
                             var ret = matchesSelector(elem, sel, ctx);
 
                             // IE 9's matchesSelector returns false on disconnected nodes
-                            if (ret || _core.disconMatch ||
+                            if (ret || core.disconMatch ||
 
                                 // As well, disconnected nodes are said to be in a document
                                 // fragment in IE 9
@@ -1669,7 +1670,7 @@ hAzzle.define('Jiesa', function() {
                         } catch (e) {}
                     } else {
                         hAzzle.err(!hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
-                        return _selector.matches(sel, elem, sel);
+                        return engine.matches(sel, elem, sel);
                     }
                 }
             }
@@ -1685,16 +1686,16 @@ hAzzle.define('Jiesa', function() {
                     len = this.length,
                     self = this.elements;
 
-                return hAzzle(_util.filter(hAzzle(selector).elements, function(node) {
+                return hAzzle(util.filter(hAzzle(selector).elements, function(node) {
                     for (; i < len; i++) {
-                        if (_core.contains(self[i], node)) {
+                        if (core.contains(self[i], node)) {
                             return true;
                         }
                     }
                 }));
             }
-            return _util.reduce(this.elements, function(els, element) {
-                return hAzzle(els.concat(_collection.slice(jiesa(selector, element))));
+            return util.reduce(this.elements, function(els, element) {
+                return hAzzle(els.concat(collection.slice(jiesa(selector, element))));
             }, []);
 
         }
@@ -1731,8 +1732,7 @@ hAzzle.define('Jiesa', function() {
         pseudos: pseudos,
         find: jiesa
     };
-});
-// strings.js
+});// strings.js
 hAzzle.define('Strings', function() {
     var
 
@@ -1821,18 +1821,18 @@ hAzzle.define('Strings', function() {
 });
 
 // storage.js
-hAzzle.define('Storage', function() {
+hAzzle.define('storage', function() {
 
-    var _util = hAzzle.require('Util'),
-        _strings = hAzzle.require('Strings'),
-        _types = hAzzle.require('Types'),
-        _core = hAzzle.require('Core'),
-        _shtmlRegEx = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
-        _scharRegEx = /([A-Z])/g,
-        _sWhiteRegex = (/\S+/g);
+    var util = hAzzle.require('util'),
+        strings = hAzzle.require('strings'),
+        types = hAzzle.require('types'),
+        core = hAzzle.require('core'),
+        shtmlRegEx = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
+        scharRegEx = /([A-Z])/g,
+        sWhiteRegex = (/\S+/g);
 
     function Storage() {
-        this.expando = _core.expando + Math.random();
+        this.expando = core.expando + Math.random();
     }
 
     Storage.accepts = function(owner) {
@@ -1845,7 +1845,7 @@ hAzzle.define('Storage', function() {
 
         register: function(owner, initial) {
 
-            hAzzle.err(!_types.isObject(owner), 22, 'no valid DOM element in storage.js')
+            hAzzle.err(!types.isObject(owner), 22, 'no valid DOM element in storage.js')
 
             var descriptor = {};
 
@@ -1900,9 +1900,9 @@ hAzzle.define('Storage', function() {
                         // Handle: [ owner, { properties } ] args
                     } else {
                         // Fresh assignments by object are shallow copied
-                        if (_types.isEmptyObject(cache)) {
+                        if (types.isEmptyObject(cache)) {
 
-                            _util.mixin(cache, data);
+                            util.mixin(cache, data);
                             // Otherwise, copy the properties one-by-one to the cache object
                         } else {
                             for (prop in data) {
@@ -1923,7 +1923,7 @@ hAzzle.define('Storage', function() {
                 stored = this.get(owner, key);
 
                 return stored !== undefined ?
-                    stored : this.get(owner, _strings.camelize(key));
+                    stored : this.get(owner, strings.camelize(key));
             }
 
             this.set(owner, key, value);
@@ -1947,10 +1947,10 @@ hAzzle.define('Storage', function() {
 
             } else {
                 // Support array or space separated string of keys
-                if (_types.isArray(key)) {
-                    name = key.concat(key.map(_strings.camelize));
+                if (types.isArray(key)) {
+                    name = key.concat(key.map(strings.camelize));
                 } else {
-                    camel = _strings.camelize(key);
+                    camel = strings.camelize(key);
                     // Try the string as a key before any manipulation
                     if (key in cache) {
                         name = [key, camel];
@@ -1958,7 +1958,7 @@ hAzzle.define('Storage', function() {
                         // If a key with the spaces exists, use it.
                         // Otherwise, create an array by matching non-whitespace
                         name = camel;
-                        name = cache[name] ? [name] : (name.match(_sWhiteRegex) || []);
+                        name = cache[name] ? [name] : (name.match(sWhiteRegex) || []);
                     }
                 }
 
@@ -1970,7 +1970,7 @@ hAzzle.define('Storage', function() {
             }
         },
         hasData: function(owner) {
-            return !_types.isEmptyObject(
+            return !types.isEmptyObject(
                 owner[this.expando] || {}
             );
         },
@@ -2010,7 +2010,7 @@ hAzzle.define('Storage', function() {
 
                             if (name.indexOf('data-') === 0) {
 
-                                name = _strings.camelize(name.slice(5));
+                                name = strings.camelize(name.slice(5));
                                 dataAttr(elem, name, data[name]);
                             }
                         }
@@ -2031,7 +2031,7 @@ hAzzle.define('Storage', function() {
                 _userData.set(elem, key);
             });
         }
-        var camelKey = _strings.camelize(key);
+        var camelKey = strings.camelize(key);
 
         if (elem && value === undefined) {
 
@@ -2102,7 +2102,7 @@ hAzzle.define('Storage', function() {
 
         if (data === undefined && elem.nodeType === 1) {
 
-            name = 'data-' + key.replace(_scharRegEx, '-$1').toLowerCase();
+            name = 'data-' + key.replace(scharRegEx, '-$1').toLowerCase();
 
             data = elem.getAttribute(name);
 
@@ -2113,7 +2113,7 @@ hAzzle.define('Storage', function() {
                         data === 'null' ? null :
                         // Only convert to a number if it doesn't change the string
                         +data + '' === data ? +data :
-                        _shtmlRegEx.test(data) ? JSON.parse(data + '') : data;
+                        shtmlRegEx.test(data) ? JSON.parse(data + '') : data;
                 } catch (e) {}
 
                 // Make sure we set the data so it isn't changed later
@@ -2133,12 +2133,12 @@ hAzzle.define('Storage', function() {
         data: _userData
     };
 });
-// curcss.js
-hAzzle.define('curcss', function() {
+// css.js
+hAzzle.define('css', function() {
 
     var // Dependencies
 
-        storage = hAzzle.require('Storage'),
+        storage = hAzzle.require('storage'),
         feature = hAzzle.require('has'),
 
         // Inline values for tagName
@@ -2314,13 +2314,13 @@ hAzzle.define('curcss', function() {
     };
 });
 // setters.js
-hAzzle.define('Setters', function() {
+hAzzle.define('setters', function() {
 
-    var _util = hAzzle.require('Util'),
-        _core = hAzzle.require('Core'),
-        _types = hAzzle.require('Types'),
-        _whiteSpace = /\S+/g,
-        _wreturn = /\r/g,
+    var util = hAzzle.require('util'),
+        core = hAzzle.require('core'),
+        types = hAzzle.require('types'),
+        whiteSpace = /\S+/g,
+        wreturn = /\r/g,
 
         boolElemArray = ('input select option textarea button form details').split(' '),
         boolAttrArray = ('multiple selected checked disabled readonly required ' +
@@ -2374,7 +2374,7 @@ hAzzle.define('Setters', function() {
             elem = getElem(elem);
             var name, propName,
                 i = 0,
-                attrNames = value && value.match(_whiteSpace);
+                attrNames = value && value.match(whiteSpace);
 
             if (attrNames && elem.nodeType === 1) {
                 while ((name = attrNames[i++])) {
@@ -2407,7 +2407,7 @@ hAzzle.define('Setters', function() {
                     return prop(elem, name, value);
                 }
 
-                if (nodeType !== 1 || !_core.isXML(elem)) {
+                if (nodeType !== 1 || !core.isXML(elem)) {
 
                     name = name.toLowerCase();
                     hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
@@ -2453,7 +2453,7 @@ hAzzle.define('Setters', function() {
 
             if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
 
-                if (nodeType !== 1 || _core.isHTML) {
+                if (nodeType !== 1 || core.isHTML) {
 
                     // Fix name and attach hooks
                     name = propMap[name] || name;
@@ -2493,7 +2493,7 @@ hAzzle.define('Setters', function() {
 
                 return typeof ret === 'string' ?
                     // Handle most common string cases
-                    ret.replace(_wreturn, '') :
+                    ret.replace(wreturn, '') :
                     // Handle cases where value is null/undef or number
                     ret == null ? '' : ret;
             }
@@ -2501,7 +2501,7 @@ hAzzle.define('Setters', function() {
             return;
         }
 
-        isFunction = _types.isType('Function')(value);
+        isFunction = types.isType('Function')(value);
 
         return this.each(function(elem, index) {
             var val;
@@ -2521,8 +2521,8 @@ hAzzle.define('Setters', function() {
                 val = '';
             } else if (typeof val === 'number') {
                 val += '';
-            } else if (_types.isArray(val)) {
-                val = _util.map(val, function(value) {
+            } else if (types.isArray(val)) {
+                val = util.map(val, function(value) {
                     return value == null ? '' : value + '';
                 });
             }
@@ -2540,7 +2540,7 @@ hAzzle.define('Setters', function() {
         var elem = this.elements;
         if (typeof name === 'object') {
             return this.each(function(elem) {
-                _util.each(name, function(value, key) {
+                util.each(name, function(value, key) {
                     prop(elem, key, value);
                 });
             });
@@ -2582,7 +2582,7 @@ hAzzle.define('Setters', function() {
 
         if (typeof name === 'object') {
             return this.each(function(elem) {
-                _util.each(name, function(value, key) {
+                util.each(name, function(value, key) {
                     attr(elem, key, value);
                 });
             });
@@ -2594,16 +2594,16 @@ hAzzle.define('Setters', function() {
             });
     };
 
-    _util.each(boolAttrArray, function(prop) {
+    util.each(boolAttrArray, function(prop) {
         boolAttr[boolAttrArray[prop]] = boolAttrArray[prop];
     });
 
-    _util.each(boolElemArray, function(prop) {
+    util.each(boolElemArray, function(prop) {
         boolElem[prop.toUpperCase()] = true;
     });
 
     // Populate propMap - all properties are written as camelCase
-    _util.each(['cellPadding', 'cellSpacing', 'maxLength', 'rowSpan',
+    util.each(['cellPadding', 'cellSpacing', 'maxLength', 'rowSpan',
         'colSpan', 'useMap', 'frameBorder', 'contentEditable', 'textContent', 'valueType',
         'tabIndex', 'readOnly', 'type', 'accessKey', 'tabIndex', 'dropZone', 'spellCheck',
         'hrefLang', 'isMap', 'srcDoc', 'mediaGroup', 'autoComplete', 'noValidate',
@@ -2627,11 +2627,28 @@ hAzzle.define('Setters', function() {
         prop: prop
     };
 });
+// boolhooks.js
+hAzzle.define('boolhooks', function() {
+
+    var setters = hAzzle.require('setters');
+
+    setters.boolHooks.set = function(elem, value, name) {
+        // If value is false, remove the attribute
+        if (value === false) {
+            setters.removeAttr(elem, name);
+        } else {
+            elem.setAttribute(name, name);
+        }
+        return name;
+    };
+
+    return {};
+});
 // attrhooks.js
 hAzzle.define('attrHooks', function() {
 
-    var _util = hAzzle.require('Util'),
-        _setters = hAzzle.require('Setters'),
+    var util = hAzzle.require('util'),
+        setters = hAzzle.require('setters'),
 
         radioValue = (function() {
 
@@ -2649,11 +2666,11 @@ hAzzle.define('attrHooks', function() {
         }());
 
     // Setter
-    _util.mixin(_setters.attrHooks.set, {
+    util.mixin(setters.attrHooks.set, {
 
         'type': function(elem, value) {
             if (!radioValue && value === 'radio' &&
-                _util.nodeName(elem, 'input')) {
+                util.nodeName(elem, 'input')) {
                 var val = elem.value;
                 elem.setAttribute('type', value);
                 if (val) {
@@ -2667,13 +2684,13 @@ hAzzle.define('attrHooks', function() {
 });
 
 // prophooks.js
-hAzzle.define('propHooks', function() {
+hAzzle.define('prophooks', function () {
 
-    var _util = hAzzle.require('Util'),
-        _setters = hAzzle.require('Setters');
+    var util = hAzzle.require('util'),
+        setters = hAzzle.require('setters');
 
-    _util.mixin(_setters.propHooks.get, {
-        'tabIndex': function(elem) {
+    util.mixin(setters.propHooks.get, {
+        'tabIndex': function (elem) {
             return elem.hasAttribute('tabindex') ||
                 /^(?:input|select|textarea|button)$/i.test(elem.nodeName) || elem.href ?
                 elem.tabIndex :
@@ -2687,8 +2704,8 @@ hAzzle.define('propHooks', function() {
     var select = document.createElement('select'),
         opt = select.appendChild(document.createElement('option'));
 
-    if (!opt.selected) {
-        _setters.propHooks.get.selected = function(elem) {
+    if (!opt.selected) { 
+        setters.propHooks.get.selected = function (elem) {
             var parent = elem.parentNode;
             if (parent && parent.parentNode) {
                 parent.parentNode.selectedIndex;
@@ -2696,18 +2713,17 @@ hAzzle.define('propHooks', function() {
             return null;
         };
     }
-    return {};
+      return {};
 });
-
 // valhooks.js
 hAzzle.define('valHooks', function() {
 
-    var _util = hAzzle.require('Util'),
-        _strings = hAzzle.require('Strings'),
-        _text = hAzzle.require('Text'),
-        _types = hAzzle.require('Types'),
-        _collection = hAzzle.require('Collection'),
-        _setters = hAzzle.require('Setters'),
+    var util = hAzzle.require('util'),
+        strings = hAzzle.require('strings'),
+        text = hAzzle.require('text'),
+        types = hAzzle.require('types'),
+        collection = hAzzle.require('collection'),
+        setters = hAzzle.require('setters'),
 
         // Support: Android<4.4
         supportCheckboxes = (function() {
@@ -2717,12 +2733,11 @@ hAzzle.define('valHooks', function() {
             var node = checkbox.getAttributeNode('checked');
             return !node || !node.specified;
         })(),
-
-
+ 
         // iOF() gives approx 40 - 60% better performance then native indexOf
         // for valHooks
 
-        iOf = function(array, item, from) {
+         iOf = function(array, item, from) {
             var i, length = array.length;
 
             for (i = (from < 0) ? Math.max(0, length + from) : from || 0; i < length; i++) {
@@ -2735,12 +2750,12 @@ hAzzle.define('valHooks', function() {
         };
 
     // Setter
-    _util.mixin(_setters.valHooks.set, {
+    util.mixin(setters.valHooks.set, {
 
         'select': function(elem, value) {
             var optionSet, option,
                 options = elem.options,
-                values = _collection.makeArray(value),
+                values = collection.makeArray(value),
                 i = options.length;
 
             while (i--) {
@@ -2760,7 +2775,7 @@ hAzzle.define('valHooks', function() {
     });
 
     // Getter    
-    _util.mixin(_setters.valHooks.get, {
+    util.mixin(setters.valHooks.get, {
 
         'option': function(elem) {
 
@@ -2768,7 +2783,7 @@ hAzzle.define('valHooks', function() {
 
             return val !== null ?
                 val :
-                _strings.trim(_text.getText(elem));
+                strings.trim(text.getText(elem));
         },
 
         'select': function(elem) {
@@ -2813,16 +2828,16 @@ hAzzle.define('valHooks', function() {
 
     // Radios and checkboxes setter
 
-    _util.each(['radio', 'checkbox'], function(val) {
-        _setters.valHooks.set[val] = function(elem, value) {
-            if (_types.isArray(value)) {
+    util.each(['radio', 'checkbox'], function(val) {
+        setters.valHooks.set[val] = function(elem, value) {
+            if (types.isArray(value)) {
                 return (elem.checked = iOf(value, hAzzle(elem).val()) >= 0);
             }
         };
     });
-
+    
     if (!supportCheckboxes) {
-        _setters.valHooks.get[val] = function(elem) {
+        setters.valHooks.get[val] = function(elem) {
             return elem.getAttribute('value') === null ? 'on' : elem.value;
         };
     }

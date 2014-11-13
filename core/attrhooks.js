@@ -1,8 +1,8 @@
 // attrhooks.js
 hAzzle.define('attrHooks', function() {
 
-    var _util = hAzzle.require('Util'),
-        _setters = hAzzle.require('Setters'),
+    var util = hAzzle.require('util'),
+        setters = hAzzle.require('setters'),
 
         radioValue = (function() {
 
@@ -20,11 +20,11 @@ hAzzle.define('attrHooks', function() {
         }());
 
     // Setter
-    _util.mixin(_setters.attrHooks.set, {
+    util.mixin(setters.attrHooks.set, {
 
         'type': function(elem, value) {
             if (!radioValue && value === 'radio' &&
-                _util.nodeName(elem, 'input')) {
+                util.nodeName(elem, 'input')) {
                 var val = elem.value;
                 elem.setAttribute('type', value);
                 if (val) {

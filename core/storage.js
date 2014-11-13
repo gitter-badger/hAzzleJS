@@ -1,16 +1,16 @@
 // storage.js
-hAzzle.define('Storage', function() {
+hAzzle.define('storage', function() {
 
-    var _util = hAzzle.require('Util'),
-        _strings = hAzzle.require('Strings'),
-        _types = hAzzle.require('Types'),
-        _core = hAzzle.require('Core'),
-        _shtmlRegEx = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
-        _scharRegEx = /([A-Z])/g,
-        _sWhiteRegex = (/\S+/g);
+    var util = hAzzle.require('util'),
+        strings = hAzzle.require('strings'),
+        types = hAzzle.require('types'),
+        core = hAzzle.require('core'),
+        shtmlRegEx = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
+        scharRegEx = /([A-Z])/g,
+        sWhiteRegex = (/\S+/g);
 
     function Storage() {
-        this.expando = _core.expando + Math.random();
+        this.expando = core.expando + Math.random();
     }
 
     Storage.accepts = function(owner) {
@@ -23,7 +23,7 @@ hAzzle.define('Storage', function() {
 
         register: function(owner, initial) {
 
-            hAzzle.err(!_types.isObject(owner), 22, 'no valid DOM element in storage.js')
+            hAzzle.err(!types.isObject(owner), 22, 'no valid DOM element in storage.js')
 
             var descriptor = {};
 
@@ -78,9 +78,9 @@ hAzzle.define('Storage', function() {
                         // Handle: [ owner, { properties } ] args
                     } else {
                         // Fresh assignments by object are shallow copied
-                        if (_types.isEmptyObject(cache)) {
+                        if (types.isEmptyObject(cache)) {
 
-                            _util.mixin(cache, data);
+                            util.mixin(cache, data);
                             // Otherwise, copy the properties one-by-one to the cache object
                         } else {
                             for (prop in data) {
@@ -101,7 +101,7 @@ hAzzle.define('Storage', function() {
                 stored = this.get(owner, key);
 
                 return stored !== undefined ?
-                    stored : this.get(owner, _strings.camelize(key));
+                    stored : this.get(owner, strings.camelize(key));
             }
 
             this.set(owner, key, value);
@@ -125,10 +125,10 @@ hAzzle.define('Storage', function() {
 
             } else {
                 // Support array or space separated string of keys
-                if (_types.isArray(key)) {
-                    name = key.concat(key.map(_strings.camelize));
+                if (types.isArray(key)) {
+                    name = key.concat(key.map(strings.camelize));
                 } else {
-                    camel = _strings.camelize(key);
+                    camel = strings.camelize(key);
                     // Try the string as a key before any manipulation
                     if (key in cache) {
                         name = [key, camel];
@@ -136,7 +136,7 @@ hAzzle.define('Storage', function() {
                         // If a key with the spaces exists, use it.
                         // Otherwise, create an array by matching non-whitespace
                         name = camel;
-                        name = cache[name] ? [name] : (name.match(_sWhiteRegex) || []);
+                        name = cache[name] ? [name] : (name.match(sWhiteRegex) || []);
                     }
                 }
 
@@ -148,7 +148,7 @@ hAzzle.define('Storage', function() {
             }
         },
         hasData: function(owner) {
-            return !_types.isEmptyObject(
+            return !types.isEmptyObject(
                 owner[this.expando] || {}
             );
         },
@@ -188,7 +188,7 @@ hAzzle.define('Storage', function() {
 
                             if (name.indexOf('data-') === 0) {
 
-                                name = _strings.camelize(name.slice(5));
+                                name = strings.camelize(name.slice(5));
                                 dataAttr(elem, name, data[name]);
                             }
                         }
@@ -209,7 +209,7 @@ hAzzle.define('Storage', function() {
                 _userData.set(elem, key);
             });
         }
-        var camelKey = _strings.camelize(key);
+        var camelKey = strings.camelize(key);
 
         if (elem && value === undefined) {
 
@@ -280,7 +280,7 @@ hAzzle.define('Storage', function() {
 
         if (data === undefined && elem.nodeType === 1) {
 
-            name = 'data-' + key.replace(_scharRegEx, '-$1').toLowerCase();
+            name = 'data-' + key.replace(scharRegEx, '-$1').toLowerCase();
 
             data = elem.getAttribute(name);
 
@@ -291,7 +291,7 @@ hAzzle.define('Storage', function() {
                         data === 'null' ? null :
                         // Only convert to a number if it doesn't change the string
                         +data + '' === data ? +data :
-                        _shtmlRegEx.test(data) ? JSON.parse(data + '') : data;
+                        shtmlRegEx.test(data) ? JSON.parse(data + '') : data;
                 } catch (e) {}
 
                 // Make sure we set the data so it isn't changed later
