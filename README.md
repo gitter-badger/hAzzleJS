@@ -76,6 +76,23 @@ DOM Level 4 (DL4)
 * matches
 * customEvent
 
+ECMA 7
+-------
+
+ECMA 7 are still experimental, and no browsers supports it except Firefox v. 35. This browser includes support for the 'contains' method of ECMA 7. 
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/contains
+
+Because of Firefox supports it, and some websites can be broken by this, hAzzle have included support for this in the Core.
+
+```javascript
+[1, 2, 3].contains(2);     // true
+[1, 2, 3].contains(4);     // false
+[1, 2, 3].contains(3, 3);  // false
+[1, 2, 3].contains(3, -1); // true
+[1, 2, NaN].contains(NaN); // true
+```
+
 Why is the Core so big?
 ---------------------
 The hAzzle Core are not so big comparing to other libraries, and contains a lot more then the Javascript library. It take care of cross-browser issues, browsers bugs, setting the right document (HTML / XML), feature detection and more.
