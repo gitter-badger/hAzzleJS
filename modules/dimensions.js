@@ -9,8 +9,30 @@ hAzzle.define('dimensions', function() {
 
         util = hAzzle.require('util'),
         types = hAzzle.require('types'),
+        features = hAzzle.require('has'),
         css = hAzzle.require('css'),
 
+        getElem = function(elem) {
+            return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
+        },
+        isBody = function(elem) {
+            elem = getElem(elem)
+            var tag = elem.tagName.toLowerCase();
+            return (tag === 'body' ||
+                tag === 'html');
+        },
+        isOffset = function(elem) {
+            elem = getElem(elem)
+            return css.css(elem, 'position') !== 'static' || isBody(elem);
+        },
+        isStatic = function(elem) {
+            elem = getElem(elem)
+            var tag = elem.tagName.toLowerCase();
+            return isOffset(elem) ||
+                (tag === 'table' ||
+                    tag === 'td' ||
+                    tag === 'th');
+        },
         _matchMedia = win.matchMedia || win.msMatchMedia,
         mq = _matchMedia ? function(q) {
             return !!_matchMedia.call(win, q).matches;
@@ -39,7 +61,7 @@ hAzzle.define('dimensions', function() {
         },
         // scrollLeft
         scrollLeft = function(elem, val) {
-            return scrollLeftTop(elem, function(elem, win) {
+            return scrollLeftTop(getElem(elem), function(elem, win) {
                 if (val === undefined) {
                     return win ? win.pageXOffset : elem.scrollLeft;
                 }
@@ -48,7 +70,7 @@ hAzzle.define('dimensions', function() {
         },
         // scrollTop
         scrollTop = function(elem, val) {
-            return scrollLeftTop(elem, function(elem, win) {
+            return scrollLeftTop(getElem(elem), function(elem, win) {
                 if (val === undefined) {
                     return win ? win.pageYOffset : elem.scrollTop;
                 }
@@ -106,6 +128,8 @@ hAzzle.define('dimensions', function() {
             w = types.isType('Function')(w) ? w.call(opt) : w;
             return w / h;
         },
+
+
         // Test if an element is in the same x-axis section as the viewport.
         inX = function(elem, cushion) {
             var r = rectangle(elem, cushion);
@@ -185,6 +209,14 @@ hAzzle.define('dimensions', function() {
         return scrollTop(this.elements[0], val);
     };
 
+    // BIG NOTE!! getBoundingClientRect() are the best solution for this function, but
+    // getBoundingClientRect() are terrible slow, and hAzzle need to be fast.
+    // http://jsperf.com/getboundingclientrect-vs-offset
+    // Too many CSS look-ups are not a problem here, it's allready cached on the element itself
+    // Example if we try this jQuery example ( Number #2): http://api.jquery.com/offset/
+    // Each action get the data from the element cache and not DOM. With gBCR() we have to
+    // ask DOM for each action
+
     this.offset = function(opts) {
         if (arguments.length) {
             return opts === undefined ?
@@ -194,7 +226,15 @@ hAzzle.define('dimensions', function() {
                 });
         }
         var docElem, elem = this.elements[0],
-            doc = elem && elem.ownerDocument;
+            position = {
+                top: 0,
+                left: 0
+            },
+            doc = elem && elem.ownerDocument,
+            win = types.isWindow(doc) ? doc : doc.nodeType === 9 && doc.defaultView,
+            borderBox = function(element) {
+                return css.css(element, 'mozBoxSizing') == 'border-box';
+            };
 
         if (!doc) {
             return;
@@ -204,22 +244,40 @@ hAzzle.define('dimensions', function() {
 
         // Make sure it's not a disconnected DOM node
         if (!hAzzle.require('Core').contains(docElem, elem)) {
-            return {
-                top: 0,
-                left: 0
-            };
+            return position;
         }
-        // All major browsers supported by hAzzle supports getBoundingClientRect, so no
-        // need for a workaround
 
-        var bcr = elem.getBoundingClientRect(),
-            isFixed = (css.css(elem, 'position') === 'fixed'),
-            win = types.isWindow(doc) ? doc : doc.nodeType === 9 && doc.defaultView;
-        return {
-            top: bcr.top + elem.parentNode.scrollTop + ((isFixed) ? 0 : win.pageYOffset) - docElem.clientTop,
-            left: bcr.left + elem.parentNode.scrollLeft + ((isFixed) ? 0 : win.pageXOffset) - docElem.clientLeft
-        };
-    };
+        var FireFox = features.has('firefox');
+        if (isBody(this)) return position;
+
+        while (elem && !isBody(elem)) {
+            position.left += elem.offsetLeft;
+            position.top += elem.offsetTop,
+                lastElem = elem;
+
+            if (FireFox) {
+                if (!borderBox(elem)) {
+                    position.left += parseFloat(css.css(elem, 'borderLeftWidth'));
+                    position.top += parseFloat(css.css(elem, 'borderTopWidth'));
+                }
+                var parent = elem.parentNode;
+                if (parent && css.css(parent, 'overflow') != 'visible') {
+                    position.left += parseFloat(css.css(parent, 'borderLeftWidth'));
+                    position.top += parseFloat(css.css(parent, 'borderTopWidth'));
+                }
+            } else if (elem !== lastElem && features.has('safari')) {
+                position.left += parseFloat(css.css(elem, 'borderLeftWidth'));
+                position.top += parseFloat(css.css(elem, 'borderTopWidth'));
+            }
+            elem = elem.offsetParent;
+        }
+        if (FireFox && !borderBox(elem)) {
+            position.left -= parseFloat(css.css(elem, 'borderLeftWidth'));
+            position.top -= parseFloat(css.css(elem, 'borderTopWidth'));
+        }
+
+        return position;
+    }
 
     this.position = function(relative) {
 
@@ -261,18 +319,20 @@ hAzzle.define('dimensions', function() {
 
     this.offsetParent = function() {
         return this.map(function(elem) {
-            var offsetParent = elem.offsetParent || docElem;
+            if (isBody(elem) || css.css(elem, 'position') == 'fixed') return null;
 
-            while (offsetParent && (!util.nodeName(offsetParent, 'html') &&
-                    css.css(offsetParent, 'position') === 'static')) {
-                offsetParent = offsetParent.offsetParent;
+            var isOffsetCheck = (css.css(elem, 'position') == 'static') ? isStatic : isOffset;
+            while ((elem = elem.parentNode)) {
+                if (isOffsetCheck(elem)) {
+                    return elem;
+                }
             }
-
-            return offsetParent || docElem;
+            return null;
         });
     };
 
     // 'this' height and width
+
 
     util.each({
         height: 'Height',
