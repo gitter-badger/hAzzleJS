@@ -66,6 +66,15 @@ hAzzle.define('has', function() {
         div = null;
         return mu;
     });
+    // Support: IE9  
+    add('BordersInWrongOrder', function() {
+        var div = document.createElement('div'),
+            ret, border = '1px solid #123abc';
+        div.style.border = border;
+        ret = div.style.border != border;
+        div = null;
+        return ret;
+    });
 
     // mobile
 

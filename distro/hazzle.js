@@ -222,6 +222,15 @@ hAzzle.define('has', function() {
         div = null;
         return mu;
     });
+    // Support: IE9  
+    add('BordersInWrongOrder', function() {
+        var div = document.createElement('div'),
+            ret, border = '1px solid #123abc';
+        div.style.border = border;
+        ret = div.style.border != border;
+        div = null;
+        return ret;
+    });
 
     // mobile
 
@@ -2152,17 +2161,6 @@ hAzzle.define('css', function() {
         btbleftkf = /^(.+)\s(.+)\s(.+)$/,
         units = /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i,
 
-        // Support: IE9        
-
-        BordersInWrongOrder = (function() {
-            var div = document.createElement('div'),
-                ret, border = '1px solid #123abc';
-            div.style.border = border;
-            ret = div.style.border != border;
-            div = null;
-            return ret;
-        }()),
-
         computedValues = function(elem) {
             if (elem && elem.ownerDocument !== null) {
                 var view = false;
@@ -2283,7 +2281,7 @@ hAzzle.define('css', function() {
                         ret = computedStyle[prop];
                     }
 
-                    if (BordersInWrongOrder && btbleft.test(prop) && hex.test(ret)) {
+                    if (feature.has('BordersInWrongOrder') && btbleft.test(prop) && hex.test(ret)) {
                         ret.replace(btbleftkf, '$2 $3 $1');
                     }
                 } else {
