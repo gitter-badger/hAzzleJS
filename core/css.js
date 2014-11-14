@@ -18,7 +18,21 @@ hAzzle.define('css', function() {
         tablerow = /^(tr)$/i,
         table = /^(table)$/i,
         margin = (/^margin/),
+        hex = /^#/,
+        btbleft = /^border(Top|Right|Bottom|Left)?$/,
+        btbleftkf = /^(.+)\s(.+)\s(.+)$/,
         units = /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i,
+
+        // Support: IE9        
+
+        BordersInWrongOrder = (function() {
+            var div = document.createElement('div'),
+                ret, border = '1px solid #123abc';
+            div.style.border = border;
+            ret = div.style.border != border;
+            div = null;
+            return ret;
+        }()),
 
         computedValues = function(elem) {
             if (elem && elem.ownerDocument !== null) {
@@ -132,8 +146,17 @@ hAzzle.define('css', function() {
                 // Support: IE9
                 // getPropertyValue is only needed for .css('filter')
 
-                if (feature.ie === 9 && prop === 'filter') {
-                    ret = computedStyle.getPropertyValue(prop);
+                if (feature.ie === 9) {
+
+                    if (prop === 'filter') {
+                        ret = computedStyle.getPropertyValue(prop);
+                    } else {
+                        ret = computedStyle[prop];
+                    }
+
+                    if (BordersInWrongOrder && btbleft.test(prop) && hex.test(ret)) {
+                        ret.replace(btbleftkf, '$2 $3 $1');
+                    }
                 } else {
                     ret = computedStyle[prop];
                 }
