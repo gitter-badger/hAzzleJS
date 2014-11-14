@@ -293,7 +293,7 @@ hAzzle.define('manipulation', function() {
 
             var append = function(el, i) {
                     util.each(normalize(value, getElem(elem), i), function(node) {
-                        el.append(node); // DOM Level 4
+//                         el.append(node); // DOM Level 4
                     });
                 },
                 updateElement = function(el, i) {
@@ -319,7 +319,7 @@ hAzzle.define('manipulation', function() {
 
             // Update each element with new content
 
-            return util.each(elem, updateElement);
+            return util.each([elem], updateElement);
         },
 
         text = function(elem, value) {

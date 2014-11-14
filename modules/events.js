@@ -10,7 +10,7 @@ hAzzle.define('events', function() {
         core = hAzzle.require('core'),
         collection = hAzzle.require('collection'),
         features = hAzzle.require('has'),
-        types = hAzzle.require('types'),
+        istypes = hAzzle.require('types'),
         jiesa = hAzzle.require('jiesa'),
 
         evwhite = (/\S+/g),
@@ -78,7 +78,7 @@ hAzzle.define('events', function() {
 
             // Types can be a map of types/handlers
 
-            if (types.isType('Object')(events)) {
+            if (istypes.isType('Object')(events)) {
                 for (type in events) {
                     fn = events[type];
                     if (selector === undefined) {
@@ -92,7 +92,7 @@ hAzzle.define('events', function() {
 
             // Event delegation
 
-            if (!types.isType('Function')(selector)) {
+            if (!istypes.isType('Function')(selector)) {
                 original = fn;
                 args = collection.slice(arguments, 4);
                 fn = delegate(selector, original);
@@ -816,9 +816,9 @@ hAzzle.define('events', function() {
 
     this.customEvent = function(eventName, detail, bubble, cancel) {
         var event = new CustomEvent(eventName, {
-            detail: types.isType('Object')(detail) ? detail : {},
-            bubbles: types.isBoolean(bubble) ? bubble : false,
-            cancelable: types.isBoolean(cancel) ? cancel : false
+            detail: istypes.isType('Object')(detail) ? detail : {},
+            bubbles: istypes.isBoolean(bubble) ? bubble : false,
+            cancelable: istypes.isBoolean(cancel) ? cancel : false
         });
         this.elements[0].dispatchEvent(event);
     };
