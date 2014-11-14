@@ -1,4 +1,5 @@
 // style.js
+// Dependencies: dimensions.js ( required for Safari & Webkit)
 var hAzzle = window.hAzzle || (window.hAzzle = {});
 
 hAzzle.define('style', function() {
@@ -10,6 +11,7 @@ hAzzle.define('style', function() {
 
         leftRightMargPad = /^(left$|right$|margin|padding)/,
         relAbsFixed = /^(relative|absolute|fixed)$/,
+
         topBottom = /^(top|bottom)$/,
 
         _unitlessProps = ('zoom box-flex columns counter-reset volume stress overflow flex-grow ' +
@@ -320,6 +322,28 @@ hAzzle.define('style', function() {
         };
     });
 
+    (function() {
+        var pixelPosition, div = document.createElement('div'), computed = window.getComputedStyle;
+        div.style.cssText = 'border:0;width:0;height:0;position:absolute;top:0;left:-9999px;margin-top:1px';
+        if (computed) {
+            pixelPosition = (computed(div, null) || {}).top !== '1%';
+
+            if (pixelPosition)
+                util.each(['top', 'left'], function(prop) {
+                    cssHooks.get[prop] = function(elem, computed) {
+                        if (computed) {
+                            computed = curCSS(elem, prop);
+                            return /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i.test(computed) ?
+                                hAzzle(elem).position()[prop] + 'px' :
+                                computed;
+                        }
+                    }
+                });
+           // Prevent memory lekas in IE     
+            div = null;
+        }
+    }());
+
     // Populate the unitless properties list
 
     util.each(_unitlessProps, function(prop) {
@@ -327,7 +351,7 @@ hAzzle.define('style', function() {
     });
 
     return {
-        vendor:vendorPrefixes,
+        vendor: vendorPrefixes,
         cssHooks: cssHooks,
         cssProps: cssProps,
         swap: swap,

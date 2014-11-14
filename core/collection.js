@@ -116,7 +116,7 @@ hAzzle.define('Collection', function() {
 
     this.contents = function() {
         return this.map(function() {
-            return this.contentDocument || slice(this.childNodes);
+            return this.contentDocument || slice(this.childNodes) || [];
         });
     };
 

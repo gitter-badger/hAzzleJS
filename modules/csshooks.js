@@ -17,16 +17,61 @@ hAzzle.define('cssHooks', function() {
             return res;
         }()),
 
+        parseBgPos = function(bgPos) {
+            var parts = bgPos.split(/\s/),
+                values = {
+                    'X': parts[0],
+                    'Y': parts[1]
+                };
+            return values;
+        },
+
         padMarg = {
-            padding: 'paddingTop paddingRight paddingBottom paddingLeft',
-            margin: 'marginTop marginRight marginBottom marginLeft',
-            borderWidth: 'borderTopWidth borderRightWidth borderBottomWidth borderLeftWidth',
-            borderColor: 'borderTopColor borderRightColor borderBottomColor borderLeftColor',
-        };
+            padding: ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'],
+            margin: ['marginTop', 'marginRight', 'marginBottom', 'marginLeft'],
+            borderWidth: ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth'],
+            borderColor: ['borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor'],
+        },
+        xy = ['X', 'Y'];
 
     if (borderRadius) {
-        padMarg.borderRadius = 'borderTopLeftRadius borderTopRightRadius borderBottomRightRadius borderBottomLeftRadius';
+        padMarg.borderRadius = ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'];
     }
+
+    util.each(padMarg, function(vals, name) {
+        cssStyle.cssHooks.get[name] = function(elem) {
+            return vals.map(function(corner) {
+                return getCSS.css(elem, corner);
+            }).join(' ');
+        };
+    });
+
+    // Background position
+
+    cssStyle.cssHooks.get.backgroundPosition = function(elem) {
+        return util.map(xy, function(prop) {
+            return getCSS.css(elem, 'backgroundPosition' + prop);
+        }).join(' ');
+    };
+    cssStyle.cssHooks.set.backgroundPosition = function(elem, value) {
+        util.each(xy, function(prop) {
+            var values = parseBgPos(value);
+            elem.style['backgroundPosition' + prop] = values[prop];
+        });
+    };
+
+    util.each(xy, function(prop) {
+        cssStyle.cssHooks.get['backgroundPosition' + prop] = function(elem) {
+            var values = parseBgPos(getCSS.css(elem, 'backgroundPosition'));
+            return values[prop];
+        };
+        cssStyle.cssHooks.set['backgroundPosition' + prop] = function(elem, value) {
+            var values = parseBgPos(getCSS.css(elem, 'backgroundPosition')),
+                isX = prop === 'X';
+            elem.style.backgroundPosition = (isX ? value : values.X) + ' ' +
+                (isX ? values.Y : value);
+        };
+    });
 
     // Fixes Chrome bug / issue
 
@@ -47,16 +92,6 @@ hAzzle.define('cssHooks', function() {
             }
         };
     }
-
-    util.each(padMarg, function(vals, name) {
-        vals = vals.split(' ');
-        cssStyle.cssHooks.get[name] = function(elem) {
-            return getCSS.css(elem, vals[0]) + ' ' +
-                getCSS.css(elem, vals[1]) + ' ' +
-                getCSS.css(elem, vals[2]) + ' ' +
-                getCSS.css(elem, vals[3]);
-        };
-    });
 
     util.mixin(cssStyle.cssHooks.get, {
         'opacity': function(elem, computed) {

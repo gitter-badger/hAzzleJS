@@ -53,6 +53,12 @@ hAzzle.define('setters', function() {
             return booleanAttr && boolElem[elem.nodeName] && booleanAttr;
         },
 
+        // Check for valid nodetypes    
+       
+        validTypes = function(nType) {
+           return nType && (nType !== 3 || nType !== 8 || nType !== 2)
+        },
+
         // Removes an attribute from an HTML element.
 
         removeAttr = function(elem, value) {
@@ -85,7 +91,7 @@ hAzzle.define('setters', function() {
             var nodeType = elem ? elem.nodeType : undefined,
                 hooks, ret;
 
-            if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
+            if (validTypes(nodeType)) {
 
                 // Fallback to prop when attributes are not supported
                 if (typeof elem.getAttribute === 'undefined') {
@@ -110,13 +116,15 @@ hAzzle.define('setters', function() {
                             return ret;
                         }
                     }
-
+                  
+                  // To avoid bugs in IE regarding href, we are adding the extra argument '2'
+      
                     ret = elem.getAttribute(name, 2);
-                    // Non-existent attributes return null, we normalize to undefined
+                    // normalize non-existing attributes to undefined (as jQuery)
                     return ret == null ? undefined : ret;
                 }
 
-                // Set attribute
+                // Set / remove a attribute
 
                 if (!value) {
                     removeAttr(elem, name);
@@ -136,7 +144,7 @@ hAzzle.define('setters', function() {
             var nodeType = elem ? elem.nodeType : undefined,
                 hook, ret;
 
-            if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
+            if (validTypes(nodeType)) {
 
                 if (nodeType !== 1 || core.isHTML) {
 

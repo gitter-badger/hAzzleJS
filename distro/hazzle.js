@@ -1403,9 +1403,8 @@ hAzzle.define('Jiesa', function() {
         collection = hAzzle.require('collection'),
         types = hAzzle.require('types'),
         features = hAzzle.require('has'),
-        engine = hAzzle.require('selector'),
 
-        // RegEx
+    // RegEx
         idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
         tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
         unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
@@ -1570,28 +1569,22 @@ hAzzle.define('Jiesa', function() {
                     });
                     return results;
                 }
-                // Fallback to QSA if the native selector engine are not installed
-                // Fixme! Check for installed selector engine will be set to false soon
-
-                if (hAzzle.installed.selector && core.qsa && (!core.QSABugs || !core.QSABugs.test(sel))) {
-                    try {
-                        if (ctx.nodeType === 1) {
-                            ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
-                        } else {
-                            // we can use the native qSA
-                            ret = ctx.querySelectorAll(sel);
-                        }
-                        return collection.slice(ret);
-                    } catch (e) {}
-                }
             }
 
-            // We are dealing with HTML / XML documents, so check if the native selector engine are installed 
-            // To avoid bloating the hAzzle Core - the main selector engine are a separate module            
+            // Fallback to QSA if the native selector engine are not installed
+            // Fixme! Check for installed selector engine will be set to false soon
 
-            hAzzle.err(!hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
-
-            return engine.find(sel, ctx);
+            if (core.qsa && (!core.QSABugs || !core.QSABugs.test(sel))) {
+                try {
+                    if (ctx.nodeType === 1) {
+                        ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
+                    } else {
+                        // we can use the native qSA
+                        ret = ctx.querySelectorAll(sel);
+                    }
+                    return collection.slice(ret);
+                } catch (e) {}
+            }
         },
 
         // Speeding up matches
@@ -1669,8 +1662,7 @@ hAzzle.define('Jiesa', function() {
                             }
                         } catch (e) {}
                     } else {
-                        hAzzle.err(!hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
-                        return engine.matches(sel, elem, sel);
+                        hAzzle.err(true, 23, ' jiesa.js module need to be installed');
                     }
                 }
             }
@@ -1732,7 +1724,9 @@ hAzzle.define('Jiesa', function() {
         pseudos: pseudos,
         find: jiesa
     };
-});// strings.js
+});
+
+// strings.js
 hAzzle.define('Strings', function() {
     var
 
@@ -2153,7 +2147,21 @@ hAzzle.define('css', function() {
         tablerow = /^(tr)$/i,
         table = /^(table)$/i,
         margin = (/^margin/),
+        hex = /^#/,
+        btbleft = /^border(Top|Right|Bottom|Left)?$/,
+        btbleftkf = /^(.+)\s(.+)\s(.+)$/,
         units = /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i,
+
+        // Support: IE9        
+
+        BordersInWrongOrder = (function() {
+            var div = document.createElement('div'),
+                ret, border = '1px solid #123abc';
+            div.style.border = border;
+            ret = div.style.border != border;
+            div = null;
+            return ret;
+        }()),
 
         computedValues = function(elem) {
             if (elem && elem.ownerDocument !== null) {
@@ -2267,8 +2275,17 @@ hAzzle.define('css', function() {
                 // Support: IE9
                 // getPropertyValue is only needed for .css('filter')
 
-                if (feature.ie === 9 && prop === 'filter') {
-                    ret = computedStyle.getPropertyValue(prop);
+                if (feature.ie === 9) {
+
+                    if (prop === 'filter') {
+                        ret = computedStyle.getPropertyValue(prop);
+                    } else {
+                        ret = computedStyle[prop];
+                    }
+
+                    if (BordersInWrongOrder && btbleft.test(prop) && hex.test(ret)) {
+                        ret.replace(btbleftkf, '$2 $3 $1');
+                    }
                 } else {
                     ret = computedStyle[prop];
                 }
