@@ -7,9 +7,9 @@ hAzzle.define('Jiesa', function() {
         core = hAzzle.require('core'),
         collection = hAzzle.require('collection'),
         types = hAzzle.require('types'),
-        features = hAzzle.require('has')
+        features = hAzzle.require('has'),
 
-        // RegEx
+    // RegEx
         idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
         tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
         unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
@@ -174,28 +174,22 @@ hAzzle.define('Jiesa', function() {
                     });
                     return results;
                 }
-                // Fallback to QSA if the native selector engine are not installed
-                // Fixme! Check for installed selector engine will be set to false soon
-
-                if (hAzzle.installed.selector && core.qsa && (!core.QSABugs || !core.QSABugs.test(sel))) {
-                    try {
-                        if (ctx.nodeType === 1) {
-                            ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
-                        } else {
-                            // we can use the native qSA
-                            ret = ctx.querySelectorAll(sel);
-                        }
-                        return collection.slice(ret);
-                    } catch (e) {}
-                }
             }
 
-            // We are dealing with HTML / XML documents, so check if the native selector engine are installed 
-            // To avoid bloating the hAzzle Core - the main selector engine are a separate module            
+            // Fallback to QSA if the native selector engine are not installed
+            // Fixme! Check for installed selector engine will be set to false soon
 
-            hAzzle.err(hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
-
-//            return engine.find(sel, ctx);
+            if (core.qsa && (!core.QSABugs || !core.QSABugs.test(sel))) {
+                try {
+                    if (ctx.nodeType === 1) {
+                        ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
+                    } else {
+                        // we can use the native qSA
+                        ret = ctx.querySelectorAll(sel);
+                    }
+                    return collection.slice(ret);
+                } catch (e) {}
+            }
         },
 
         // Speeding up matches
@@ -273,8 +267,7 @@ hAzzle.define('Jiesa', function() {
                             }
                         } catch (e) {}
                     } else {
-                        hAzzle.err(!hAzzle.installed.selector, 22, ' the selector.js module need to be installed');
-//                        return engine.matches(sel, elem, sel);
+                        hAzzle.err(true, 23, ' jiesa.js module need to be installed');
                     }
                 }
             }
