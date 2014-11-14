@@ -4,9 +4,8 @@
  * Version: 1.0.2a
  * Released under the MIT License.
  *
- * Date: 2014-11-14
+ * Date: 2014-11-15
  */
- 
 (function() {
 
     var
@@ -105,10 +104,10 @@
                 }
                 // hAzzle([dom]) 
             } else if (Array.isArray(sel)) {
-                els = util.unique( util.filter(sel, validTypes));
+                els = util.unique(util.filter(sel, validTypes));
                 // hAzzle(dom)
             } else if (this.isNodeList(sel)) {
-                els = util.filter( util.makeArray(sel), validTypes);
+                els = util.filter(util.makeArray(sel), validTypes);
                 // hAzzle(dom)
             } else if (sel.nodeType) {
                 // If it's a html fragment, create nodes from it
@@ -326,8 +325,8 @@ hAzzle.define('Types', function() {
         },
 
         isElement = function(node) {
-            return !!(node && 
-              node.nodeName // we are a direct element
+            return !!(node &&
+                node.nodeName // we are a direct element
             );
         },
         isNaN = function(value) {
@@ -362,13 +361,13 @@ hAzzle.define('Types', function() {
                 return oString.call(arg) === '[object ' + type + ']';
             } : function() {};
         },
-        
+
         // Determines if a reference is an `Object`. Unlike `typeof` in JavaScript, `null`s are not
         // considered to be objects. Note that JavaScript arrays are objects.
 
         isObject = function(value) {
-             // http://jsperf.com/isobject4
-           return value !== null && typeof value === 'object';
+            // http://jsperf.com/isobject4
+            return value !== null && typeof value === 'object';
         },
 
         isPlainObject = function(obj) {
@@ -537,6 +536,7 @@ hAzzle.define('util', function() {
 
             if (!fn) return identity;
         },
+
 
         // Determine if at least one element in the object matches a truth test. 
         // ECMAScript 5 15.4.4.17
@@ -1413,7 +1413,7 @@ hAzzle.define('Jiesa', function() {
         types = hAzzle.require('types'),
         features = hAzzle.require('has'),
 
-    // RegEx
+        // RegEx
         idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
         tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
         unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
@@ -2686,13 +2686,13 @@ hAzzle.define('attrHooks', function() {
 });
 
 // prophooks.js
-hAzzle.define('prophooks', function () {
+hAzzle.define('prophooks', function() {
 
     var util = hAzzle.require('util'),
         setters = hAzzle.require('setters');
 
     util.mixin(setters.propHooks.get, {
-        'tabIndex': function (elem) {
+        'tabIndex': function(elem) {
             return elem.hasAttribute('tabindex') ||
                 /^(?:input|select|textarea|button)$/i.test(elem.nodeName) || elem.href ?
                 elem.tabIndex :
@@ -2706,8 +2706,8 @@ hAzzle.define('prophooks', function () {
     var select = document.createElement('select'),
         opt = select.appendChild(document.createElement('option'));
 
-    if (!opt.selected) { 
-        setters.propHooks.get.selected = function (elem) {
+    if (!opt.selected) {
+        setters.propHooks.get.selected = function(elem) {
             var parent = elem.parentNode;
             if (parent && parent.parentNode) {
                 parent.parentNode.selectedIndex;
@@ -2715,7 +2715,7 @@ hAzzle.define('prophooks', function () {
             return null;
         };
     }
-      return {};
+    return {};
 });
 // valhooks.js
 hAzzle.define('valHooks', function() {
@@ -2735,11 +2735,11 @@ hAzzle.define('valHooks', function() {
             var node = checkbox.getAttributeNode('checked');
             return !node || !node.specified;
         })(),
- 
+
         // iOF() gives approx 40 - 60% better performance then native indexOf
         // for valHooks
 
-         iOf = function(array, item, from) {
+        iOf = function(array, item, from) {
             var i, length = array.length;
 
             for (i = (from < 0) ? Math.max(0, length + from) : from || 0; i < length; i++) {
@@ -2837,7 +2837,7 @@ hAzzle.define('valHooks', function() {
             }
         };
     });
-    
+
     if (!supportCheckboxes) {
         setters.valHooks.get[val] = function(elem) {
             return elem.getAttribute('value') === null ? 'on' : elem.value;
@@ -3060,5 +3060,48 @@ hAzzle.define('valHooks', function() {
                 detail: null
             }
         );
+    }
+
+    // ECMA 7 - contains
+
+    if (![].contains) {
+        Object.defineProperty(Array.prototype, 'contains', {
+            enumerable: false,
+            configurable: true,
+            writable: true,
+            value: function(searchElement /*, fromIndex*/ ) {
+                if (this === undefined || this === null) {
+                    throw new TypeError('Cannot convert this value to object');
+                }
+
+                var O = Object(this),
+                    len = parseInt(O.length) || 0;
+
+                if (len === 0) {
+                    return false;
+                }
+                var n = parseInt(arguments[1]) || 0;
+                if (n >= len) {
+                    return false;
+                }
+                var k;
+                if (n >= 0) {
+                    k = n;
+                } else {
+                    k = len + n;
+                    if (k < 0) k = 0;
+                }
+                while (k < len) {
+                    var currentElement = O[k];
+                    if (searchElement === currentElement ||
+                        searchElement !== searchElement && currentElement !== currentElement
+                    ) {
+                        return true;
+                    }
+                    k++;
+                }
+                return false;
+            }
+        });
     }
 }(window));
