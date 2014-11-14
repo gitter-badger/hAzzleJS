@@ -3,23 +3,27 @@ var hAzzle = window.hAzzle || (window.hAzzle = {});
 
 hAzzle.define('Classes', function() {
 
-    var _has = hAzzle.require('has'),
-        _util = hAzzle.require('Util'),
-        _storage = hAzzle.require('Storage'),
-        _strings = hAzzle.require('Strings'),
-        _types = hAzzle.require('Types'),
-        _reSpace = /[\n\t\r]/g,
-        _whitespace = /\s+/,
+    var // Dependencies 
+    
+        features = hAzzle.require('has'),
+        util = hAzzle.require('Util'),
+        storage = hAzzle.require('Storage'),
+        strings = hAzzle.require('Strings'),
+        types = hAzzle.require('Types'),
+        reSpace = /[\n\t\r]/g,
+        witespace = /\s+/,
         a1 = [''],
-
+        
+        // Convert a string - set of class names - to an array
+        
         str2array = function(classes) {
             if (typeof classes === 'string') {
-                if (classes && !_whitespace.test(classes)) {
+                if (classes && !witespace.test(classes)) {
                     a1[0] = classes;
                     return a1;
                 }
 
-                var arr = classes.split(_whitespace);
+                var arr = classes.split(witespace);
 
                 if (arr.length && !arr[0]) {
                     arr.shift();
@@ -36,28 +40,28 @@ hAzzle.define('Classes', function() {
             return classes;
         },
         getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem : [elem];
+            return elem instanceof hAzzle ? elem.elements : elem.length ? elem : [elem];
         },
         addRemove = function(elem, classes, nativeMethodName, fn, done) {
 
-            if (!_types.isEmptyObject(elem)) {
+            if (!types.isEmptyObject(elem)) {
 
                 // Array support (e.g. ['hello', 'world']  
 
                 classes = str2array(classes);
 
-                var length, i, based = false;
+                var length, i, real = false;
 
                 if (nativeMethodName === 'remove' && !classes) {
                     elem.className = '';
                 }
-                // use native classList property if possible
+                // Use native classList property if possible
 
-                if (!_has.has('classlist')) {
+                if (!features.has('classlist')) {
 
                     // Flag native
 
-                    based = true;
+                    real = true;
 
                     fn = function(elem, cls) {
                         return elem.classList[nativeMethodName](cls);
@@ -66,7 +70,7 @@ hAzzle.define('Classes', function() {
 
                 // Some browsers (e.g. IE) don't support multiple  arguments
 
-                if (based && _has.has('multiArgs')) {
+                if (real && features.has('multiArgs')) {
                     elem && elem.classList[nativeMethodName].apply(elem.classList, classes);
                 } else {
 
@@ -79,7 +83,7 @@ hAzzle.define('Classes', function() {
                 // Callback function (if provided) that will be fired after the
                 // className value has been added / removed to / from the element 
 
-                if (_types.isType('Function')(done)) {
+                if (types.isType('Function')(done)) {
                     done.call(elem, elem);
                 }
             }
@@ -95,7 +99,7 @@ hAzzle.define('Classes', function() {
             var className = ' ' + classes + ' ',
                 els = elem.length ? elem : [elem],
                 i = 0,
-                cls = _has.has('classlist'),
+                cls = features.has('classlist'),
                 l = els.length;
 
             for (; i < l; i++) {
@@ -105,7 +109,7 @@ hAzzle.define('Classes', function() {
                             return true;
                         }
                     } else {
-                        if ((' ' + els[i].className + ' ').replace(_reSpace, ' ').indexOf(className) >= 0) {
+                        if ((' ' + els[i].className + ' ').replace(reSpace, ' ').indexOf(className) >= 0) {
                             return true;
                         }
                     }
@@ -117,10 +121,10 @@ hAzzle.define('Classes', function() {
         // Add classes to element collection
 
         addClass = function(elem, classes, /*optional*/ fn) {
-            _util.each(getElem(elem), function(elem) {
+            util.each(getElem(elem), function(elem) {
                 return addRemove(elem, classes, 'add', function(elem, cls) {
 
-                    var cur = (' ' + elem.className + ' ').replace(_reSpace, ' '),
+                    var cur = (' ' + elem.className + ' ').replace(reSpace, ' '),
                         finalValue;
 
                     if (cur.indexOf(' ' + cls + ' ') < 0) {
@@ -128,7 +132,7 @@ hAzzle.define('Classes', function() {
                     }
 
                     // Only assign if different to avoid unneeded rendering.
-                    finalValue = _strings.trim(cur);
+                    finalValue = strings.trim(cur);
                     if (elem.className !== finalValue) {
                         elem.className = finalValue;
                     }
@@ -140,17 +144,17 @@ hAzzle.define('Classes', function() {
         // Remove classes from element collection
 
         removeClass = function(elem, classes, /*optional*/ fn) {
-            _util.each(getElem(elem), function(elem) {
+            util.each(getElem(elem), function(elem) {
                 return addRemove(elem, classes, 'remove', function(elem, cls) {
 
-                    var cur = (' ' + elem.className + ' ').replace(_reSpace, ' '),
+                    var cur = (' ' + elem.className + ' ').replace(reSpace, ' '),
                         finalValue;
 
                     if (cur.indexOf(' ' + cls + ' ') >= 0) {
                         cur = cur.replace(' ' + cls + ' ', ' ');
                     }
                     // Only assign if different to avoid unneeded rendering.
-                    finalValue = cls ? _strings.trim(cur) : '';
+                    finalValue = cls ? strings.trim(cur) : '';
                     if (elem.className !== finalValue) {
                         elem.className = finalValue;
                     }
@@ -166,7 +170,7 @@ hAzzle.define('Classes', function() {
 
         toggleClass = function(elem, value, condition) {
 
-            var els = getElem(elem),
+            var els = getElem(elem)[0],
                 type = typeof value;
 
             if (typeof condition === 'boolean' && type === 'string') {
@@ -200,10 +204,10 @@ hAzzle.define('Classes', function() {
                 } else if (value === undefined || type === 'boolean') {
                     if (elem.className) {
                         // store className if set
-                        _storage.private.set(elem, '__className__', elem.className);
+                        storage.private.set(elem, '__className__', elem.className);
                     }
                     elem.className = elem.className || value === false ?
-                        '' : _storage.private.get(this, '__className__') || '';
+                        '' : storage.private.get(this, '__className__') || '';
                 }
             }
         };
