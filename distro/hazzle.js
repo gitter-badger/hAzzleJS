@@ -538,6 +538,7 @@ hAzzle.define('util', function() {
         },
 
 
+
         // Determine if at least one element in the object matches a truth test. 
         // ECMAScript 5 15.4.4.17
 
@@ -1675,6 +1676,7 @@ hAzzle.define('Jiesa', function() {
                     }
                 }
             }
+
         };
 
     this.find = function(selector, context, /*internal*/ internal) {
@@ -3069,7 +3071,7 @@ hAzzle.define('valHooks', function() {
             enumerable: false,
             configurable: true,
             writable: true,
-            value: function(searchElement /*, fromIndex*/ ) {
+            value: function(target /*, fromIndex*/ ) {
                 if (this === undefined || this === null) {
                     throw new TypeError('Cannot convert this value to object');
                 }
@@ -3080,7 +3082,8 @@ hAzzle.define('valHooks', function() {
                 if (len === 0) {
                     return false;
                 }
-                var n = parseInt(arguments[1]) || 0;
+                var n = (arguments[1] !== undefined) ? parseInt(arguments[1]) : 0;
+
                 if (n >= len) {
                     return false;
                 }
@@ -3088,17 +3091,19 @@ hAzzle.define('valHooks', function() {
                 if (n >= 0) {
                     k = n;
                 } else {
-                    k = len + n;
-                    if (k < 0) k = 0;
+                    k = len + Math.abs(n);
+                    if (k < 0) {
+                        k = 0;
+                    }
                 }
                 while (k < len) {
                     var currentElement = O[k];
-                    if (searchElement === currentElement ||
-                        searchElement !== searchElement && currentElement !== currentElement
+                    if (target === currentElement ||
+                        target !== target && currentElement !== currentElement
                     ) {
                         return true;
                     }
-                    k++;
+                    k += 1;
                 }
                 return false;
             }
