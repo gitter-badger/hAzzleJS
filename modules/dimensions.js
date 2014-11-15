@@ -259,23 +259,23 @@ hAzzle.define('dimensions', function() {
 
             if (FireFox) {
                 if (!borderBox(elem)) {
-                    position.left += parseFloat(css.css(elem, 'borderLeftWidth'));
-                    position.top += parseFloat(css.css(elem, 'borderTopWidth'));
+                    position.left += parseFloat(css.css(elem, 'borderLeftWidth')) || 0;
+                    position.top += parseFloat(css.css(elem, 'borderTopWidth')) || 0;
                 }
                 var parent = elem.parentNode;
                 if (parent && css.css(parent, 'overflow') !== 'visible') {
-                    position.left += parseFloat(css.css(parent, 'borderLeftWidth'));
-                    position.top += parseFloat(css.css(parent, 'borderTopWidth'));
+                    position.left += parseFloat(css.css(parent, 'borderLeftWidth')) || 0;
+                    position.top += parseFloat(css.css(parent, 'borderTopWidth')) || 0;
                 }
             } else if (elem !== lastElem && features.has('safari')) {
-                position.left += parseFloat(css.css(elem, 'borderLeftWidth'));
-                position.top += parseFloat(css.css(elem, 'borderTopWidth'));
+                position.left += parseFloat(css.css(elem, 'borderLeftWidth')) || 0;
+                position.top += parseFloat(css.css(elem, 'borderTopWidth')) || 0;
             }
             elem = elem.offsetParent;
         }
         if (FireFox && !borderBox(elem)) {
-            position.left -= parseFloat(css.css(elem, 'borderLeftWidth'));
-            position.top -= parseFloat(css.css(elem, 'borderTopWidth'));
+            position.left -= parseFloat(css.css(elem, 'borderLeftWidth')) || 0;
+            position.top -= parseFloat(css.css(elem, 'borderTopWidth')) || 0;
         }
 
         return position;

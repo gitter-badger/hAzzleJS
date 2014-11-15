@@ -55,6 +55,8 @@ hAzzle.define('storage', function() {
         };
 
     Storage.prototype = {
+        
+        constructor: Storage,
 
         register: function(elem, initial) {
 
