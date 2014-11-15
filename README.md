@@ -296,7 +296,6 @@ console.log(_core.isHTML);
 console.log(_core.isXML);
 
 ```
-
 **Note!** hAzzle's selector engine has a few similarites with other selector engines regarding the **core.js** module. It can't be avoid, for if you
 look at **Prototype**, **Slick** or even **Sizzle** they are almost the same when it comes to sorting DOM nodes e.g.
 Based on this **hAzzle** supports similarities with Sizzle when it comes to **QSA** and **matchesSelector** bug tests. 
@@ -351,7 +350,7 @@ Core
   <tr>
     <th><a href="core/jiesa.js#files">jiesa</a></th>
      <td>
-      <code>Jiesa</code> basic selector. Also includes <code>find()</code>, <code>filter()</code> methods. <code>DOM Level 4 - matches() are used for some of this methods</code>
+      <code>Jiesa</code> basic selector. Also includes <code>find()</code>, <code>filter()</code> methods. <code>DOM Level 4 - matches()</code> are used for some of this methods.
     </td>
   </tr>
   <tr>
@@ -399,14 +398,18 @@ Core
       Provides basic getter / setter function for methods in <code>setters.js</code> module.
     </td>
   </tr>
- 
- <tr>
+  <tr>
     <th><a href="core/doml4.js#files">doml4</a></th>
      <td>
       DOM Level 4 pollify. See the <code>DOM Level 4 section</code>
     </td>
   </tr>
- 
+  <tr>
+    <th><a href="core/contains.js#files">contains</a></th>
+     <td>
+      ECMA 7 pollify function for contains() methods for browsers who don't support it. See the <code>ECMA 7 section</code>
+    </td>
+  </tr>
 </tbody>
 </table>
 
