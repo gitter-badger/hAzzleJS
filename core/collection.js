@@ -6,7 +6,9 @@ hAzzle.define('Collection', function() {
         arrayProto = Array.prototype,
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
-
+        
+        // For DOM elements, better to use ECMA 7 - contains (e.g.  elem.contains(array, obj);
+        
         includes = function(array, obj) {
             return arrayProto.indexOf.call(array, obj) != -1;
         },
@@ -153,11 +155,7 @@ hAzzle.define('Collection', function() {
     // Similar to jQuery / Zepto's .add() method
 
     this.add = function(sel, ctx) {
-        var elements = sel;
-        if (typeof sel === 'string') {
-            elements = hAzzle(sel, ctx).elements;
-        }
-        return this.concat(elements);
+       return this.concat(typeof sel === 'string' ? hAzzle(sel, ctx).elements : sel);
     };
 
     // Reduce the set of matched elements to the first in the set, or 
@@ -213,6 +211,13 @@ hAzzle.define('Collection', function() {
             return hAzzle(matched);
         };
     }.bind(this));
+
+    // Native prototype methods that return a usable value
+    util.each(['shift', 'splice', 'unshift', 'join', 'lastIndexOf', 'forEach', 'every', 'reduceRight'], function(method){
+        this[method] = function (a, b, c, d) {
+            return this.elements[method](a, b, c, d)
+        }
+    }.bind(this))
 
     return {
         makeArray: makeArray,

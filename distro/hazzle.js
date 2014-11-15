@@ -1186,7 +1186,9 @@ hAzzle.define('Collection', function() {
         arrayProto = Array.prototype,
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
-
+        
+        // For DOM elements, better to use ECMA 7 - contains (e.g.  elem.contains(array, obj);
+        
         includes = function(array, obj) {
             return arrayProto.indexOf.call(array, obj) != -1;
         },
@@ -1296,7 +1298,7 @@ hAzzle.define('Collection', function() {
 
     this.contents = function() {
         return this.map(function() {
-            return this.contentDocument || slice(this.childNodes);
+            return this.contentDocument || slice(this.childNodes) || [];
         });
     };
 
@@ -1333,13 +1335,9 @@ hAzzle.define('Collection', function() {
     // Similar to jQuery / Zepto's .add() method
 
     this.add = function(sel, ctx) {
-        var elements = sel;
-        if (typeof sel === 'string') {
-            elements = hAzzle(sel, ctx).elements;
-        }
-        return this.concat(elements);
+       return this.concat(typeof sel === 'string' ? hAzzle(sel, ctx).elements : sel);
     };
-
+    
     // Reduce the set of matched elements to the first in the set, or 
     // to the 'num' first element in the set
 
@@ -1393,6 +1391,13 @@ hAzzle.define('Collection', function() {
             return hAzzle(matched);
         };
     }.bind(this));
+
+    // Native methods that return a usable value
+    util.each(['shift', 'splice', 'unshift', 'join', 'lastIndexOf', 'forEach', 'every', 'reduceRight'], function(method){
+        this[method] = function (a, b, c, d) {
+            return this.elements[method](a, b, c, d)
+        }
+    }.bind(this))
 
     return {
         makeArray: makeArray,
@@ -3066,47 +3071,57 @@ hAzzle.define('valHooks', function() {
 
     // ECMA 7 - contains
 
-    if (![].contains) {
-        Object.defineProperty(Array.prototype, 'contains', {
-            enumerable: false,
-            configurable: true,
-            writable: true,
-            value: function(target /*, fromIndex*/ ) {
-                if (this === undefined || this === null) {
-                    throw new TypeError('Cannot convert this value to object');
-                }
+if (![].contains) {
+    Object.defineProperty(Array.prototype, 'contains', {
+        enumerable: false,
+        configurable: true,
+        writable: true,
+        value: function(target /*, fromIndex*/ ) {
+            if (this === undefined || this === null) {
+                throw new TypeError('Cannot convert this value to object');
+            }
 
-                var O = Object(this),
-                    len = parseInt(O.length) || 0;
+            var O = Object(this),
+                len = parseInt(O.length) || 0;
 
-                if (len === 0) {
-                    return false;
-                }
-                var n = (arguments[1] !== undefined) ? parseInt(arguments[1]) : 0;
-
-                if (n >= len) {
-                    return false;
-                }
-                var k;
-                if (n >= 0) {
-                    k = n;
-                } else {
-                    k = len + Math.abs(n);
-                    if (k < 0) {
-                        k = 0;
-                    }
-                }
-                while (k < len) {
-                    var currentElement = O[k];
-                    if (target === currentElement ||
-                        target !== target && currentElement !== currentElement
-                    ) {
-                        return true;
-                    }
-                    k += 1;
-                }
+            if (len < 1) {
                 return false;
             }
-        });
-    }
+            var from = Math.floor(arguments[1] || 0);
+            // In ECMA 6 max length is 2^53-1, currently limited to 2^32-1
+            if (from >= len || from > 0xFFFFFFFF) {
+                return false;
+            }
+
+            if (from < 0) {
+                from = len + from;
+            }
+            if (from === -Infinity || from < 0) {
+                from = 0;
+            }
+
+            var check;
+
+            if (from >= 0) {
+                check = from;
+            } else {
+                check = len + Math.abs(from);
+                if (check < 0) {
+                    check = 0;
+                }
+            }
+            while (check < len) {
+                var currentElement = O[check];
+                if (target === currentElement ||
+                    target !== target && currentElement !== currentElement
+                ) {
+                    return true;
+                }
+                check += 1;
+            }
+            return false;
+        }
+    });
+}
+
 }(window));
