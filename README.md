@@ -311,27 +311,104 @@ Based on this **hAzzle** supports similarities with Sizzle when it comes to **QS
 * QSABugs
 * matchesBugs
 
-Module order ( Core)
+Core
 ---------------------
-Correct module order for the Core if you need to test individual modules:
 
-* core/hAzzle.js
-* core/has.js
-* core/core.js
-* core/types.js
-* core/util.js
-* core/text.js
-* core/collection.js
-* core/jiesa.js
-* core/strings.js
-* core/storage.js
-* core/curcss.js
-* core/setters.js
-* core/attrhooks.js
-* core/prophooks.js
-* core/valhooks.js
-* core/boolhooks.js
-* core/doml4.js
+<table>
+<thead><tr>
+  <th>module</th>  <th>description</th>
+</tr></thead>
+<tbody>
+   <tr>
+    <th><a href="core/hazzle.js#files">hazzle</a></th>
+        <td>Main functions such as module system</td>
+  </tr>
+  <tr>
+    <th><a href="core/has.js#files">has</a></th>
+        <td>Feature detection methods</td>
+  </tr>
+  <tr>
+    <th><a href="core/core.js#files">core</a></th>
+        <td>Core functions for the library. Dealing with correct documents - XML and HTML e.g.</td>
+  </tr>
+  <tr>
+    <th><a href="core/types.js#files">types</a></th>
+        <td></td>
+  </tr>
+  <tr>
+    <th><a href="core/util.js#files">util</a></th>
+        <td>Ultility belt functions faithfull to native Javascript and browser features</td>
+  </tr>
+  <tr>
+    <th><a href="core/text.js#files">text</a></th>
+        <td></td>
+  </tr>
+  <tr>
+    <th><a href="core/collection.js#files">collection</a></th>
+     <td>
+      Internal function for dealing with the <code>.elements array</code></td>
+  </tr>
+  <tr>
+    <th><a href="core/jiesa.js#files">jiesa</a></th>
+     <td>
+      Jiesa basic selector. Also includes find(), filter() methods.
+    </td>
+  </tr>
+  <tr>
+    <th><a href="core/strings.js#files">strings</a></th>
+    <td> </td>
+  </tr>
+  <tr>
+    <th><a href="core/storage.js#files">storage</a></th>
+    <td>
+      Data / element storage methods
+    </td>
+  </tr>
+  <tr>
+    <th><a href="core/curcss.js#files">curcss</a></th>
+     <td>
+      Provides basic getter / setter function for CSS styles
+    </td>
+  </tr>
+ <tr>
+    <th><a href="core/setters.js#files">setters</a></th>
+     <td> </td>
+  </tr>
+ <tr>
+    <th><a href="core/attrhooks.js#files">attrhooks</a></th>
+     <td>
+      Provides basic getter / setter function for CSS styles
+    </td>
+  </tr>
+ <tr>
+    <th><a href="core/prophooks.js#files">prophooks</a></th>
+     <td>
+      Provides basic getter / setter function for CSS styles
+    </td>
+  </tr>
+ 
+ <tr>
+    <th><a href="core/valhooks.js#files">valhooks</a></th>
+     <td>
+      Provides basic getter / setter function for CSS styles
+    </td>
+  </tr>
+ <tr>
+    <th><a href="core/boolhooks.js#files">boolhooks</a></th>
+     <td>
+      Provides basic getter / setter function for CSS styles
+    </td>
+  </tr>
+ 
+ <tr>
+    <th><a href="core/doml4.js#files">doml4</a></th>
+     <td>
+      DOM Level 4 pollify
+    </td>
+  </tr>
+ 
+</tbody>
+</table>
 
 Modules
 -------
@@ -341,11 +418,7 @@ Modules
   <th>module</th>  <th>description</th>
 </tr></thead>
 <tbody>
-  <tr>
-    <th><a href="modules/features.js#files">zepto</a></th>
-        <td>Core module; contains most methods</td>
-  </tr>
-  <tr>
+   <tr>
     <th><a href="modules/attributes.js#files">attributes</a></th>
         <td>attributes</td>
   </tr>
