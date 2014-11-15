@@ -46,15 +46,16 @@ hAzzle.define('Classes', function() {
 
             if (!types.isEmptyObject(elem)) {
 
+                var length, i, real = false;
+
+                if (nativeMethodName === 'remove' && (classes === undefined || classes == null)) {
+                    return elem.className = '';
+                }
+
                 // Array support (e.g. ['hello', 'world']  
 
                 classes = str2array(classes);
 
-                var length, i, real = false;
-
-                if (nativeMethodName === 'remove' && !classes) {
-                    elem.className = '';
-                }
                 // Use native classList property if possible
 
                 if (!features.has('classlist')) {
@@ -68,11 +69,16 @@ hAzzle.define('Classes', function() {
                     };
                 }
 
-                // Some browsers (e.g. IE) don't support multiple  arguments
+                // Some browsers (e.g. IE) don't support multiple arguments
 
-                if (real && features.has('multiArgs')) {
-                    elem && elem.classList[nativeMethodName].apply(elem.classList, classes);
-                } else {
+                if (real && features.has('multiArgs')) {  
+
+                  // Check if the 'elem' are a valid DOM elem and not a window object, by checking
+                  // if the classList exist on the 'elem'. 
+                
+                    elem.classList && elem.classList[nativeMethodName].apply(elem.classList, classes);
+    
+                } else { 
 
                     length = classes.length;
 
@@ -123,7 +129,7 @@ hAzzle.define('Classes', function() {
         addClass = function(elem, classes, /*optional*/ fn) {
             util.each(getElem(elem), function(elem) {
                 return addRemove(elem, classes, 'add', function(elem, cls) {
-
+                        
                     var cur = (' ' + elem.className + ' ').replace(reSpace, ' '),
                         finalValue;
 

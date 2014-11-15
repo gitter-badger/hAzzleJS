@@ -1,8 +1,9 @@
 // collection.js
 hAzzle.define('Collection', function() {
 
-    var win = this,
+    var
     // Dependencies
+
         util = hAzzle.require('util'),
         types = hAzzle.require('types'),
         arrayProto = Array.prototype,
@@ -69,20 +70,21 @@ hAzzle.define('Collection', function() {
     // Return an array or a specific DOM element matched by the hAzzle object
 
     this.get = function(index) {
-        var result, els = this.elements;
-        if (index === undefined) {
-            result = slice(els, 0);
-        } else if (index < 0) {
-            result = els[this.length + index];
-        } else {
-            result = els[index];
-        }
-        return result;
+        return index === undefined ?
+            slice(index, 0) :
+            index < 0 ?
+            this.elements[this.length + index] :
+            this.elements[index];
     };
 
     // Get the element at position specified by index from the current collection.
     this.eq = function(index) {
-        return hAzzle(index === -1 ? slice(this.elements, this.length - 1) : slice(this.elements, index, index + 1));
+
+        // If it's a window or document object, hAzzle will throw. Prevent that .... !
+        if (!types.isWindow(this.elements[0]) && this.elements[0].nodeType !== 9) {
+            return typeof index === 'number' && hAzzle(index === -1 ? slice(this.elements, this.length - 1) : this.elements[index]);
+        }
+        return this;
     };
 
     this.reduce = function(fn, accumulator, args) {
@@ -128,7 +130,7 @@ hAzzle.define('Collection', function() {
     // hAzzle object and return true if at least one of these elements matches the given arguments.
 
     this.is = function(sel) {
-        return this.length > 0 && this.filter(sel).length > 0;
+        return sel ? this.length > 0 && this.filter(sel).length > 0 : false;
     };
 
     // Remove elements from the set of matched elements
@@ -214,7 +216,8 @@ hAzzle.define('Collection', function() {
         };
     }.bind(this));
 
-    // Native prototype methods that return a usable value
+    // Native prototype methods that return a usable value (ECMA 5+)
+
     util.each(['shift',
             'splice',
             'unshift',
