@@ -321,11 +321,11 @@ Core
 <tbody>
    <tr>
     <th><a href="core/hazzle.js#files">hazzle</a></th>
-        <td>Main functions such as module system</td>
+        <td>Main functions such as the module system</td>
   </tr>
   <tr>
     <th><a href="core/has.js#files">has</a></th>
-        <td>Feature detection methods</td>
+        <td>Feature and browser detection methods. All browsers are detected with feature detection and not UserAgent (ua) for better security</td>
   </tr>
   <tr>
     <th><a href="core/core.js#files">core</a></th>
@@ -333,7 +333,7 @@ Core
   </tr>
   <tr>
     <th><a href="core/types.js#files">types</a></th>
-        <td></td>
+        <td>Provides a collection of <code>'is-methods'</code> e.g. <code>isString</code> and <code>isObject</code></td>
   </tr>
   <tr>
     <th><a href="core/util.js#files">util</a></th>
@@ -351,59 +351,59 @@ Core
   <tr>
     <th><a href="core/jiesa.js#files">jiesa</a></th>
      <td>
-      Jiesa basic selector. Also includes find(), filter() methods.
+      <code>Jiesa</code> basic selector. Also includes <code>find()</code>, <code>filter()</code> methods. <code>DOM Level 4 - matches() are used for some of this methods</code>
     </td>
   </tr>
   <tr>
     <th><a href="core/strings.js#files">strings</a></th>
-    <td> </td>
+    <td><code>Provides methods for dealing with string such as <code>trim()</code> and <code>camelize()</code> </td>
   </tr>
   <tr>
     <th><a href="core/storage.js#files">storage</a></th>
     <td>
-      Data / element storage methods
+      Data / element storage methods. Store private and public data on object or <code>HTML5</code>.
     </td>
   </tr>
   <tr>
     <th><a href="core/curcss.js#files">curcss</a></th>
      <td>
-      Provides basic getter / setter function for CSS styles
+      Provides basic getter / setter function for <code>CSS styles</code>, and return correct native values in the <code>px</code> unit
     </td>
   </tr>
  <tr>
     <th><a href="core/setters.js#files">setters</a></th>
-     <td> </td>
+     <td> Provide methods for setting / getting <code>attributes</code>, <code>properties</code> and <code>values</code></td>
   </tr>
  <tr>
     <th><a href="core/attrhooks.js#files">attrhooks</a></th>
      <td>
-      Provides basic getter / setter function for CSS styles
+      Provides basic getter / setter function for the <code>attr()</code> method <code>setters.js</code> module.
     </td>
   </tr>
  <tr>
     <th><a href="core/prophooks.js#files">prophooks</a></th>
      <td>
-      Provides basic getter / setter function for CSS styles
+      Provides basic getter / setter function for the <code>prop()</code> method <code>setters.js</code> module.
     </td>
   </tr>
  
  <tr>
     <th><a href="core/valhooks.js#files">valhooks</a></th>
      <td>
-      Provides basic getter / setter function for CSS styles
+      Provides basic getter / setter function for the <code>val()</code> method <code>setters.js</code> module.
     </td>
   </tr>
  <tr>
     <th><a href="core/boolhooks.js#files">boolhooks</a></th>
      <td>
-      Provides basic getter / setter function for CSS styles
+      Provides basic getter / setter function for methods in <code>setters.js</code> module.
     </td>
   </tr>
  
  <tr>
     <th><a href="core/doml4.js#files">doml4</a></th>
      <td>
-      DOM Level 4 pollify
+      DOM Level 4 pollify. See the <code>DOM Level 4 section</code>
     </td>
   </tr>
  
@@ -420,7 +420,7 @@ Modules
 <tbody>
    <tr>
     <th><a href="modules/attributes.js#files">attributes</a></th>
-        <td>attributes</td>
+        <td><code>HTML5</code> attribute functions</td>
   </tr>
   <tr>
     <th><a href="modules/style.js#files">style</a></th>
@@ -445,12 +445,12 @@ Modules
   <tr>
     <th><a href="modules/classes.js#files">classes</a></th>
      <td>
-      <code>Add</code>, <code>remove</code> and <code>toggle</code> classes. Uses classList if browser supports it</td>
+      <code>Add</code>, <code>remove</code> and <code>toggle</code> classes. Uses <code>classList</code> if browser supports it</td>
   </tr>
   <tr>
     <th><a href="modules/traversing.js#files">traversing</a></th>
      <td>
-      Most common DOM traversion methods such as up(), down(), next(), prev() and similar methods know from **jQuery** / **Zepto**
+      Most common DOM traversion methods such as <code>up()</code>, <code>down()</code>, <code>next()<code>, <code>prev()</code> and similar methods know from jQuery / Zepto
     </td>
   </tr>
   <tr>
@@ -462,16 +462,21 @@ Modules
   <tr>
     <th><a href="modules/jsonxml.js#files">jsonxml</a></th>
     <td>
-      JSON and XML support / parsing
+      <code>JSON</code> and <code>XML</code> support / parsing
     </td>
   </tr>
   <tr>
     <th><a href="modules/manipulation.js#files">manipulation</a></th>
      <td>
-      Provides <code>append</code>, <code>prepend</code>, <code>text</code> and other familiar methods known from from jQuery / Zepto
+      Provides <code>append</code>, <code>prepend</code>, <code>text</code> and other familiar methods known from from jQuery / Zepto. <code>DOM Level 4</code> are used for some of this methods, and <code>insertAdjutantHTML</code>.
     </td>
   </tr>
- 
+ <tr>
+    <th><a href="modules/ecma7.js#files">ecma7</a></th>
+     <td>
+      Provides a few <code>ECMA 7 (ecma262)</code> methids. This is experimentell and not supported by browsers!
+    </td>
+  </tr>
 </tbody>
 </table>
 
