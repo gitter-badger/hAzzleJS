@@ -148,8 +148,9 @@ hAzzle.define('traversing', function() {
     };
 
     // Return elements that is a descendant of another.
+    // 'contains' would be a better name, but it will conflict with ECMA 7
 
-    this.contains = function(selector) {
+    this.descendant = function(selector) {
         var matches;
         return new hAzzle(collection.reduce(this.elements, function(elements, element) {
             matches = jiesa.find(element, selector);
