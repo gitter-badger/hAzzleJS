@@ -11,7 +11,7 @@ hAzzle.define('style', function() {
 
         leftRightMargPad = /^(left$|right$|margin|padding)/,
         relAbsFixed = /^(relative|absolute|fixed)$/,
-
+doesNotRemoveStyles,
         topBottom = /^(top|bottom)$/,
 
         _unitlessProps = ('zoom box-flex columns counter-reset volume stress overflow flex-grow ' +
@@ -151,8 +151,7 @@ hAzzle.define('style', function() {
                         value += ret && ret[3] ? ret[3] : 'px';
                     }
 
-                    // If null and NaN values, remove / don't set current style
-
+                   // Support: IE9
                     if (value === null || value === '') {
                         action = 'remove';
                     } else {
@@ -259,6 +258,14 @@ hAzzle.define('style', function() {
 
             return unit ? px / unit : px;
         };
+        
+     var removeStyle = function(style, property){
+	if (property == 'backgroundPosition'){
+		style.removeAttribute(property + 'X');
+		property += 'Y';
+	}
+	style.removeAttribute(property);
+};   
 
     this.css = function(name, value) {
 

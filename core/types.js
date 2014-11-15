@@ -2,12 +2,17 @@
 hAzzle.define('Types', function() {
 
     var oString = Object.prototype.toString,
+        
+        // Determines if a reference is an `Array`
+        
         isArray = Array.isArray,
 
+        // Determines if a reference is a `String`
+        
         isString = function(value) {
             return typeof value === 'string';
         },
-
+       // Returns true if `obj` is an array or array-like object (NodeList, Arguments, String ...)
         isArrayLike = function(obj) {
             if (obj == null || isWindow(obj)) {
                 return false;
@@ -102,7 +107,10 @@ hAzzle.define('Types', function() {
         isNodeList = function(nodes) {
             var result = Object.prototype.toString.call(nodes);
             // Modern browser such as IE9 / firefox / chrome etc.
-            if (result === '[object HTMLCollection]' || result === '[object NodeList]') {
+            if (result === '[object HTMLCollection]' || 
+                result === '[object NodeList]' || 
+                // https://developer.mozilla.org/en/docs/Web/API/HTMLFormControlsCollection
+                result === '[object HTMLFormControlsCollection]') {
                 return true;
             }
             // Detect length and item 

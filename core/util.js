@@ -6,12 +6,6 @@ hAzzle.define('util', function() {
         types = hAzzle.require('types'),
         oKeys = Object.keys,
 
-        // Short cut for `hasOwnProperty`.
-
-        has = function(arg, id) {
-            return Object.prototype.hasOwnProperty.call(arg, id);
-        },
-
         // Optimized each function
         // Replacement for forEach - ECMAScript 5 15.4.4.18 
 
@@ -136,7 +130,7 @@ hAzzle.define('util', function() {
                 for (; i < length; i++) {
                     source = arguments[i];
                     for (prop in source) {
-                        if (has(source, prop)) {
+                    if (Object.prototype.hasOwnProperty.call(source, prop)) {
                             obj[prop] = source[prop];
                         }
                     }
@@ -419,7 +413,6 @@ hAzzle.define('util', function() {
         indexOf: indexOf,
         filter: filter,
         now: Date.now,
-        has: has,
         bind: bind
     };
 });

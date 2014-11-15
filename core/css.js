@@ -18,9 +18,6 @@ hAzzle.define('css', function() {
         tablerow = /^(tr)$/i,
         table = /^(table)$/i,
         margin = (/^margin/),
-        hex = /^#/,
-        btbleft = /^border(Top|Right|Bottom|Left)?$/,
-        btbleftkf = /^(.+)\s(.+)\s(.+)$/,
         units = /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i,
 
         computedValues = function(elem) {
@@ -47,6 +44,7 @@ hAzzle.define('css', function() {
             }
         },
         getStyles = function(elem) {
+            if(computed(elem).computedStyle) console.log("cached!");
             return computed(elem).computedStyle === null ?
                 computed(elem).computedStyle = computedValues(elem) :
                 computed(elem).computedStyle;
@@ -133,19 +131,9 @@ hAzzle.define('css', function() {
                 }
 
                 // Support: IE9
-                // getPropertyValue is only needed for .css('filter')
 
-                if (feature.ie === 9) {
-
-                    if (prop === 'filter') {
-                        ret = computedStyle.getPropertyValue(prop);
-                    } else {
-                        ret = computedStyle[prop];
-                    }
-
-                    if (feature.has('BordersInWrongOrder') && btbleft.test(prop) && hex.test(ret)) {
-                        ret.replace(btbleftkf, '$2 $3 $1');
-                    }
+                if (feature.ie === 9 && prop === 'filter') {
+                    ret = computedStyle.getPropertyValue(prop);
                 } else {
                     ret = computedStyle[prop];
                 }

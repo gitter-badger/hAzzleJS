@@ -66,15 +66,6 @@ hAzzle.define('has', function() {
         div = null;
         return mu;
     });
-    // Support: IE9  
-    add('BordersInWrongOrder', function() {
-        var div = document.createElement('div'),
-            ret, border = '1px solid #123abc';
-        div.style.border = border;
-        ret = div.style.border != border;
-        div = null;
-        return ret;
-    });
 
     // mobile
 
@@ -104,14 +95,55 @@ hAzzle.define('has', function() {
     // Safari
     add('safari', oString.call(window.HTMLElement).indexOf('Constructor') > 0);
 
-    // Safari
+    // ie
     add('ie', function() {
         return false || !!doc.documentMode;
     });
 
+    // Macintosh
+    has.add('mac', navigator.appVersion.indexOf('Macintosh') >= 0);
+
     // ClassList
     add('classlist', !!document.documentElement.classList);
 
+    // Quirks mode
+
+    has.add('quirks', document.compatMode == 'BackCompat');
+
+    // XPath
+
+    has.add('xpath', !!doc.evaluate);
+
+    // Air 
+
+    has.add('air', !!win.runtime);
+
+    // Detects native support for the Dart programming language
+
+    has.add('dart', !!(win.startDart || doc.startDart));
+
+    // Detects native support for promises
+
+    has.add('promise', !!win.Promise);
+
+    // Touch support
+
+    has.add('touch', "ontouchstart" in document ||
+        ("onpointerdown" in document && navigator.maxTouchPoints > 0) ||
+        window.navigator.msMaxTouchPoints);
+
+    // Touch events 
+
+    has.add('touchEvents', 'ontouchstart' in document);
+
+    // Pointer Events
+
+    has.add('pointerEvents', 'onpointerdown' in document);
+
+    has.add('MSPointer', 'msMaxTouchPoints' in navigator); //IE10+
+
+    // querySelectorAll
+    has.add('qsa', !!document.querySelectorAll);
     return {
         has: has,
         add: add,

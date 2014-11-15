@@ -1,5 +1,5 @@
 // strings.js
-hAzzle.define('Strings', function() {
+hAzzle.define('strings', function() {
     var
 
     // Hyphenate RegExp

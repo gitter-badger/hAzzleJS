@@ -1,14 +1,16 @@
 // collection.js
 hAzzle.define('Collection', function() {
 
-    var util = hAzzle.require('util'),
+    var win = this,
+    // Dependencies
+        util = hAzzle.require('util'),
         types = hAzzle.require('types'),
         arrayProto = Array.prototype,
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
-        
+
         // For DOM elements, better to use ECMA 7 - contains (e.g.  elem.contains(array, obj);
-        
+
         includes = function(array, obj) {
             return arrayProto.indexOf.call(array, obj) != -1;
         },
@@ -155,7 +157,7 @@ hAzzle.define('Collection', function() {
     // Similar to jQuery / Zepto's .add() method
 
     this.add = function(sel, ctx) {
-       return this.concat(typeof sel === 'string' ? hAzzle(sel, ctx).elements : sel);
+        return this.concat(typeof sel === 'string' ? hAzzle(sel, ctx).elements : sel);
     };
 
     // Reduce the set of matched elements to the first in the set, or 
@@ -213,17 +215,25 @@ hAzzle.define('Collection', function() {
     }.bind(this));
 
     // Native prototype methods that return a usable value
-    util.each(['shift', 'splice', 'unshift', 'join', 'lastIndexOf', 'forEach', 'every', 'reduceRight'], function(method){
-        this[method] = function (a, b, c, d) {
-            return this.elements[method](a, b, c, d)
-        }
-    }.bind(this))
+    util.each(['shift',
+            'splice',
+            'unshift',
+            'join',
+            'lastIndexOf',
+            'forEach',
+            'reduceRight'
+        ],
+        function(method) {
+            this[method] = function() {
+                return this.elements[method].apply(this.elements, arguments)
+            }
+        }.bind(this))
 
     return {
         makeArray: makeArray,
         inArray: inArray,
-        slice: slice,
         includes: includes,
-        arrayRemove: arrayRemove
+        arrayRemove: arrayRemove,
+        slice: slice
     };
 });

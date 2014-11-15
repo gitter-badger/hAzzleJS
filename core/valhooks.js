@@ -1,12 +1,12 @@
 // valhooks.js
 hAzzle.define('valHooks', function() {
 
-    var _util = hAzzle.require('Util'),
-        _strings = hAzzle.require('Strings'),
-        _text = hAzzle.require('Text'),
-        _types = hAzzle.require('Types'),
-        _collection = hAzzle.require('Collection'),
-        _setters = hAzzle.require('Setters'),
+    var util = hAzzle.require('util'),
+        strings = hAzzle.require('strings'),
+        text = hAzzle.require('text'),
+        types = hAzzle.require('types'),
+        collection = hAzzle.require('collection'),
+        setters = hAzzle.require('setters'),
 
         // Support: Android<4.4
         supportCheckboxes = (function() {
@@ -33,12 +33,12 @@ hAzzle.define('valHooks', function() {
         };
 
     // Setter
-    _util.mixin(_setters.valHooks.set, {
+    util.mixin(setters.valHooks.set, {
 
         'select': function(elem, value) {
             var optionSet, option,
                 options = elem.options,
-                values = _collection.makeArray(value),
+                values = collection.makeArray(value),
                 i = options.length;
 
             while (i--) {
@@ -58,7 +58,7 @@ hAzzle.define('valHooks', function() {
     });
 
     // Getter    
-    _util.mixin(_setters.valHooks.get, {
+    util.mixin(setters.valHooks.get, {
 
         'option': function(elem) {
 
@@ -66,7 +66,7 @@ hAzzle.define('valHooks', function() {
 
             return val !== null ?
                 val :
-                _strings.trim(_text.getText(elem));
+                strings.trim(text.getText(elem));
         },
 
         'select': function(elem) {
@@ -111,16 +111,16 @@ hAzzle.define('valHooks', function() {
 
     // Radios and checkboxes setter
 
-    _util.each(['radio', 'checkbox'], function(val) {
-        _setters.valHooks.set[val] = function(elem, value) {
-            if (_types.isArray(value)) {
+    util.each(['radio', 'checkbox'], function(val) {
+        setters.valHooks.set[val] = function(elem, value) {
+            if (types.isArray(value)) {
                 return (elem.checked = iOf(value, hAzzle(elem).val()) >= 0);
             }
         };
     });
     
     if (!supportCheckboxes) {
-        _setters.valHooks.get[val] = function(elem) {
+        setters.valHooks.get[val] = function(elem) {
             return elem.getAttribute('value') === null ? 'on' : elem.value;
         };
     }

@@ -221,15 +221,6 @@ hAzzle.define('has', function() {
         div = null;
         return mu;
     });
-    // Support: IE9  
-    add('BordersInWrongOrder', function() {
-        var div = document.createElement('div'),
-            ret, border = '1px solid #123abc';
-        div.style.border = border;
-        ret = div.style.border != border;
-        div = null;
-        return ret;
-    });
 
     // mobile
 
@@ -259,14 +250,55 @@ hAzzle.define('has', function() {
     // Safari
     add('safari', oString.call(window.HTMLElement).indexOf('Constructor') > 0);
 
-    // Safari
+    // ie
     add('ie', function() {
         return false || !!doc.documentMode;
     });
 
+    // Macintosh
+    has.add('mac', navigator.appVersion.indexOf('Macintosh') >= 0);
+
     // ClassList
     add('classlist', !!document.documentElement.classList);
 
+    // Quirks mode
+
+    has.add('quirks', document.compatMode == 'BackCompat');
+
+    // XPath
+
+    has.add('xpath', !!doc.evaluate);
+
+    // Air 
+
+    has.add('air', !!win.runtime);
+
+    // Detects native support for the Dart programming language
+
+    has.add('dart', !!(win.startDart || doc.startDart));
+
+    // Detects native support for promises
+
+    has.add('promise', !!win.Promise);
+
+    // Touch support
+
+    has.add('touch', "ontouchstart" in document ||
+        ("onpointerdown" in document && navigator.maxTouchPoints > 0) ||
+        window.navigator.msMaxTouchPoints);
+
+    // Touch events 
+
+    has.add('touchEvents', 'ontouchstart' in document);
+
+    // Pointer Events
+
+    has.add('pointerEvents', 'onpointerdown' in document);
+
+    has.add('MSPointer', 'msMaxTouchPoints' in navigator); //IE10+
+
+    // querySelectorAll
+    has.add('qsa', !!document.querySelectorAll);
     return {
         has: has,
         add: add,
@@ -280,12 +312,17 @@ hAzzle.define('has', function() {
 hAzzle.define('Types', function() {
 
     var oString = Object.prototype.toString,
+
+        // Determines if a reference is an `Array`
+
         isArray = Array.isArray,
+
+        // Determines if a reference is a `String`
 
         isString = function(value) {
             return typeof value === 'string';
         },
-
+        // Returns true if `obj` is an array or array-like object (NodeList, Arguments, String ...)
         isArrayLike = function(obj) {
             if (obj == null || isWindow(obj)) {
                 return false;
@@ -380,7 +417,10 @@ hAzzle.define('Types', function() {
         isNodeList = function(nodes) {
             var result = Object.prototype.toString.call(nodes);
             // Modern browser such as IE9 / firefox / chrome etc.
-            if (result === '[object HTMLCollection]' || result === '[object NodeList]') {
+            if (result === '[object HTMLCollection]' ||
+                result === '[object NodeList]' ||
+                // https://developer.mozilla.org/en/docs/Web/API/HTMLFormControlsCollection
+                result === '[object HTMLFormControlsCollection]') {
                 return true;
             }
             // Detect length and item 
@@ -463,12 +503,6 @@ hAzzle.define('util', function() {
         types = hAzzle.require('types'),
         oKeys = Object.keys,
 
-        // Short cut for `hasOwnProperty`.
-
-        has = function(arg, id) {
-            return Object.prototype.hasOwnProperty.call(arg, id);
-        },
-
         // Optimized each function
         // Replacement for forEach - ECMAScript 5 15.4.4.18 
 
@@ -537,8 +571,6 @@ hAzzle.define('util', function() {
             if (!fn) return identity;
         },
 
-
-
         // Determine if at least one element in the object matches a truth test. 
         // ECMAScript 5 15.4.4.17
 
@@ -595,7 +627,7 @@ hAzzle.define('util', function() {
                 for (; i < length; i++) {
                     source = arguments[i];
                     for (prop in source) {
-                        if (has(source, prop)) {
+                        if (Object.prototype.hasOwnProperty.call(source, prop)) {
                             obj[prop] = source[prop];
                         }
                     }
@@ -878,7 +910,6 @@ hAzzle.define('util', function() {
         indexOf: indexOf,
         filter: filter,
         now: Date.now,
-        has: has,
         bind: bind
     };
 });
@@ -1035,6 +1066,7 @@ hAzzle.define('Core', function() {
                     }
                 }
             }
+
             return false;
         };
 
@@ -1181,14 +1213,16 @@ hAzzle.define('Core', function() {
 // collection.js
 hAzzle.define('Collection', function() {
 
-    var util = hAzzle.require('util'),
+    var win = this,
+        // Dependencies
+        util = hAzzle.require('util'),
         types = hAzzle.require('types'),
         arrayProto = Array.prototype,
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
-        
+
         // For DOM elements, better to use ECMA 7 - contains (e.g.  elem.contains(array, obj);
-        
+
         includes = function(array, obj) {
             return arrayProto.indexOf.call(array, obj) != -1;
         },
@@ -1335,9 +1369,9 @@ hAzzle.define('Collection', function() {
     // Similar to jQuery / Zepto's .add() method
 
     this.add = function(sel, ctx) {
-       return this.concat(typeof sel === 'string' ? hAzzle(sel, ctx).elements : sel);
+        return this.concat(typeof sel === 'string' ? hAzzle(sel, ctx).elements : sel);
     };
-    
+
     // Reduce the set of matched elements to the first in the set, or 
     // to the 'num' first element in the set
 
@@ -1392,19 +1426,27 @@ hAzzle.define('Collection', function() {
         };
     }.bind(this));
 
-    // Native methods that return a usable value
-    util.each(['shift', 'splice', 'unshift', 'join', 'lastIndexOf', 'forEach', 'every', 'reduceRight'], function(method){
-        this[method] = function (a, b, c, d) {
-            return this.elements[method](a, b, c, d)
-        }
-    }.bind(this))
+    // Native prototype methods that return a usable value
+    util.each(['shift',
+            'splice',
+            'unshift',
+            'join',
+            'lastIndexOf',
+            'forEach',
+            'reduceRight'
+        ],
+        function(method) {
+            this[method] = function() {
+                return this.elements[method].apply(this.elements, arguments)
+            }
+        }.bind(this))
 
     return {
         makeArray: makeArray,
         inArray: inArray,
-        slice: slice,
         includes: includes,
-        arrayRemove: arrayRemove
+        arrayRemove: arrayRemove,
+        slice: slice
     };
 });
 
@@ -1833,62 +1875,93 @@ hAzzle.define('Strings', function() {
 // storage.js
 hAzzle.define('storage', function() {
 
-    var util = hAzzle.require('util'),
+    var // Dependencies
+
+        util = hAzzle.require('util'),
         strings = hAzzle.require('strings'),
         types = hAzzle.require('types'),
         core = hAzzle.require('core'),
-        shtmlRegEx = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
-        scharRegEx = /([A-Z])/g,
-        sWhiteRegex = (/\S+/g);
 
-    function Storage() {
-        this.expando = core.expando + Math.random();
-    }
+        // camelize 
 
-    Storage.accepts = function(owner) {
-        if (owner) {
-            return owner.nodeType === 1 || owner.nodeType === 9 || !(+owner.nodeType);
-        }
-    };
+        camelize = strings.camelize,
+
+        // RegExes
+
+        htmlRegEx = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
+        charRegEx = /([A-Z])/g,
+        WhiteRegex = (/\S+/g),
+
+        dataAttr = function(elem, key, data) {
+
+            var name;
+
+            if (data === undefined && elem.nodeType === 1) {
+
+                name = 'data-' + key.replace(charRegEx, '-$1').toLowerCase();
+
+                data = elem.getAttribute(name);
+
+                if (typeof data === 'string') {
+                    try {
+                        data = data === 'true' ? true :
+                            data === 'false' ? false :
+                            data === 'null' ? null :
+                            // Only convert to a number if it doesn't change the string
+                            +data + '' === data ? +data :
+                            htmlRegEx.test(data) ? JSON.parse(data + '') : data;
+                    } catch (e) {}
+
+                    // Make sure we set the data so it isn't changed later
+                    userData.set(elem, key, data);
+
+                } else {
+
+                    data = undefined;
+                }
+            }
+
+            return data;
+        },
+
+        Storage = function() {
+            this.expando = core.expando + Math.random();
+        };
 
     Storage.prototype = {
 
-        register: function(owner, initial) {
+        register: function(elem, initial) {
 
-            hAzzle.err(!types.isObject(owner), 22, 'no valid DOM element in storage.js')
+            hAzzle.err(!types.isObject(elem), 22, 'no valid DOM element in storage.js');
 
-            var descriptor = {};
+            if (elem.nodeType) {
 
-            // Secure cache in a non-enumerable, configurable, writable property
-            // configurability must be true to allow the property to be
-            // deleted with the delete operator
-
-            descriptor[this.expando] = {
-                value: initial || {},
-                writable: true,
-                configurable: true
-            };
-
-            if (owner.nodeType) {
-                owner[this.expando] = {
+                elem[this.expando] = {
                     value: initial || {}
                 };
+
                 // Only use ES5 defineProperty for non-nodes
             } else {
-                Object.defineProperties(owner, descriptor);
+                Object.defineProperty(elem, this.expando, {
+                    value: initial || {},
+                    writable: true,
+                    configurable: true
+                });
             }
 
-            return owner[this.expando];
+            return elem[this.expando];
         },
-        cache: function(owner, initial) {
+        cache: function(elem, initial) {
 
             // Always return an empty object.
-            if (!Storage.accepts(owner)) {
+            if (!elem || !(elem.nodeType === 1 ||
+                    elem.nodeType === 9 ||
+                    !(+elem.nodeType))) {
                 return {};
             }
 
-            // Check if the owner object already has a cache
-            var cache = owner[this.expando];
+            // Check if the elem object already has a cache
+            var cache = elem[this.expando];
 
             // If so, return it
             if (cache) {
@@ -1896,18 +1969,19 @@ hAzzle.define('storage', function() {
             }
 
             // If not, register one
-            return this.register(owner, initial);
+            return this.register(elem, initial);
         },
-        set: function(owner, data, value) {
-            if (owner) {
-                var prop,
-                    cache = this.cache(owner);
+        set: function(elem, data, value) {
+            if (elem) {
+
+                var prop, cache = this.cache(elem);
+
                 if (cache) {
-                    // Handle: [ owner, key, value ] args
+                    // Handle: [ elem, key, value ] args
                     if (typeof data === 'string') {
                         cache[data] = value;
 
-                        // Handle: [ owner, { properties } ] args
+                        // Handle: [ elem, { properties } ] args
                     } else {
                         // Fresh assignments by object are shallow copied
                         if (types.isEmptyObject(cache)) {
@@ -1924,51 +1998,49 @@ hAzzle.define('storage', function() {
                 }
             }
         },
-        access: function(owner, key, value) {
+        access: function(elem, key, value) {
             var stored;
 
             if (key === undefined ||
                 ((key && typeof key === 'string') && value === undefined)) {
 
-                stored = this.get(owner, key);
+                stored = this.get(elem, key);
 
                 return stored !== undefined ?
-                    stored : this.get(owner, strings.camelize(key));
+                    stored : this.get(elem, camelize(key));
             }
 
-            this.set(owner, key, value);
+            this.set(elem, key, value);
 
             // Since the 'set' path can have two possible entry points
             // return the expected data based on which path was taken[*]
             return value !== undefined ? value : key;
         },
-        get: function(owner, key) {
-            var cache = this.cache(owner);
+        get: function(elem, key) {
+            var cache = this.cache(elem);
             if (cache) {
                 return cache !== undefined && key === undefined ? cache : cache[key];
             }
         },
-        release: function(owner, key) {
+        release: function(elem, key) {
             var i, name, camel,
-                cache = this.cache(owner);
+                cache = this.cache(elem);
 
             if (key === undefined) {
-                this.register(owner);
+                this.register(elem);
 
             } else {
                 // Support array or space separated string of keys
                 if (types.isArray(key)) {
-                    name = key.concat(key.map(strings.camelize));
+                    name = key.concat(key.map(camelize));
                 } else {
-                    camel = strings.camelize(key);
+                    camel = camelize(key);
                     // Try the string as a key before any manipulation
                     if (key in cache) {
                         name = [key, camel];
                     } else {
-                        // If a key with the spaces exists, use it.
-                        // Otherwise, create an array by matching non-whitespace
                         name = camel;
-                        name = cache[name] ? [name] : (name.match(sWhiteRegex) || []);
+                        name = cache[name] ? [name] : (name.match(WhiteRegex) || []);
                     }
                 }
 
@@ -1979,20 +2051,20 @@ hAzzle.define('storage', function() {
                 }
             }
         },
-        hasData: function(owner) {
+        hasData: function(elem) {
             return !types.isEmptyObject(
-                owner[this.expando] || {}
+                elem[this.expando] || {}
             );
         },
-        flush: function(owner) {
-            if (owner[this.expando]) {
-                delete owner[this.expando];
+        flush: function(elem) {
+            if (elem[this.expando]) {
+                delete elem[this.expando];
             }
         }
     };
 
-    var _privateData = new Storage(),
-        _userData = new Storage();
+    var privateData = new Storage(),
+        userData = new Storage();
 
     this.data = function(key, value) {
 
@@ -2006,9 +2078,9 @@ hAzzle.define('storage', function() {
 
             if (this.length) {
 
-                data = _userData.get(elem);
+                data = userData.get(elem);
 
-                if (elem.nodeType === 1 && !_privateData.get(elem, 'hasDataAttrs')) {
+                if (elem.nodeType === 1 && !privateData.get(elem, 'hasDataAttrs')) {
 
                     i = attrs.length;
 
@@ -2020,13 +2092,13 @@ hAzzle.define('storage', function() {
 
                             if (name.indexOf('data-') === 0) {
 
-                                name = strings.camelize(name.slice(5));
+                                name = camelize(name.slice(5));
                                 dataAttr(elem, name, data[name]);
                             }
                         }
                     }
 
-                    _privateData.set(elem, 'hasDataAttrs', true);
+                    privateData.set(elem, 'hasDataAttrs', true);
                 }
             }
 
@@ -2038,23 +2110,23 @@ hAzzle.define('storage', function() {
         if (typeof key === 'object') {
 
             return this.each(function(elem) {
-                _userData.set(elem, key);
+                userData.set(elem, key);
             });
         }
-        var camelKey = strings.camelize(key);
+        var camelKey = camelize(key);
 
         if (elem && value === undefined) {
 
-            data = _userData.get(elem, key);
+            data = userData.get(elem, key);
 
             if (data !== undefined) {
 
                 return data;
             }
 
-            data = _userData.get(elem, camelKey);
+            data = userData.get(elem, camelKey);
 
-            var hasDataAttrs = _privateData.get(this, 'hasDataAttrs'),
+            var hasDataAttrs = privateData.get(this, 'hasDataAttrs'),
                 isHyphenated = key.indexOf('-') !== -1;
 
             if (data !== undefined) {
@@ -2078,69 +2150,30 @@ hAzzle.define('storage', function() {
 
         this.each(function(elem) {
 
-            var data = _userData.get(elem, camelKey);
-            _userData.set(elem, camelKey, value);
+            var data = userData.get(elem, camelKey);
+            userData.set(elem, camelKey, value);
 
             if (isHyphenated && data !== undefined) {
-                _userData.set(elem, key, value);
+                userData.set(elem, key, value);
             }
 
             if (isHyphenated && hasDataAttrs === undefined) {
-                _userData.set(elem, key, value);
+                userData.set(elem, key, value);
             }
         });
     };
 
-    /**
-     * Remove attributes from element collection
-     *
-     * @param {String} key
-
-     *
-     * @return {Object}
-     */
+    // Remove attributes from element collection
 
     this.removeData = function(key) {
         return this.each(function(elem) {
-            _userData.release(elem, key);
+            userData.release(elem, key);
         });
     };
 
-    function dataAttr(elem, key, data) {
-
-        var name;
-
-        if (data === undefined && elem.nodeType === 1) {
-
-            name = 'data-' + key.replace(scharRegEx, '-$1').toLowerCase();
-
-            data = elem.getAttribute(name);
-
-            if (typeof data === 'string') {
-                try {
-                    data = data === 'true' ? true :
-                        data === 'false' ? false :
-                        data === 'null' ? null :
-                        // Only convert to a number if it doesn't change the string
-                        +data + '' === data ? +data :
-                        shtmlRegEx.test(data) ? JSON.parse(data + '') : data;
-                } catch (e) {}
-
-                // Make sure we set the data so it isn't changed later
-                _userData.set(elem, key, data);
-
-            } else {
-
-                data = undefined;
-            }
-        }
-
-        return data;
-    }
-
     return {
-        private: _privateData,
-        data: _userData
+        private: privateData,
+        data: userData
     };
 });
 // css.js
@@ -3071,57 +3104,57 @@ hAzzle.define('valHooks', function() {
 
     // ECMA 7 - contains
 
-if (![].contains) {
-    Object.defineProperty(Array.prototype, 'contains', {
-        enumerable: false,
-        configurable: true,
-        writable: true,
-        value: function(target /*, fromIndex*/ ) {
-            if (this === undefined || this === null) {
-                throw new TypeError('Cannot convert this value to object');
-            }
+    if (![].contains) {
+        Object.defineProperty(Array.prototype, 'contains', {
+            enumerable: false,
+            configurable: true,
+            writable: true,
+            value: function(target /*, fromIndex*/ ) {
+                if (this === undefined || this === null) {
+                    throw new TypeError('Cannot convert this value to object');
+                }
 
-            var O = Object(this),
-                len = parseInt(O.length) || 0;
+                var O = Object(this),
+                    len = parseInt(O.length) || 0;
 
-            if (len < 1) {
+                if (len < 1) {
+                    return false;
+                }
+                var from = Math.floor(arguments[1] || 0);
+                // In ECMA 6 max length is 2^53-1, currently limited to 2^32-1
+                if (from >= len || from > 0xFFFFFFFF) {
+                    return false;
+                }
+
+                if (from < 0) {
+                    from = len + from;
+                }
+                if (from === -Infinity || from < 0) {
+                    from = 0;
+                }
+
+                var check;
+
+                if (from >= 0) {
+                    check = from;
+                } else {
+                    check = len + Math.abs(from);
+                    if (check < 0) {
+                        check = 0;
+                    }
+                }
+                while (check < len) {
+                    var currentElement = O[check];
+                    if (target === currentElement ||
+                        target !== target && currentElement !== currentElement
+                    ) {
+                        return true;
+                    }
+                    check += 1;
+                }
                 return false;
             }
-            var from = Math.floor(arguments[1] || 0);
-            // In ECMA 6 max length is 2^53-1, currently limited to 2^32-1
-            if (from >= len || from > 0xFFFFFFFF) {
-                return false;
-            }
-
-            if (from < 0) {
-                from = len + from;
-            }
-            if (from === -Infinity || from < 0) {
-                from = 0;
-            }
-
-            var check;
-
-            if (from >= 0) {
-                check = from;
-            } else {
-                check = len + Math.abs(from);
-                if (check < 0) {
-                    check = 0;
-                }
-            }
-            while (check < len) {
-                var currentElement = O[check];
-                if (target === currentElement ||
-                    target !== target && currentElement !== currentElement
-                ) {
-                    return true;
-                }
-                check += 1;
-            }
-            return false;
-        }
-    });
-}
+        });
+    }
 
 }(window));

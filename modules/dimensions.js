@@ -16,17 +16,17 @@ hAzzle.define('dimensions', function() {
             return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
         },
         isBody = function(elem) {
-            elem = getElem(elem)
+            elem = getElem(elem);
             var tag = elem.tagName.toLowerCase();
             return (tag === 'body' ||
                 tag === 'html');
         },
         isOffset = function(elem) {
-            elem = getElem(elem)
+            elem = getElem(elem);
             return css.css(elem, 'position') !== 'static' || isBody(elem);
         },
         isStatic = function(elem) {
-            elem = getElem(elem)
+            elem = getElem(elem);
             var tag = elem.tagName.toLowerCase();
             return isOffset(elem) ||
                 (tag === 'table' ||
@@ -231,9 +231,8 @@ hAzzle.define('dimensions', function() {
                 left: 0
             },
             doc = elem && elem.ownerDocument,
-            win = types.isWindow(doc) ? doc : doc.nodeType === 9 && doc.defaultView,
             borderBox = function(element) {
-                return css.css(element, 'mozBoxSizing') == 'border-box';
+                return css.css(element, 'mozBoxSizing') === 'border-box';
             };
 
         if (!doc) {
@@ -247,13 +246,16 @@ hAzzle.define('dimensions', function() {
             return position;
         }
 
-        var FireFox = features.has('firefox');
-        if (isBody(this)) return position;
+        var lastElem, FireFox = features.has('firefox');
+
+        if (isBody(this)) {
+        return position;
+        }
 
         while (elem && !isBody(elem)) {
             position.left += elem.offsetLeft;
-            position.top += elem.offsetTop,
-                lastElem = elem;
+            position.top += elem.offsetTop;
+            lastElem = elem;
 
             if (FireFox) {
                 if (!borderBox(elem)) {
@@ -261,7 +263,7 @@ hAzzle.define('dimensions', function() {
                     position.top += parseFloat(css.css(elem, 'borderTopWidth'));
                 }
                 var parent = elem.parentNode;
-                if (parent && css.css(parent, 'overflow') != 'visible') {
+                if (parent && css.css(parent, 'overflow') !== 'visible') {
                     position.left += parseFloat(css.css(parent, 'borderLeftWidth'));
                     position.top += parseFloat(css.css(parent, 'borderTopWidth'));
                 }
@@ -277,7 +279,7 @@ hAzzle.define('dimensions', function() {
         }
 
         return position;
-    }
+    };
 
     this.position = function(relative) {
 
