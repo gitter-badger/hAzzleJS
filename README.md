@@ -94,8 +94,7 @@ Example of usage:
 ```
 **hAzzle** also supports other **ECMA 7** specs through the **ecma7.js** module in the **/modules folder**. 
 
- * values
- * entries
+  * entries
  * escape
  * compare
  * getPropertyNames
