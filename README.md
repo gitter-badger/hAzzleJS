@@ -336,19 +336,84 @@ Correct module order for the Core if you need to test individual modules:
 Module order (module folder)
 ----------------------------
 
-* modules/features.js
-* modules/selector.js
-* modules/attributes.js
-* modules/style.js
-* modules/csshooks.js
-* modules/dimensions.js
-* modules/xhr.js
-* modules/ready.js
-* modules/classes.js
-* modules/traversing.js
-* modules/visibility.js
-* modules/jsonxml.js
-* modules/manipulation.js
+
+<table>
+<thead><tr>
+  <th>module</th> <th>default</th> <th>description</th>
+</tr></thead>
+<tbody>
+  <tr>
+    <th><a href="modules/features.js#files">zepto</a></th>
+    <td>✔</td>
+    <td>Core module; contains most methods</td>
+  </tr>
+  <tr>
+    <th><a href="modules/attributes.js#files">attributes</a></th>
+    <td>✔</td>
+    <td>attributes</td>
+  </tr>
+  <tr>
+    <th><a href="modules/style.js#files">style</a></th>
+    <td>✔</td>
+    <td>Setter and getter for CSS styles</td>
+  </tr>
+  <tr>
+    <th><a href="modules/csshook.js#files">csshooks</a></th>
+    <td>✔</td>
+    <td>cssHooks for the style.js module</td>
+  </tr>
+  <tr>
+    <th><a href="modules/dimensions.js#files">dimensions</a></th>
+    <td>✔</td>
+    <td>Provides various features for deling with width, and height, viewport, positions e.g.</td>
+  </tr>
+  <tr>
+    <th><a href="modules/xhr.js#files">xhr</a></th>
+    <td></td>
+    <td>XHR v. 2 with native promises support</td>
+  </tr>
+  <tr>
+    <th><a href="modules/ready.js#files">ready</a></th>
+    <td></td>
+    <td>Document ready method</td>
+  </tr>
+  <tr>
+    <th><a href="modules/classes.js#files">classes</a></th>
+    <td></td>
+    <td>
+      <code>Add</code>, <code>remove</code> and <code>toggle</code> classes. Uses classList if browser supports it</td>
+  </tr>
+  <tr>
+    <th><a href="modules/traversing.js#files">traversing</a></th>
+    <td></td>
+    <td>
+      Most common DOM traversion methods such as up(), down(), next(), prev() and similar methods know from **jQuery** / **Zepto**
+    </td>
+  </tr>
+  <tr>
+    <th><a href="modules/visibility.js#files">visibility</a></th>
+    <td></td>
+    <td>
+       <code>Add</code>, <code>remove</code> and <code>toggle</code> DOM elements     
+    </td>
+  </tr>
+  <tr>
+    <th><a href="modules/jsonxml.js#files">jsonxml</a></th>
+    <td></td>
+    <td>
+      JSON and XML support / parsing
+    </td>
+  </tr>
+  <tr>
+    <th><a href="modules/manipulation.js#files">manipulation</a></th>
+    <td></td>
+    <td>
+      Provides <code>append</code>, <code>prepend</code>, <code>text</code> and other familiar methods known from from **jQuery** / **Zepto**
+    </td>
+  </tr>
+ 
+</tbody>
+</table>
 
 Browser compatiblity
 --------------------
