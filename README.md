@@ -79,11 +79,11 @@ DOM Level 4 (DL4)
 ECMA 7
 -------
 
-ECMA 7 are still experimental, and no browsers supports it except Firefox v. 35. This browser includes support for the 'contains' method of ECMA 7. 
+ECMA 7 are still experimental, and no browsers supports it except Firefox v. 35. This browser includes support for the 'contains' method of ECMA 7, and because the main goal with hAzzle are to create all browsers equal, hAzzle supports this in the Core. 
 
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/contains
 
-Because of Firefox supports it, and some websites can be broken by this, hAzzle have included support for this in the Core.
+Example of usage:
 
 ```javascript
 [1, 2, 3].contains(2);     // true
@@ -92,6 +92,17 @@ Because of Firefox supports it, and some websites can be broken by this, hAzzle 
 [1, 2, 3].contains(3, -1); // true
 [1, 2, NaN].contains(NaN); // true
 ```
+**hAzzle** also supports other **ECMA 7** specs through the **ecma7.js** module in the **/modules folder**. 
+
+ * values
+ * entries
+ * escape
+ * compare
+ * getPropertyNames
+ * getOwnPropertyDescriptors
+ * getPropertyDescriptor
+
+The **ecma7.js** module only contains functions that most likely will not change in the future. 
 
 Why is the Core so big?
 ---------------------
