@@ -107,7 +107,7 @@ DOM Level 4 (DL4)
 ECMA 7
 -------
 
-ECMA 7 are still experimental, and no browsers supports it except Firefox v. 35. This browser includes support for the 'contains' method of ECMA 7, and because the main goal with hAzzle are to create all browsers equal, hAzzle supports this in the Core. 
+**ECMA 7** are still experimental, and no browsers supports it except **Firefox v. 35**. This browser includes support for the 'contains' method of **ECMA 7**, and because the main goal with hAzzle are to create all browsers equal, **hAzzle** supports this in the **Core**. 
 
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/contains
 
@@ -133,13 +133,13 @@ The **ecma7.js** module only contains functions that most likely will not change
 
 Why is the Core so big?
 ---------------------
-The hAzzle Core are not so big comparing to other libraries, and contains a lot more then the Javascript library. It take care of cross-browser issues, browsers bugs, setting the right document (HTML / XML), feature detection and more.
+The hAzzle Core are not so big comparing to other libraries, and contains a lot more then the Javascript library. It take care of cross-browser issues, browsers bugs, setting the right document (**HTML** / **XML**), feature detection and more.
 
 One example are the **customEvent**. This method are not usable as a constructor in **IE9** / **IE10**. With **hAzzle Core** this is fixed! Ref: https://developer.mozilla.org/en/docs/Web/API/CustomEvent
 
-Another quick example on the benefits using the **hAzzle Core** comparing to jQuery library.
+Another quick example on the benefits using the **hAzzle Core** comparing to **jQuery library**.
 
-Let's say you want to append() some content. With hAzzle and DL4, you do it like this:
+Let's say you want to append() some content. With hAzzle and **DL4**, you do it like this:
 
 ```javascript
 <div id="d">Hello! </div>
