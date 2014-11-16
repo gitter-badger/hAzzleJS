@@ -225,15 +225,12 @@ hAzzle.define('dimensions', function() {
                     setOffset(elem, opts, i);
                 });
         }
+
         var docElem, elem = this.elements[0],
-            position = {
-                top: 0,
-                left: 0
-            },
+            FireFox = features.has('firefox'),
             doc = elem && elem.ownerDocument,
-            borderBox = function(element) {
-                return css.css(element, 'mozBoxSizing') === 'border-box';
-            };
+            top = 0,
+            left = 0;
 
         if (!doc) {
             return;
@@ -243,43 +240,45 @@ hAzzle.define('dimensions', function() {
 
         // Make sure it's not a disconnected DOM node
         if (!hAzzle.require('Core').contains(docElem, elem)) {
-            return position;
+            return {
+                top: 0,
+                left: 0
+            };
         }
 
-        var lastElem, FireFox = features.has('firefox');
+        while (elem && elem !== document.body && elem !== document.documentElement) {
 
-        if (isBody(this)) {
-        return position;
-        }
-
-        while (elem && !isBody(elem)) {
-            position.left += elem.offsetLeft;
-            position.top += elem.offsetTop;
-            lastElem = elem;
+            left += elem.offsetLeft;
+            top += elem.offsetTop;
 
             if (FireFox) {
-                if (!borderBox(elem)) {
-                    position.left += parseFloat(css.css(elem, 'borderLeftWidth')) || 0;
-                    position.top += parseFloat(css.css(elem, 'borderTopWidth')) || 0;
+                if (css.css(elem, 'mozBoxSizing') !== 'border-box') {
+                    left += parseFloat(css.css(elem, 'borderLeftWidth')) || 0;
+                    top += parseFloat(css.css(elem, 'borderTopWidth')) || 0;
                 }
-                var parent = elem.parentNode;
-                if (parent && css.css(parent, 'overflow') !== 'visible') {
-                    position.left += parseFloat(css.css(parent, 'borderLeftWidth')) || 0;
-                    position.top += parseFloat(css.css(parent, 'borderTopWidth')) || 0;
+                if (elem.parentElement && css.css(elem.parentElement, 'overflow') !== 'visible') {
+                    top += parseFloat(css.css(elem.parentElement, 'borderTopWidth')) || 0;
+                    left += parseFloat(css.css(elem.parentElement, 'borderLeftWidth')) || 0;
+
                 }
-            } else if (elem !== lastElem && features.has('safari')) {
-                position.left += parseFloat(css.css(elem, 'borderLeftWidth')) || 0;
-                position.top += parseFloat(css.css(elem, 'borderTopWidth')) || 0;
+            } else if (features.has('safari')) {
+                left += parseFloat(css.css(elem, 'borderLeftWidth')) || 0;
+                top += parseFloat(css.css(elem, 'borderTopWidth')) || 0;
             }
             elem = elem.offsetParent;
         }
-        if (FireFox && !borderBox(elem)) {
-            position.left -= parseFloat(css.css(elem, 'borderLeftWidth')) || 0;
-            position.top -= parseFloat(css.css(elem, 'borderTopWidth')) || 0;
+        if (FireFox && css.css(elem, 'mozBoxSizing') !== 'border-box') {
+            left -= parseFloat(css.css(elem, 'borderLeftWidth')) || 0;
+            top -= parseFloat(css.css(elem, 'borderTopWidth')) || 0;
         }
 
-        return position;
+        return {
+            top: top,
+            left: left
+        };
     };
+
+
 
     this.position = function(relative) {
 

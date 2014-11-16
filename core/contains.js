@@ -8,8 +8,8 @@ if (![].contains) {
                 throw new TypeError('Cannot convert this value to object');
             }
 
-            var O = Object(this),
-                len = parseInt(O.length) || 0;
+            var obj = Object(this),
+                len = parseInt(obj.length) || 0;
 
             if (len < 1) {
                 return false;
@@ -38,7 +38,7 @@ if (![].contains) {
                 }
             }
             while (check < len) {
-                var currentElement = O[check];
+                var currentElement = obj[check];
                 if (target === currentElement ||
                     target !== target && currentElement !== currentElement
                 ) {

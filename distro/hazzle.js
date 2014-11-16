@@ -1222,15 +1222,6 @@ hAzzle.define('Collection', function() {
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
 
-        // For DOM elements, better to use ECMA 7 - contains (e.g.  elem.contains(array, obj);
-
-        includes = function(array, obj) {
-            return arrayProto.indexOf.call(array, obj) != -1;
-        },
-        inArray = function(elem, array, i) {
-            return array === undefined ? -1 : arrayProto.indexOf.call(array, elem, i);
-        },
-
         arrayRemove = function(array, value) {
             var index = array.indexOf(value);
             if (index >= 0)
@@ -1291,9 +1282,9 @@ hAzzle.define('Collection', function() {
 
     // Get the element at position specified by index from the current collection.
     this.eq = function(index) {
-
-        // If it's a window or document object, hAzzle will throw. Prevent that .... !
-        if (!types.isWindow(this.elements[0]) && this.elements[0].nodeType !== 9) {
+        var elem = this.elements[0];
+        // Prevent hAzzle from throwing on a window or document object
+        if (elem.nodeType && elem.nodeType !== 9) {
             return typeof index === 'number' && hAzzle(index === -1 ? slice(this.elements, this.length - 1) : this.elements[index]);
         }
         return this;
@@ -1400,7 +1391,7 @@ hAzzle.define('Collection', function() {
         });
     };
 
-    // First() and prev()
+    // First() and prev() methods
     util.each({
         next: 'nextElementSibling',
         prev: 'previousElementSibling'
@@ -1412,7 +1403,7 @@ hAzzle.define('Collection', function() {
         };
     }.bind(this));
 
-    // prevAll() and nextAll()
+    // prevAll() and nextAll() methods
     util.each({
         prevAll: 'previousElementSibling',
         nextAll: 'nextElementSibling'
@@ -1447,12 +1438,10 @@ hAzzle.define('Collection', function() {
     return {
         makeArray: makeArray,
         inArray: inArray,
-        includes: includes,
         arrayRemove: arrayRemove,
         slice: slice
     };
 });
-
 // jiesa.js
 hAzzle.define('Jiesa', function() {
 
@@ -1932,7 +1921,7 @@ hAzzle.define('storage', function() {
         };
 
     Storage.prototype = {
-        
+
         constructor: Storage,
 
         register: function(elem, initial) {
@@ -2733,10 +2722,11 @@ hAzzle.define('attrHooks', function() {
 // prophooks.js
 hAzzle.define('prophooks', function() {
 
-    var util = hAzzle.require('util'),
-        setters = hAzzle.require('setters');
+    // Dependencies
 
-    util.mixin(setters.propHooks.get, {
+    var setters = hAzzle.require('setters');
+
+    hAzzle.require('util').mixin(setters.propHooks.get, {
         'tabIndex': function(elem) {
             return elem.hasAttribute('tabindex') ||
                 /^(?:input|select|textarea|button)$/i.test(elem.nodeName) || elem.href ?
@@ -2748,18 +2738,22 @@ hAzzle.define('prophooks', function() {
     // Support: IE<=11+
     // Must access selectedIndex to make default options select
 
-    var select = document.createElement('select'),
-        opt = select.appendChild(document.createElement('option'));
+    (function() {
 
-    if (!opt.selected) {
-        setters.propHooks.get.selected = function(elem) {
-            var parent = elem.parentNode;
-            if (parent && parent.parentNode) {
-                parent.parentNode.selectedIndex;
-            }
-            return null;
-        };
-    }
+        var select = document.createElement('select'),
+            opt = select.appendChild(document.createElement('option'));
+
+        if (!opt.selected) {
+            setters.propHooks.get.selected = function(elem) {
+                var parent = elem.parentNode;
+                if (parent && parent.parentNode) {
+                    parent.parentNode.selectedIndex;
+                }
+                return null;
+            };
+        }
+    }());
+
     return {};
 });
 // valhooks.js
@@ -2779,22 +2773,7 @@ hAzzle.define('valHooks', function() {
             checkbox.checked = true;
             var node = checkbox.getAttributeNode('checked');
             return !node || !node.specified;
-        })(),
-
-        // iOF() gives approx 40 - 60% better performance then native indexOf
-        // for valHooks
-
-        iOf = function(array, item, from) {
-            var i, length = array.length;
-
-            for (i = (from < 0) ? Math.max(0, length + from) : from || 0; i < length; i++) {
-                if (array[i] === item) {
-                    return i;
-                }
-            }
-
-            return -1;
-        };
+        })();
 
     // Setter
     util.mixin(setters.valHooks.set, {
@@ -2808,7 +2787,9 @@ hAzzle.define('valHooks', function() {
             while (i--) {
                 option = options[i];
 
-                if ((option.selected = iOf(values, option.value) >= 0)) {
+                // ECMA 7 - contains
+
+                if ((option.selected = values.contains(option.value))) {
                     optionSet = true;
                 }
             }
@@ -2825,19 +2806,14 @@ hAzzle.define('valHooks', function() {
     util.mixin(setters.valHooks.get, {
 
         'option': function(elem) {
-
             var val = elem.getAttribute(name, 2);
-
-            return val !== null ?
-                val :
-                strings.trim(text.getText(elem));
+            return val !== null ? val : strings.trim(text.getText(elem));
         },
 
         'select': function(elem) {
 
             var index = elem.selectedIndex,
-                // Single box type attribute for select-one
-                // Checkbox type attribute for select-multiple
+
                 one = elem.type === 'select-one',
                 options = elem.options,
                 vals = [],
@@ -2878,7 +2854,8 @@ hAzzle.define('valHooks', function() {
     util.each(['radio', 'checkbox'], function(val) {
         setters.valHooks.set[val] = function(elem, value) {
             if (types.isArray(value)) {
-                return (elem.checked = iOf(value, hAzzle(elem).val()) >= 0);
+                // ECMA 7 - contains
+                return (elem.checked = value.contains(hAzzle(elem).val()));
             }
         };
     });
@@ -3066,6 +3043,7 @@ hAzzle.define('valHooks', function() {
                     throw new Error('An event name must be provided');
                 }
 
+
                 if (eventName === 'Event') {
                     event.initCustomEvent = initCustomEvent;
                 }
@@ -3119,8 +3097,8 @@ hAzzle.define('valHooks', function() {
                     throw new TypeError('Cannot convert this value to object');
                 }
 
-                var O = Object(this),
-                    len = parseInt(O.length) || 0;
+                var obj = Object(this),
+                    len = parseInt(obj.length) || 0;
 
                 if (len < 1) {
                     return false;
@@ -3149,7 +3127,7 @@ hAzzle.define('valHooks', function() {
                     }
                 }
                 while (check < len) {
-                    var currentElement = O[check];
+                    var currentElement = obj[check];
                     if (target === currentElement ||
                         target !== target && currentElement !== currentElement
                     ) {

@@ -173,8 +173,9 @@ hAzzle.define('events', function() {
             }
 
             // removeEvent(el, 't1 t2 t3', fn) or off(el, 't1 t2 t3')
-            if (typeof types === 'string' && collection.inArray(types, ' ') > 0) {
-
+            // ECMA 7 - contains
+            alert(types.contains)
+            if (typeof types === 'string' && types.contains(' ')) {
                 // Once for each type.namespace in types; type may be omitted
                 types = (types || '').match(evwhite) || [''];
 

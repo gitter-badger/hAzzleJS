@@ -83,7 +83,12 @@ hAzzle.define('Classes', function() {
                     length = classes.length;
 
                     for (i = 0; i < length; i++) {
+
+                   // Don't define a global className on the window or document object
+                  
+                   if(elem.nodeType && elem.nodeType === 9 ) {
                         fn(elem, classes[i]);
+                       }
                     }
                 }
                 // Callback function (if provided) that will be fired after the

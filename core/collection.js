@@ -10,15 +10,6 @@ hAzzle.define('Collection', function() {
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
 
-        // For DOM elements, better to use ECMA 7 - contains (e.g.  elem.contains(array, obj);
-
-        includes = function(array, obj) {
-            return arrayProto.indexOf.call(array, obj) != -1;
-        },
-        inArray = function(elem, array, i) {
-            return array === undefined ? -1 : arrayProto.indexOf.call(array, elem, i);
-        },
-
         arrayRemove = function(array, value) {
             var index = array.indexOf(value);
             if (index >= 0)
@@ -79,9 +70,9 @@ hAzzle.define('Collection', function() {
 
     // Get the element at position specified by index from the current collection.
     this.eq = function(index) {
-
-        // If it's a window or document object, hAzzle will throw. Prevent that .... !
-        if (!types.isWindow(this.elements[0]) && this.elements[0].nodeType !== 9) {
+        var elem = this.elements[0];
+        // Prevent hAzzle from throwing on a window or document object
+        if (elem.nodeType && elem.nodeType !== 9) {
             return typeof index === 'number' && hAzzle(index === -1 ? slice(this.elements, this.length - 1) : this.elements[index]);
         }
         return this;
@@ -188,7 +179,7 @@ hAzzle.define('Collection', function() {
         });
     };
 
-    // First() and prev()
+    // First() and prev() methods
     util.each({
         next: 'nextElementSibling',
         prev: 'previousElementSibling'
@@ -200,7 +191,7 @@ hAzzle.define('Collection', function() {
         };
     }.bind(this));
 
-    // prevAll() and nextAll()
+    // prevAll() and nextAll() methods
     util.each({
         prevAll: 'previousElementSibling',
         nextAll: 'nextElementSibling'
@@ -234,9 +225,7 @@ hAzzle.define('Collection', function() {
 
     return {
         makeArray: makeArray,
-        inArray: inArray,
-        includes: includes,
-        arrayRemove: arrayRemove,
+       arrayRemove: arrayRemove,
         slice: slice
     };
 });

@@ -15,22 +15,7 @@ hAzzle.define('valHooks', function() {
             checkbox.checked = true;
             var node = checkbox.getAttributeNode('checked');
             return !node || !node.specified;
-        })(),
- 
-        // iOF() gives approx 40 - 60% better performance then native indexOf
-        // for valHooks
-
-         iOf = function(array, item, from) {
-            var i, length = array.length;
-
-            for (i = (from < 0) ? Math.max(0, length + from) : from || 0; i < length; i++) {
-                if (array[i] === item) {
-                    return i;
-                }
-            }
-
-            return -1;
-        };
+        })();
 
     // Setter
     util.mixin(setters.valHooks.set, {
@@ -43,8 +28,10 @@ hAzzle.define('valHooks', function() {
 
             while (i--) {
                 option = options[i];
+              
+              // ECMA 7 - contains
 
-                if ((option.selected = iOf(values, option.value) >= 0)) {
+                if ((option.selected = values.contains(option.value))) {
                     optionSet = true;
                 }
             }
@@ -61,19 +48,14 @@ hAzzle.define('valHooks', function() {
     util.mixin(setters.valHooks.get, {
 
         'option': function(elem) {
-
             var val = elem.getAttribute(name, 2);
-
-            return val !== null ?
-                val :
-                strings.trim(text.getText(elem));
+            return val !== null ? val : strings.trim(text.getText(elem));
         },
 
         'select': function(elem) {
 
             var index = elem.selectedIndex,
-                // Single box type attribute for select-one
-                // Checkbox type attribute for select-multiple
+
                 one = elem.type === 'select-one',
                 options = elem.options,
                 vals = [],
@@ -114,7 +96,8 @@ hAzzle.define('valHooks', function() {
     util.each(['radio', 'checkbox'], function(val) {
         setters.valHooks.set[val] = function(elem, value) {
             if (types.isArray(value)) {
-                return (elem.checked = iOf(value, hAzzle(elem).val()) >= 0);
+               // ECMA 7 - contains
+                return (elem.checked = value.contains( hAzzle(elem).val() ));
             }
         };
     });
