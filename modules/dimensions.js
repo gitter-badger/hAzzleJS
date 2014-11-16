@@ -10,6 +10,7 @@ hAzzle.define('dimensions', function() {
         util = hAzzle.require('util'),
         types = hAzzle.require('types'),
         features = hAzzle.require('has'),
+        styles = hAzzle.require('style'),
         css = hAzzle.require('css'),
 
         getElem = function(elem) {
@@ -373,10 +374,19 @@ hAzzle.define('dimensions', function() {
         };
         // outerHeight / outerWidth
         this['outer' + val] = function(margin) {
+
             var elem = this.elements[0];
-            return margin ? (elem['offset' + val] +
-                (parseInt(css.css(elem, prop === 'height' ? 'marginTop' : 'marginLeft'), 10) || 0) +
-                (parseInt(css.css(elem, prop === 'height' ? 'marginBottom' : 'marginRight'), 10) || 0)) : elem['offset' + val];
+
+            if (margin) {
+                // Set new value
+               hAzzle(this.elements).css('width', margin);
+               // Return the new value
+                return (elem['offset' + val] +
+                    (parseInt(css.css(elem, prop === 'height' ? 'marginTop' : 'marginLeft'), 10) || 0) +
+                    (parseInt(css.css(elem, prop === 'height' ? 'marginBottom' : 'marginRight'), 10) || 0))
+            }
+
+            return elem['offset' + val];
 
         };
     }.bind(this));
@@ -389,8 +399,8 @@ hAzzle.define('dimensions', function() {
         var top = 'pageYOffset' === prop;
 
         this[method] = function(val) {
-          var elem = this.elements[0],
-              win = getWindow(elem);
+            var elem = this.elements[0],
+                win = getWindow(elem);
 
             if (val === undefined) {
                 return win ? win[prop] : elem[method];

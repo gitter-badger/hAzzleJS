@@ -8,7 +8,9 @@ hAzzle.define('manipulation', function() {
         // Dependencies
 
         util = hAzzle.require('util'),
-
+        types = hAzzle.require('types'),
+        features = hAzzle.require('has'),
+        
         // RegExp
 
         checkradioRegExp = (/^(?:checkbox|radio)$/i),
@@ -144,7 +146,10 @@ hAzzle.define('manipulation', function() {
         },
 
         buildFragment = function(html, context) {
-
+          
+          if(!types.isPlainObject(context)) {
+            return
+           }
             var tmp, tag, wrap,
                 elem,
                 fragment = context.createDocumentFragment(),
@@ -194,9 +199,16 @@ hAzzle.define('manipulation', function() {
 
             // Mitigate XSS vulnerability
 
-            var parsed, defaultContext = imcHTML ?
-                _doc.implementation.createHTMLDocument() :
-                _doc;
+            var parsed, defaultContext;
+       
+       // createHTMLDocument will stop working in IE if we feature check for this method, so 
+       // only use this feature for non-ie browsers (same issue in IE 11 / 12 on the Windows 10tp )   
+       
+                if(features.ie || !imcHTML) {
+                    defaultContext = context || _doc;
+                 } else {
+                    defaultContext = context || imcHTML;                 
+                 }
 
             if ((parsed = /^<(\w+)\s*\/?>(?:<\/\1>|)$/.exec(html))) {
                 return [context.createElement(parsed[1])];
