@@ -86,7 +86,7 @@ hAzzle.define('Classes', function() {
 
                    // Don't define a global className on the window or document object
                   
-                   if(elem.nodeType && elem.nodeType === 9 ) {
+                   if(elem.nodeType && elem.nodeType !== 9 ) {
                         fn(elem, classes[i]);
                        }
                     }
