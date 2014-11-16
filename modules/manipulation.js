@@ -201,8 +201,8 @@ hAzzle.define('manipulation', function() {
 
             var parsed, defaultContext;
        
-       // createHTMLDocument will stop working in IE if we feature check for this method, so 
-       // only use this feature for non-ie browsers (same issue in IE 11 / 12 on the Windows 10tp )   
+       // create() will stop working in IE if we feature check for createHTMLDocument, so 
+       // only use this for non-ie browsers (same issue in IE 11 / 12 on the Windows 10tp )   
        
                 if(features.ie || !imcHTML) {
                     defaultContext = context || _doc;
