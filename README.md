@@ -41,7 +41,7 @@ the **.elements array** will be converted to **jQuery / Zepto style** and you ca
 jQuery  similarities
 ---------------------
 
-As most of the developers are accustomed to using jQuery, hAzzle supports some of the same features, although the API is different.  This function names are identical:
+As most of the developers are accustomed to using jQuery, hAzzle supports some of the same features, although the API is different. This function names are identical:
 
 * attr () 
 * prop () 
@@ -54,6 +54,35 @@ As most of the developers are accustomed to using jQuery, hAzzle supports some o
 * propHooks () 
 * attrHooks () 
 * cssHooks ()
+
+**Note!** that the css methods in hAzzle are little different then **jQuery**, only the method names are the same.
+
+An example on the differences.
+
+In **hAzzle** you can do:
+
+```javascript
+// Include the needed module
+var css = hAzzle.require('css')
+// Get the result
+console.log(css.css($('#console'), 'width') )
+
+Expected result:
+Result: 1030px
+
+```
+Width **jQuery**:
+
+```javascript
+
+// Get the result
+console.log(jQuery.css($('#console'), 'width') )
+
+Result is jQuery:
+
+TypeError: invalid 'in' operand style
+if ( name in style ) {
+```
 
 Your modules
 --------------
