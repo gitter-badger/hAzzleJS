@@ -11,7 +11,7 @@ hAzzle.define('style', function() {
 
         leftRightMargPad = /^(left$|right$|margin|padding)/,
         relAbsFixed = /^(relative|absolute|fixed)$/,
-doesNotRemoveStyles,
+        doesNotRemoveStyles,
         topBottom = /^(top|bottom)$/,
 
         _unitlessProps = ('zoom box-flex columns counter-reset volume stress overflow flex-grow ' +
@@ -151,7 +151,7 @@ doesNotRemoveStyles,
                         value += ret && ret[3] ? ret[3] : 'px';
                     }
 
-                   // Support: IE9
+                    // Support: IE9
                     if (value === null || value === '') {
                         action = 'remove';
                     } else {
@@ -163,8 +163,10 @@ doesNotRemoveStyles,
                     if (hook) {
                         hook(elem, name, value);
                     } else {
-                        // CSSStyleDeclaration 
-                        style[action + 'Property'](name, '' + value);
+                        if (value) {
+                            // CSSStyleDeclaration 
+                            style[action + 'Property'](name, '' + value);
+                        }
                     }
 
                 } else {
@@ -258,14 +260,14 @@ doesNotRemoveStyles,
 
             return unit ? px / unit : px;
         };
-        
-     var removeStyle = function(style, property){
-	if (property == 'backgroundPosition'){
-		style.removeAttribute(property + 'X');
-		property += 'Y';
-	}
-	style.removeAttribute(property);
-};   
+
+    var removeStyle = function(style, property) {
+        if (property == 'backgroundPosition') {
+            style.removeAttribute(property + 'X');
+            property += 'Y';
+        }
+        style.removeAttribute(property);
+    };
 
     this.css = function(name, value) {
 
@@ -290,6 +292,7 @@ doesNotRemoveStyles,
             }
 
             return this.each(function(elem) {
+
                 util.each(name, function(value, prop) {
                     setCSS(elem, prop, value);
                 });
@@ -301,6 +304,7 @@ doesNotRemoveStyles,
             setCSS(elem, name, value);
         });
     };
+
     // Width and height
     util.each({
         height: 'Height',
@@ -328,28 +332,27 @@ doesNotRemoveStyles,
             });
         };
     });
-
-    (function() {
-        var pixelPosition, div = document.createElement('div'), computed = window.getComputedStyle;
-        div.style.cssText = 'border:0;width:0;height:0;position:absolute;top:0;left:-9999px;margin-top:1px';
-        if (computed) {
-            pixelPosition = (computed(div, null) || {}).top !== '1%';
-
-            if (pixelPosition)
-                util.each(['top', 'left'], function(prop) {
-                    cssHooks.get[prop] = function(elem, computed) {
-                        if (computed) {
-                            computed = curCSS(elem, prop);
-                            return /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i.test(computed) ?
-                                hAzzle(elem).position()[prop] + 'px' :
-                                computed;
+   
+        (function() {
+            var pixelPosition, div = document.createElement('div'), computed = window.getComputedStyle;
+            div.style.cssText = 'border:0;width:0;height:0;position:absolute;top:0;left:-9999px;margin-top:1px';
+            if (computed) {
+                pixelPosition = (computed(div, null) || {}).top !== '1%';
+                if (!pixelPosition)
+                    util.each(['top', 'left'], function(prop) {
+                        cssHooks.get[prop] = function(elem, computed) {
+                            if (computed) {
+                                computed = css.css(elem, prop);
+                                return /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i.test(computed) ?
+                                    hAzzle(elem).position()[prop] + 'px' :
+                                    computed;
+                            }
                         }
-                    }
-                });
-           // Prevent memory lekas in IE     
-            div = null;
-        }
-    }());
+                    });
+               // Prevent memory lekas in IE     
+                div = null;
+            }
+        }());
 
     // Populate the unitless properties list
 

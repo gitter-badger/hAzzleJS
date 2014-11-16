@@ -11,7 +11,7 @@ hAzzle.define('util', function() {
 
         each = function(obj, fn, args, /*reverse*/ rev) {
 
-            if (obj === undefined) {
+            if (obj === undefined || obj == null) {
                 return obj;
             }
 

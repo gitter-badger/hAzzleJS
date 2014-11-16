@@ -508,7 +508,7 @@ hAzzle.define('util', function() {
 
         each = function(obj, fn, args, /*reverse*/ rev) {
 
-            if (obj === undefined) {
+            if (obj === undefined || obj == null) {
                 return obj;
             }
 
@@ -627,7 +627,7 @@ hAzzle.define('util', function() {
                 for (; i < length; i++) {
                     source = arguments[i];
                     for (prop in source) {
-                        if (Object.prototype.hasOwnProperty.call(source, prop)) {
+                    if (Object.prototype.hasOwnProperty.call(source, prop)) {
                             obj[prop] = source[prop];
                         }
                     }
@@ -2193,8 +2193,8 @@ hAzzle.define('css', function() {
         units = /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i,
 
         computedValues = function(elem) {
-
-            if (elem && elem.ownerDocument !== null) {
+            // Avoid getting style values on the window object
+            if (elem && elem.nodeType && elem.ownerDocument !== null) {
                 var view = false;
 
                 // Avoid hAzzle from throwing errors if the element doesn't exist
@@ -2268,9 +2268,10 @@ hAzzle.define('css', function() {
             } else {
                 elem = elem != null && elem instanceof hAzzle ? elem.elements : elem.length ? elem[0] : elem
             }
+
             // Avoid hAzzle from throwing errors if the element doesn't exist
 
-            if (!elem && /* internal */ !elem.elements) {
+            if (elem && /* internal */ elem.elements) {
                 return;
             }
 
@@ -2281,16 +2282,7 @@ hAzzle.define('css', function() {
                 elem.style.display = getDisplay(elem);
             }
 
-            if (feature.has('ie') && prop === 'auto') {
-                if (prop === 'height') {
-                    return elem.offsetHeight;
-                }
-                if (prop === 'width') {
-                    return elem.offsetWidth;
-                }
-            }
-
-            if (!force || force === undefined) {
+            if (!force || force === undefined) { 
                 // NOTE! hAzzle will throw 'too much recusion' if this get screwed up
                 if (prop === 'height' &&
                     css(elem, 'boxSizing') !== 'border-box') {
@@ -2308,7 +2300,6 @@ hAzzle.define('css', function() {
                         (toPixel(css(elem, 'paddingRight'))) + 'px';
                 }
             }
-
             var computedStyle = getStyles(elem);
 
             if (computedStyle) {

@@ -33,6 +33,25 @@ hAzzle.define('dimensions', function() {
                     tag === 'td' ||
                     tag === 'th');
         },
+        origValues = function(elem, t) {
+
+            var originalValues = {
+                position: elem.style.position || '',
+                visibility: elem.style.visibility || '',
+                display: elem.style.display || ''
+            };
+            // New CSS style values we are setting to get right values for hidden elements,
+            // the original values will be restored later on
+
+            t.first().css({
+                position: 'absolute',
+                visibility: 'hidden',
+                display: 'block'
+            });
+
+            return originalValues;
+        },
+
         _matchMedia = win.matchMedia || win.msMatchMedia,
         mq = _matchMedia ? function(q) {
             return !!_matchMedia.call(win, q).matches;
@@ -62,7 +81,7 @@ hAzzle.define('dimensions', function() {
         // scrollLeft
         scrollLeft = function(elem, val) {
             return scrollLeftTop(getElem(elem), function(elem, win) {
-                if (val === undefined) {
+                if (val === undefined || val === null) {
                     return win ? win.pageXOffset : elem.scrollLeft;
                 }
                 return win ? win.scrollTo(val) : elem.scrollLeft = val;
@@ -71,7 +90,7 @@ hAzzle.define('dimensions', function() {
         // scrollTop
         scrollTop = function(elem, val) {
             return scrollLeftTop(getElem(elem), function(elem, win) {
-                if (val === undefined) {
+                if (val === undefined || val === null) {
                     return win ? win.pageYOffset : elem.scrollTop;
                 }
                 return win ? win.scrollTo(val) : elem.scrollTop = val;
@@ -293,19 +312,18 @@ hAzzle.define('dimensions', function() {
         }
 
         elem = elem.parentNode;
-/*
+
         if (!util.nodeName(elem, 'html')) {
             scroll.top += elem.scrollLeft;
             scroll.left += elem.scrollTop;
         }
-  */      
         position.top = offset.top - scroll.top;
         position.left = offset.left - scroll.left;
 
         if (relative && (relative = hAzzle(relative))) {
-     
+
             var relativePosition = relative.getPosition();
-     
+
             return {
                 // Add borders
                 top: position.top - relativePosition.top - parseInt(css.css(relative, 'borderLeftWidth')) || 0,
@@ -329,35 +347,69 @@ hAzzle.define('dimensions', function() {
         });
     };
 
-    // 'this' height and width
+    this.getWidthHeight = function(dim) {
 
+        if (!this.length) {
+            return;
+        }
+
+        var elem = this.elements[0],
+
+            // Get window width or height
+
+            win = types.isWindow(elem),
+
+            // Get document width or height
+
+            doc = elem.nodeType == 9 && elem.documentElement,
+
+            // Check if the element are visible or not. If hidden, we get the original values, and set new ones so
+            // we can measure the right values properly. The original values will be restored later on
+
+            orig = !doc && !!elem.style && !elem.offsetWidth && !elem.offsetHeight ? origValues(elem, this) : null,
+
+            // Calculate width
+
+            width = win ? elem.document.documentElement.clientWidth :
+            doc ? Math.max(elem.body.scrollWidth, elem.body.offsetWidth, doc.scrollWidth, doc.offsetWidth, doc.clientWidth) :
+            elem.offsetWidth,
+
+            // Calculate height
+
+            height = win ? elem.document.documentElement.clientHeight :
+            doc ? Math.max(elem.body.scrollHeight, elem.body.offsetHeight, doc.scrollHeight, doc.offsetHeight, doc.clientHeight) :
+            elem.offsetHeight;
+
+        // Restore original CSS values on current element it's not a window or document object
+
+        if (orig) {
+            this.first().css(orig);
+        }
+
+        // Return 'width' or 'height' if given, if not return a object with both dimensions
+
+        return (dim === 'width') ? width : (dim === 'height') ? height : {
+            height: height,
+            width: width
+        };
+    };
+
+    this.width = function() {
+        return this.getWidthHeight('width');
+
+    };
+
+    this.height = function() {
+        return this.getWidthHeight('height');
+    };
+
+    // innerHeight / outerHeight
 
     util.each({
         height: 'Height',
         width: 'Width'
     }, function(val, prop) {
-        // Height / Width
-        this[prop] = function(value) {
-            var elem = this.elements[0],
-                doc;
 
-            if (types.isWindow(elem)) {
-                return elem.document.documentElement['client' + val];
-            }
-
-            if (elem.nodeType === 9) {
-                doc = elem.documentElement;
-
-                return Math.max(
-                    elem.body['scroll' + val], doc['scroll' + val],
-                    elem.body['offset' + val], doc['offset' + val],
-                    doc['client' + val]
-                );
-            }
-            return value === undefined ?
-                css.css(this.elements[0], 'width', /*force*/ true) :
-                hAzzle.require('Style').setCSS(this.elements[0], 'height', val);
-        };
         // innerHeight / innerWidth
         this['inner' + val] = function() {
             return this.elements[0]['client' + val];
