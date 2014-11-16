@@ -83,6 +83,38 @@ TypeError: invalid 'in' operand style
 if ( name in style ) {
 ```
 
+Native javascript
+-----------------
+Each Core module has it's own stand-alone methods that let you use the methods you need with native Javascript. So you are not bound to use the build-in selector engine.
+
+Couple of examples wihtout a selector engine:
+
+```javascript
+// Include the needed module
+var css = hAzzle.require('css')
+// Get the result 
+console.log(css.css( document.getElementById('test'), 'width') )
+
+```
+You can also use **nodeList**
+
+```javascript
+// Include the needed module
+var css = hAzzle.require('css')
+// Get the result 
+console.log(css.css( document.getElementsByTagName('div'), 'width') )
+```
+
+Adding a class (This example will set the same className on each div element):
+
+```javascript
+// Include the needed module
+var cls = hAzzle.require('classes')
+// Get the result 
+console.log(cls.addClass( document.getElementsByTagName('div'), 'hello!') )
+```
+
+
 Your modules
 --------------
 
