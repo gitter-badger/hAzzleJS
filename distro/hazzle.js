@@ -2185,7 +2185,7 @@ hAzzle.define('css', function() {
 
         // Various Regexes
 
-        widthheight = /^(width|height)$/,
+        widthHeight = /^(width|height)$/,
         listitem = /^(li)$/i,
         tablerow = /^(tr)$/i,
         table = /^(table)$/i,
@@ -2193,8 +2193,16 @@ hAzzle.define('css', function() {
         units = /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i,
 
         computedValues = function(elem) {
+
             if (elem && elem.ownerDocument !== null) {
                 var view = false;
+
+                // Avoid hAzzle from throwing errors if the element doesn't exist
+
+                if (!elem && /* internal */ !elem.elements) {
+                    return;
+                }
+
                 if (elem) {
                     if (elem.ownerDocument !== undefined) {
                         view = elem.ownerDocument.defaultView;
@@ -2206,17 +2214,21 @@ hAzzle.define('css', function() {
             return '';
         },
         computed = function(elem) {
+
             if (elem) {
+
                 if (storage.private.get(elem, 'css') === undefined) {
+
                     storage.private.access(elem, 'css', {
                         computedStyle: null
                     });
                 }
+
                 return storage.private.get(elem, 'css');
             }
         },
         getStyles = function(elem) {
-            return computed(elem).computedStyle === null ?
+            return elem && (computed(elem).computedStyle === undefined || computed(elem).computedStyle == null) ?
                 computed(elem).computedStyle = computedValues(elem) :
                 computed(elem).computedStyle;
         },
@@ -2247,16 +2259,24 @@ hAzzle.define('css', function() {
                 }
             }
             return 'block';
-
         },
 
         css = function(elem, prop, force) {
 
-            elem = elem instanceof hAzzle ? elem.elements[0] : elem;
+            if (elem === null || elem === undefined) {
+                return;
+            } else {
+                elem = elem != null && elem instanceof hAzzle ? elem.elements : elem.length ? elem[0] : elem
+            }
+            // Avoid hAzzle from throwing errors if the element doesn't exist
+
+            if (!elem && /* internal */ !elem.elements) {
+                return;
+            }
 
             var ret = 0;
 
-            if (widthheight.test(prop) && css(elem, 'display') === 0) {
+            if (widthHeight.test(prop) && css(elem, 'display') === 0) {
                 elem.style.display = 'none';
                 elem.style.display = getDisplay(elem);
             }
@@ -2270,24 +2290,23 @@ hAzzle.define('css', function() {
                 }
             }
 
-            if (!force) {
-
+            if (!force || force === undefined) {
+                // NOTE! hAzzle will throw 'too much recusion' if this get screwed up
                 if (prop === 'height' &&
-                    css(elem, 'boxSizing').toString().toLowerCase() !== 'border-box') {
+                    css(elem, 'boxSizing') !== 'border-box') {
                     return elem.offsetHeight -
                         (toPixel(css(elem, 'borderTopWidth'))) -
                         (toPixel(css(elem, 'borderBottomWidth'))) -
                         (toPixel(css(elem, 'paddingTop'))) -
-                        (toPixel(css(elem, 'paddingBottom')));
+                        (toPixel(css(elem, 'paddingBottom'))) + 'px';
                 } else if (prop === 'width' &&
-                    css(elem, 'boxSizing').toString().toLowerCase() !== 'border-box') {
+                    css(elem, 'boxSizing') !== 'border-box') {
                     return elem.offsetWidth -
                         (toPixel(css(elem, 'borderLeftWidth'))) -
                         (toPixel(css(elem, 'borderRightWidth'))) -
                         (toPixel(css(elem, 'paddingLeft'))) -
-                        (toPixel(css(elem, 'paddingRight')));
+                        (toPixel(css(elem, 'paddingRight'))) + 'px';
                 }
-
             }
 
             var computedStyle = getStyles(elem);

@@ -209,13 +209,10 @@ hAzzle.define('dimensions', function() {
         return scrollTop(this.elements[0], val);
     };
 
-    // BIG NOTE!! getBoundingClientRect() are the best solution for this function, but
-    // getBoundingClientRect() are terrible slow, and hAzzle need to be fast.
+    // BIG NOTE!! getBoundingClientRect() should have been the best solution for this method, but
+    // it's terrible slow, and hAzzle need to be fast.
+    //
     // http://jsperf.com/getboundingclientrect-vs-offset
-    // Too many CSS look-ups are not a problem here, it's allready cached on the element itself
-    // Example if we try this jQuery example ( Number #2): http://api.jquery.com/offset/
-    // Each action get the data from the element cache and not DOM. With gBCR() we have to
-    // ask DOM for each action
 
     this.offset = function(opts) {
         if (arguments.length) {
@@ -278,8 +275,6 @@ hAzzle.define('dimensions', function() {
         };
     };
 
-
-
     this.position = function(relative) {
 
         var offset = this.offset(),
@@ -298,19 +293,21 @@ hAzzle.define('dimensions', function() {
         }
 
         elem = elem.parentNode;
-
+/*
         if (!util.nodeName(elem, 'html')) {
             scroll.top += elem.scrollLeft;
             scroll.left += elem.scrollTop;
         }
-        position = {
-            top: offset.top - scroll.top,
-            left: offset.left - scroll.left
-        };
+  */      
+        position.top = offset.top - scroll.top;
+        position.left = offset.left - scroll.left;
 
         if (relative && (relative = hAzzle(relative))) {
+     
             var relativePosition = relative.getPosition();
+     
             return {
+                // Add borders
                 top: position.top - relativePosition.top - parseInt(css.css(relative, 'borderLeftWidth')) || 0,
                 left: position.left - relativePosition.left - parseInt(css.css(relative, 'borderTopWidth')) || 0
             };
