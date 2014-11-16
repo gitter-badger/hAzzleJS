@@ -15,15 +15,9 @@ hAzzle.define('dimensions', function() {
         getElem = function(elem) {
             return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
         },
-        isBody = function(elem) {
-            elem = getElem(elem);
-            var tag = elem.tagName.toLowerCase();
-            return (tag === 'body' ||
-                tag === 'html');
-        },
         isOffset = function(elem) {
             elem = getElem(elem);
-            return css.css(elem, 'position') !== 'static' || isBody(elem);
+            return css.css(elem, 'position') !== 'static' || !util.nodeName(elem, 'html');
         },
         isStatic = function(elem) {
             elem = getElem(elem);
@@ -60,41 +54,18 @@ hAzzle.define('dimensions', function() {
         },
 
         viewportW = function() {
-            var a = docElem.clientWidth,
-                b = win.innerWidth;
-            return a < b ? b : a;
+            var cw = docElem.clientWidth,
+                iw = win.innerWidth;
+            return cw < iw ? iw : cw;
         },
         viewportH = function() {
-            var a = docElem.clientHeight,
-                b = win.innerHeight;
-            return a < b ? b : a;
-        },
-
-        scrollLeftTop = function(elem, fn) {
-            var win = getWindow(elem);
-            return fn(elem, win);
+            var ch = docElem.clientHeight,
+                ih = win.innerHeight;
+            return ch < ih ? ih : ch;
         },
 
         getWindow = function(elem) {
             return types.isWindow(elem) ? elem : elem.nodeType === 9 && elem.defaultView;
-        },
-        // scrollLeft
-        scrollLeft = function(elem, val) {
-            return scrollLeftTop(getElem(elem), function(elem, win) {
-                if (val === undefined || val === null) {
-                    return win ? win.pageXOffset : elem.scrollLeft;
-                }
-                return win ? win.scrollTo(val) : elem.scrollLeft = val;
-            });
-        },
-        // scrollTop
-        scrollTop = function(elem, val) {
-            return scrollLeftTop(getElem(elem), function(elem, win) {
-                if (val === undefined || val === null) {
-                    return win ? win.pageYOffset : elem.scrollTop;
-                }
-                return win ? win.scrollTo(val) : elem.scrollTop = val;
-            });
         },
         // Test if a media query is active   
         mediaQuery = function() {
@@ -129,7 +100,7 @@ hAzzle.define('dimensions', function() {
         // optional cushion amount
 
         rectangle = function(elem, cushion) {
-            if ((elem = elem instanceof hAzzle ? elem.elements[0] : elem.nodeType ? elem : elem[0])) {
+            if ((elem = elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem)) {
                 if (!elem || elem.nodeType !== 1) {
                     return false;
                 }
@@ -148,15 +119,14 @@ hAzzle.define('dimensions', function() {
             return w / h;
         },
 
-
         // Test if an element is in the same x-axis section as the viewport.
-        inX = function(elem, cushion) {
+        Xaxis = function(elem, cushion) {
             var r = rectangle(elem, cushion);
             return !!r && r.right >= 0 && r.left <= viewportW();
         },
         // Test if an element is in the same y-axis section as the viewport.    
 
-        inY = function(elem, cushion) {
+        Yaxis = function(elem, cushion) {
             var r = rectangle(elem, cushion);
             return !!r && r.bottom >= 0 && r.top <= viewportH();
         },
@@ -164,14 +134,6 @@ hAzzle.define('dimensions', function() {
         inViewport = function(elem, cushion) {
             var r = rectangle(elem, cushion);
             return !!r && r.bottom >= 0 && r.right >= 0 && r.top <= viewportH() && r.left <= viewportW();
-        },
-        // Get the vertical scroll position in pixels
-        scrollY = function() {
-            return win.pageYOffset || docElem.scrollTop;
-        },
-        // Get the horizontal scroll position in pixels
-        scrollX = function() {
-            return win.pageXOffset || docElem.scrollLeft;
         },
         setOffset = function(elem, opts, i) {
             var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft, calculatePosition,
@@ -230,7 +192,6 @@ hAzzle.define('dimensions', function() {
 
     // BIG NOTE!! getBoundingClientRect() should have been the best solution for this method, but
     // it's terrible slow, and hAzzle need to be fast.
-    //
     // http://jsperf.com/getboundingclientrect-vs-offset
 
     this.offset = function(opts) {
@@ -296,46 +257,49 @@ hAzzle.define('dimensions', function() {
 
     this.position = function(relative) {
 
-        var offset = this.offset(),
-            elem = this.elements[0],
-            scroll = {
-                top: 0,
-                left: 0
-            },
+        var elem = this.elements[0];
+
+        if (!elem) {
+            return null;
+        }
+
+        var element = elem.parentNode,
             position = {
+                x: 0,
+                y: 0
+            };
+
+        // Do some magic...
+
+        while (element && !util.nodeName(element, 'html')) {
+            position.x += element.scrollLeft;
+            position.y += element.scrollTop;
+            element = element.parentNode;
+        }
+
+        var offsetParent = this.offsetParent().elements,
+            offset = this.offset(),
+            parentOffset = !util.nodeName(offsetParent[0], 'html') ? {
                 top: 0,
                 left: 0
-            };
+            } : offsetParent.offset();
+        offset.top -= position.y;
+        offset.left -= position.x;
 
-        if (!this.elements[0]) {
-            return;
-        }
+        parentOffset.top += parseFloat(css.css(offsetParent[0], 'borderTopWidth')) || 0;
+        parentOffset.left += parseFloat(css.css(offsetParent[0], 'borderLeftWidth')) || 0;
 
-        elem = elem.parentNode;
+        // Subtract the two offsets
 
-        if (!util.nodeName(elem, 'html')) {
-            scroll.top += elem.scrollLeft;
-            scroll.left += elem.scrollTop;
-        }
-        position.top = offset.top - scroll.top;
-        position.left = offset.left - scroll.left;
-
-        if (relative && (relative = hAzzle(relative))) {
-
-            var relativePosition = relative.getPosition();
-
-            return {
-                // Add borders
-                top: position.top - relativePosition.top - parseInt(css.css(relative, 'borderLeftWidth')) || 0,
-                left: position.left - relativePosition.left - parseInt(css.css(relative, 'borderTopWidth')) || 0
-            };
-        }
-        return position;
+        return {
+            top: offset.top - parentOffset.top,
+            left: offset.left - parentOffset.left
+        };
     };
 
     this.offsetParent = function() {
         return this.map(function(elem) {
-            if (isBody(elem) || css.css(elem, 'position') == 'fixed') return null;
+            if (util.nodeName(elem, 'html') || css.css(elem, 'position') == 'fixed') return null;
 
             var isOffsetCheck = (css.css(elem, 'position') == 'static') ? isStatic : isOffset;
             while ((elem = elem.parentNode)) {
@@ -424,18 +388,41 @@ hAzzle.define('dimensions', function() {
         };
     }.bind(this));
 
+
+    util.each({
+        scrollLeft: 'pageXOffset',
+        scrollTop: 'pageYOffset'
+    }, function(method, prop) {
+        var top = 'pageYOffset' === prop;
+
+        this[method] = function(val) {
+            elem = this.elements[0];
+
+            var win = getWindow(elem);
+
+            if (val === undefined) {
+                return win ? win[prop] : elem[method];
+            }
+
+            if (win) {
+                win.scrollTo(!top ? val : window.pageXOffset,
+                    top ? val : window.pageYOffset
+                );
+
+            } else {
+                elem[method] = val;
+            }
+        };
+    }.bind(this));
+
     return {
         getWindow: getWindow,
-        scrollLeft: scrollLeft,
-        scrollTop: scrollTop,
         matchMedia: matchMedia,
         mediaQuery: mediaQuery,
         aspect: aspect,
         inViewport: inViewport,
-        scrollY: scrollY,
-        scrollX: scrollX,
-        inX: inX,
-        inY: inY,
+        Xaxis: Xaxis,
+        Yaxis: Yaxis,
         rectangle: rectangle,
         viewportW: viewportW,
         viewportH: viewportH
