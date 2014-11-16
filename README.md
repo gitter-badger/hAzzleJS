@@ -110,8 +110,8 @@ Adding a class (This example will set the same className on each div element):
 ```javascript
 // Include the needed module
 var cls = hAzzle.require('classes')
-// Get the result 
-console.log(cls.addClass( document.getElementsByTagName('div'), 'hello!') )
+// Set the class names
+cls.addClass( document.getElementsByTagName('div'), 'hello!') 
 ```
 
 
