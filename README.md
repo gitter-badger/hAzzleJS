@@ -55,7 +55,7 @@ As most of the developers are accustomed to using jQuery, hAzzle supports some o
 * attrHooks () 
 * cssHooks ()
 
-**Note!** that the css methods in hAzzle are little different then **jQuery**, only the method names are the same.
+**Note!** The css methods in hAzzle are little different then **jQuery**, only the method names are the same.
 
 An example on the differences.
 
