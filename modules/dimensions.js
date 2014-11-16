@@ -183,13 +183,6 @@ hAzzle.define('dimensions', function() {
             }
         };
 
-    this.scrollLeft = function(val) {
-        return scrollLeft(this.elements[0], val);
-    };
-    this.scrollTop = function(val) {
-        return scrollTop(this.elements[0], val);
-    };
-
     // BIG NOTE!! getBoundingClientRect() should have been the best solution for this method, but
     // it's terrible slow, and hAzzle need to be fast.
     // http://jsperf.com/getboundingclientrect-vs-offset
@@ -255,7 +248,7 @@ hAzzle.define('dimensions', function() {
         };
     };
 
-    this.position = function(relative) {
+    this.position = function() {
 
         var elem = this.elements[0];
 
@@ -396,9 +389,8 @@ hAzzle.define('dimensions', function() {
         var top = 'pageYOffset' === prop;
 
         this[method] = function(val) {
-            elem = this.elements[0];
-
-            var win = getWindow(elem);
+          var elem = this.elements[0],
+              win = getWindow(elem);
 
             if (val === undefined) {
                 return win ? win[prop] : elem[method];
