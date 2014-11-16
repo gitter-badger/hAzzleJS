@@ -67,7 +67,6 @@ var css = hAzzle.require('css')
 // Get the result
 console.log(css.css($('#console'), 'width') )
 
-Expected result:
 Result: 1030px
 
 ```
@@ -78,7 +77,7 @@ Width **jQuery**:
 // Get the result
 console.log(jQuery.css($('#console'), 'width') )
 
-Result is jQuery:
+Result:
 
 TypeError: invalid 'in' operand style
 if ( name in style ) {
