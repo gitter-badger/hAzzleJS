@@ -38,7 +38,7 @@ the **.elements array** will be converted to **jQuery / Zepto style** and you ca
 
 **Note! hazzle will work as before, so you can actually use both hAzzle and jQuery / Zepto methods together**
 
-jQuery  similarities
+jQuery similarities
 ---------------------
 
 As most of the developers are accustomed to using jQuery, hAzzle supports some of the same features, although the API is different. This function names are identical:
@@ -82,6 +82,24 @@ Result:
 TypeError: invalid 'in' operand style
 if ( name in style ) {
 ```
+Meaning **jQuery** throws an error in this case. To archive the same in **jQuery** you have to do this:
+
+```javascript
+
+// Get the result
+console.log(jQuery.css($('#console').get(0), 'width') )
+
+```
+or
+
+```javascript
+
+// Get the result
+console.log(jQuery.css($('#console')[0], 'width') )
+
+
+```
+
 
 Native javascript
 -----------------
