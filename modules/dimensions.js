@@ -13,32 +13,19 @@ hAzzle.define('dimensions', function() {
         styles = hAzzle.require('style'),
         css = hAzzle.require('css'),
 
-        getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
-        },
-        isOffset = function(elem) {
-            elem = getElem(elem);
-            return css.css(elem, 'position') !== 'static' || !util.nodeName(elem, 'html');
-        },
-        isStatic = function(elem) {
-            elem = getElem(elem);
-            var tag = elem.tagName.toLowerCase();
-            return isOffset(elem) ||
-                (tag === 'table' ||
-                    tag === 'td' ||
-                    tag === 'th');
-        },
-        origValues = function(elem, t) {
+        origValues = function(elem, core) {
 
-            var originalValues = {
-                position: elem.style.position || '',
-                visibility: elem.style.visibility || '',
-                display: elem.style.display || ''
-            };
-            // New CSS style values we are setting to get right values for hidden elements,
-            // the original values will be restored later on
+            var style = elem.style,
+                originalValues = {
+                    position: style.position,
+                    visibility: style.visibility,
+                    display: style.display
+                };
 
-            t.first().css({
+            // Set new CSS rules *only* on the first element in a collection,
+            // and return it's original values
+
+            core.first().css({
                 position: 'absolute',
                 visibility: 'hidden',
                 display: 'block'
@@ -249,59 +236,45 @@ hAzzle.define('dimensions', function() {
         };
     };
 
+    // Get the current coordinates of the first element in the set of matched 
+    // elements, relative to the offset parent.
+
     this.position = function() {
 
-        var elem = this.elements[0];
+        var elem = this.elements[0]
 
         if (!elem) {
             return null;
         }
 
-        var element = elem.parentNode,
-            position = {
-                x: 0,
-                y: 0
-            };
-
-        // Do some magic...
-
-        while (element && !util.nodeName(element, 'html')) {
-            position.x += element.scrollLeft;
-            position.y += element.scrollTop;
-            element = element.parentNode;
-        }
-
-        var offsetParent = this.offsetParent().elements,
+        var offsetParent = this.offsetParent(),
             offset = this.offset(),
-            parentOffset = !util.nodeName(offsetParent[0], 'html') ? {
+            parentOffset = util.nodeName(offsetParent.nodeName, "html") ? {
                 top: 0,
                 left: 0
             } : offsetParent.offset();
-        offset.top -= position.y;
-        offset.left -= position.x;
-
-        parentOffset.top += parseFloat(css.css(offsetParent[0], 'borderTopWidth')) || 0;
-        parentOffset.left += parseFloat(css.css(offsetParent[0], 'borderLeftWidth')) || 0;
+        offset.top -= parseFloat(css.css(elem, "marginTop")) || 0;
+        offset.left -= parseFloat(css.css(elem, "marginLeft")) || 0;
+        alert(offset.top)
+        parentOffset.top += parseFloat(css.css(offsetParent, "borderTopWidth")) || 0;
+        parentOffset.left += parseFloat(css.css(offsetParent, "borderLeftWidth")) || 0;
 
         // Subtract the two offsets
-
         return {
             top: offset.top - parentOffset.top,
             left: offset.left - parentOffset.left
         };
     };
 
-    this.offsetParent = function() {
-        return this.map(function(elem) {
-            if (util.nodeName(elem, 'html') || css.css(elem, 'position') == 'fixed') return null;
+    //  Get the closest ancestor element that is positioned.
 
-            var isOffsetCheck = (css.css(elem, 'position') == 'static') ? isStatic : isOffset;
-            while ((elem = elem.parentNode)) {
-                if (isOffsetCheck(elem)) {
-                    return elem;
-                }
+    this.offsetParent = function() {
+        return this.map(function() {
+            var offsetParent = this.offsetParent || docElem;
+            if (util.nodeName(offsetParent, "html") || css.css(this, 'position') === 'fixed') {
+                return null;
             }
-            return null;
+            return offsetParent;
         });
     };
 
@@ -352,14 +325,16 @@ hAzzle.define('dimensions', function() {
         };
     };
 
-    this.width = function() {
-        return this.getWidthHeight('width');
+    // width / height
 
-    };
-
-    this.height = function() {
-        return this.getWidthHeight('height');
-    };
+    util.each([
+        'height',
+        'width'
+    ], function(prop) {
+        this[prop] = function(val) {
+            return val ? styles.setCSS(this.elements[0], prop, val) : this.getWidthHeight(prop);
+        };
+    }.bind(this));
 
     // innerHeight / outerHeight
 
@@ -379,11 +354,11 @@ hAzzle.define('dimensions', function() {
 
             if (margin) {
                 // Set new value
-               hAzzle(this.elements).css('width', margin);
-               // Return the new value
+                hAzzle(this.elements).css('width', margin);
+                // Return the new value
                 return (elem['offset' + val] +
                     (parseInt(css.css(elem, prop === 'height' ? 'marginTop' : 'marginLeft'), 10) || 0) +
-                    (parseInt(css.css(elem, prop === 'height' ? 'marginBottom' : 'marginRight'), 10) || 0))
+                    (parseInt(css.css(elem, prop === 'height' ? 'marginBottom' : 'marginRight'), 10) || 0));
             }
 
             return elem['offset' + val];
@@ -391,6 +366,7 @@ hAzzle.define('dimensions', function() {
         };
     }.bind(this));
 
+    // scrollLeft / scrollTop
 
     util.each({
         scrollLeft: 'pageXOffset',
