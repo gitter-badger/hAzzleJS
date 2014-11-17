@@ -140,7 +140,7 @@ Build in the Core are the units conversation, and you can convert units like thi
 ```javascript
 // Include the needed module
 var css = hAzzle.require('css')
-// Set the class names
+
 css.toPx(element, '2vh');
 ```
 Or convert from **em** to **px**
@@ -148,7 +148,7 @@ Or convert from **em** to **px**
 ```javascript
 // Include the needed module
 var css = hAzzle.require('css')
-// Set the class names
+// convert from em to px
 css.toPx(element, '2em');
 ```
 
