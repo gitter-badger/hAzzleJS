@@ -38,7 +38,7 @@ the **.elements array** will be converted to **jQuery / Zepto style** and you ca
 
 **Note! hazzle will work as before, so you can actually use both hAzzle and jQuery / Zepto methods together**
 
-jQuery  similarities
+jQuery similarities
 ---------------------
 
 As most of the developers are accustomed to using jQuery, hAzzle supports some of the same features, although the API is different. This function names are identical:
@@ -82,6 +82,22 @@ Result:
 TypeError: invalid 'in' operand style
 if ( name in style ) {
 ```
+Meaning **jQuery** throws an error in this case. To archive the same in **jQuery** you have to do this:
+
+```javascript
+
+// Get the result
+console.log(jQuery.css($('#console').get(0), 'width') )
+
+```
+or
+
+```javascript
+
+// Get the result
+console.log(jQuery.css($('#console')[0], 'width') )
+
+```
 
 Native javascript
 -----------------
@@ -113,7 +129,30 @@ var cls = hAzzle.require('classes')
 // Set the class names
 cls.addClass( document.getElementsByTagName('div'), 'hello!') 
 ```
+Units and dimensions
+--------------------
 
+In many other libraries such as **jQuery** there are issues and glitches when it comes to returning correct values on different dimensions methods such as  **height()**, **offset()**, **position()** and **offsetParent()**.
+One of hAzzle design goals is to return the the correct values on this methods, and supports all known units ( e.g. **px**,  **pc**, **mm**, **%**, **cm**)
+
+Build in the Core are the units conversation, and you can convert units like this:
+
+```javascript
+// Include the needed module
+var css = hAzzle.require('css')
+
+css.toPx(element, '2vh');
+```
+Or convert from **em** to **px**
+
+```javascript
+// Include the needed module
+var css = hAzzle.require('css')
+// convert from em to px
+css.toPx(element, '2em');
+```
+
+For the other methods - e.g.  **height()** and **offset()** you need to include the **dimensjons.js** module.
 
 Your modules
 --------------
