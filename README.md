@@ -97,9 +97,7 @@ or
 // Get the result
 console.log(jQuery.css($('#console')[0], 'width') )
 
-
 ```
-
 
 Native javascript
 -----------------
@@ -131,7 +129,28 @@ var cls = hAzzle.require('classes')
 // Set the class names
 cls.addClass( document.getElementsByTagName('div'), 'hello!') 
 ```
+Units and dimensions
+--------------------
 
+In many other libraries such as **jQuery** there are issues and glitches when it comes to returning correct values on different dimensions methods such as  **height()**, **offset()**, **position()** and **offsetParent()**.
+One of hAzzle design goals is to return the the correct values on this methods, and supports all known units ( e.g. **px**,  **pc**, **mm**, **%**, *cm**)
+
+Build in the Core are the units conversation, and you can convert units like this:
+
+```javascript
+// Include the needed module
+var css = hAzzle.require('css')
+// Set the class names
+css.toPx(element, '2vh');
+```
+Or convert from **em** to **px**
+
+```javascript
+// Include the needed module
+var css = hAzzle.require('css')
+// Set the class names
+css.toPx(element, '2em');
+```
 
 Your modules
 --------------
