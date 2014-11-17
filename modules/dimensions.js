@@ -249,15 +249,16 @@ hAzzle.define('dimensions', function() {
 
         var offsetParent = this.offsetParent(),
             offset = this.offset(),
-            parentOffset = util.nodeName(offsetParent.nodeName, "html") ? {
+            parentOffset = util.nodeName(offsetParent.nodeName, 'html') ? {
                 top: 0,
                 left: 0
             } : offsetParent.offset();
-        offset.top -= parseFloat(css.css(elem, "marginTop")) || 0;
-        offset.left -= parseFloat(css.css(elem, "marginLeft")) || 0;
+            
+        offset.top -= parseFloat(css.css(elem, 'marginTop')) || 0;
+        offset.left -= parseFloat(css.css(elem, 'marginLeft')) || 0;
         alert(offset.top)
-        parentOffset.top += parseFloat(css.css(offsetParent, "borderTopWidth")) || 0;
-        parentOffset.left += parseFloat(css.css(offsetParent, "borderLeftWidth")) || 0;
+        parentOffset.top += parseFloat(css.css(offsetParent, 'borderTopWidth')) || 0;
+        parentOffset.left += parseFloat(css.css(offsetParent, 'borderLeftWidth')) || 0;
 
         // Subtract the two offsets
         return {
@@ -271,7 +272,7 @@ hAzzle.define('dimensions', function() {
     this.offsetParent = function() {
         return this.map(function() {
             var offsetParent = this.offsetParent || docElem;
-            if (util.nodeName(offsetParent, "html") || css.css(this, 'position') === 'fixed') {
+            if (util.nodeName(offsetParent, 'html') || css.css(this, 'position') === 'fixed') {
                 return null;
             }
             return offsetParent;

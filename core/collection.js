@@ -70,9 +70,10 @@ hAzzle.define('Collection', function() {
 
     // Get the element at position specified by index from the current collection.
     this.eq = function(index) {
+
         var elem = this.elements[0];
         // Prevent hAzzle from throwing on a window or document object
-        if (elem.nodeType && elem.nodeType !== 9) {
+        if (elem && elem.nodeType && elem.nodeType !== 9) {
             return typeof index === 'number' && hAzzle(index === -1 ? slice(this.elements, this.length - 1) : this.elements[index]);
         }
         return this;

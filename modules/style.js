@@ -9,11 +9,6 @@ hAzzle.define('style', function() {
         strings = hAzzle.require('strings'),
         css = hAzzle.require('css'),
 
-        leftRightMargPad = /^(left$|right$|margin|padding)/,
-        relAbsFixed = /^(relative|absolute|fixed)$/,
-        doesNotRemoveStyles,
-        topBottom = /^(top|bottom)$/,
-
         _unitlessProps = ('zoom box-flex columns counter-reset volume stress overflow flex-grow ' +
             'column-count flex-shrink flex-height order orphans widows rotate3d flipped ' +
             'transform ms-flex-order transform-origin perspective transform-style ' +
@@ -128,6 +123,7 @@ hAzzle.define('style', function() {
                 name = cssProps[origName] || (cssProps[origName] = vendorPrefixes(name)[0]);
 
                 style = elem.style;
+
                 if (!style) {
                     return;
                 }
@@ -141,9 +137,10 @@ hAzzle.define('style', function() {
                     // and convert all unit types to PX (e.g. 10em will become 160px)
 
                     if (type === 'string' && (ret = sNumbs.exec(value))) {
-                        value = units(css.css(elem, name), ret[3], elem, name) + (ret[1] + 1) * ret[2];
+                        value = units(parseFloat(css.css(elem, name)), ret[3], elem, name) + (ret[1] + 1) * ret[2];
                         type = 'number';
                     }
+                   
 
                     // If a number was passed in, add 'px' (except for certain CSS properties)
 
@@ -164,8 +161,7 @@ hAzzle.define('style', function() {
                         hook(elem, name, value);
                     } else {
                         if (value) {
-                            // CSSStyleDeclaration 
-                            style[action + 'Property'](name, '' + value);
+                          style[name] = value;
                         }
                     }
 
@@ -180,27 +176,6 @@ hAzzle.define('style', function() {
                 }
             }
         },
-        swap = function(elem, fn) {
-            var obj = {},
-                name, style = elem.style,
-                val;
-
-            if (elem.offsetWidth) {
-                val = fn();
-            } else {
-                for (name in cssShow) {
-                    obj[name] = style[name];
-                    style[name] = cssShow[name];
-                }
-
-                val = fn();
-                for (name in obj) {
-                    style[name] = obj[name];
-                }
-            }
-
-            return val;
-        },
         // Converts one unit to another
 
         units = function(px, unit, elem, prop) {
@@ -212,21 +187,29 @@ hAzzle.define('style', function() {
 
             if (unit === '%') {
 
-                if (leftRightMargPad.test(prop)) {
+                if (prop === 'left' ||
+                    prop === 'right' ||
+                    prop === 'margin' ||
+                    prop === 'padding') {
+
                     prop = 'width';
 
-                } else if (topBottom.test(prop)) {
+                } else if (prop === 'top' ||
+                    prop === 'bottom') {
                     prop = 'height';
                 }
 
-                elem = relAbsFixed.test(css.css(elem, 'position')) ?
+                // Get the correct position
+
+                var pos = css.css(elem, 'position');
+
+                elem = (pos === 'relative' ||
+                        pos === 'absolute' ||
+                        pos === 'fixed') ?
                     elem.offsetParent : elem.parentNode;
 
                 if (elem) {
-
-                    prop = parseFloat(css.css(elem, prop));
-
-                    if (prop !== 0) {
+                    if (( prop = parseFloat(css.css(elem, prop)) ) !== 0) {
                         return px / prop * 100;
                     }
                 }
@@ -234,6 +217,7 @@ hAzzle.define('style', function() {
             }
 
             if (unit === 'em') {
+                console.log(px / parseFloat(css.css(elem, 'fontSize')))
                 return px / parseFloat(css.css(elem, 'fontSize'));
             }
 
@@ -260,14 +244,6 @@ hAzzle.define('style', function() {
 
             return unit ? px / unit : px;
         };
-
-    var removeStyle = function(style, property) {
-        if (property == 'backgroundPosition') {
-            style.removeAttribute(property + 'X');
-            property += 'Y';
-        }
-        style.removeAttribute(property);
-    };
 
     this.css = function(name, value) {
 
@@ -304,55 +280,7 @@ hAzzle.define('style', function() {
             setCSS(elem, name, value);
         });
     };
-
-    // Width and height
-    util.each({
-        height: 'Height',
-        width: 'Width'
-    }, function(val, prop) {
-        cssHooks.get[prop] = function(elem) {
-
-            var docElem;
-
-            if (!elem) {
-                return;
-            }
-
-            if (types.isWindow(elem)) {
-                return elem.document.documentElement['client' + val];
-            }
-
-            if (elem.nodeType === 9) {
-                docElem = elem.documentElement;
-                return Math.max(docElem['scroll' + val], docElem['client' + val]);
-            }
-
-            return swap(elem, function() {
-                return css.css(elem, prop);
-            });
-        };
-    });
    
-        (function() {
-            var pixelPosition, div = document.createElement('div'), computed = window.getComputedStyle;
-            div.style.cssText = 'border:0;width:0;height:0;position:absolute;top:0;left:-9999px;margin-top:1px';
-            if (computed) {
-                pixelPosition = (computed(div, null) || {}).top !== '1%';
-                if (!pixelPosition)
-                    util.each(['top', 'left'], function(prop) {
-                        cssHooks.get[prop] = function(elem, computed) {
-                            if (computed) {
-                                computed = css.css(elem, prop);
-                                return /^([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(?!px)[a-z%]+$/i.test(computed) ?
-                                    hAzzle(elem).position()[prop] + 'px' :
-                                    computed;
-                            }
-                        }
-                    });
-               // Prevent memory lekas in IE     
-                div = null;
-            }
-        }());
 
     // Populate the unitless properties list
 

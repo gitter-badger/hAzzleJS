@@ -174,7 +174,7 @@ hAzzle.define('events', function() {
 
             // removeEvent(el, 't1 t2 t3', fn) or off(el, 't1 t2 t3')
             // ECMA 7 - contains
-            alert(types.contains)
+
             if (typeof types === 'string' && types.contains(' ')) {
                 // Once for each type.namespace in types; type may be omitted
                 types = (types || '').match(evwhite) || [''];
@@ -795,7 +795,7 @@ hAzzle.define('events', function() {
 
     // Trigger specific event for element collection
 
-    this.fire = function(type, args) {
+    this.trigger = function(type, args) {
         return this.each(function(el) {
             fire(el, type, args);
         });
@@ -879,6 +879,6 @@ hAzzle.define('events', function() {
         one: one,
         off: removeEvent,
         clone: clone,
-        fire: fire
+        trigger: fire
     };
 });
