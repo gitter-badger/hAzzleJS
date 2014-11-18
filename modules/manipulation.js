@@ -249,7 +249,7 @@ hAzzle.define('manipulation', function() {
 
         clearData = function(elems) {
             hAzzle.installed.events && util.each(getElem(elems), function(elem) {
-                if (elem && elem.nodeType === 1 || elem.nodeType === 9 || !(+owner.nodeType)) {
+                if (elem && elem.nodeType === 1 || elem.nodeType === 9 || !(+elem.nodeType)) {
                     hAzzle(elem).off();
                 }
             });
@@ -273,67 +273,6 @@ hAzzle.define('manipulation', function() {
                 return ret;
             }
             return node;
-        },
-
-        html = function(elem, value) {
-
-            var append = function(el, i) {
-                    util.each(normalize(value, getElem(elem), i), function(node) {
-                        el.append(node); // DOM Level 4
-                    });
-                },
-                updateElement = function(el, i) {
-                    try {
-
-                        if (el.nodeType === 1 && typeof value === 'string' && !scriptRegExp.test(value) &&
-                            !wrapMap[(tagRegExp.exec(value) || ['', ''])[1].toLowerCase()]) {
-                            // Remove element nodes and prevent memory leaks
-                            clearData(grab(el, false));
-                            elem.innerHTML = value;
-                        }
-                    } catch (e) {}
-                    append(el, i);
-                };
-
-            if (value === undefined && elem[0].nodeType === 1) {
-                return elem[0] ? elem[0].innerHTML : '';
-            }
-
-            // Remove child nodes to avoid memory leaks
-
-            empty(elem);
-
-            // Update each element with new content
-
-            return util.each([elem], updateElement);
-        },
-
-        text = function(elem, value) {
-
-            elem = getElem(elem)[0];
-
-            if (value === undefined) {
-                return hAzzle.require('text').getText(elem);
-            }
-
-            var nodeType = elem ? elem.nodeType : undefined;
-
-            if (nodeType === 1 || nodeType === 11 || nodeType === 9) {
-                elem.textContent = value;
-            }
-        },
-        //  Remove all child nodes of the set of matched elements from the DOM
-
-        empty = function(elem) {
-            elem = getElem(elem)[0];
-            if (elem) {
-                // Do a 'deep each' and clear all listeners if any 
-                deepEach(elem.children, clearData);
-                // Remove children
-                while (elem.firstChild) {
-                    elem.removeChild(elem.firstChild);
-                }
-            }
         };
 
     this.domManip = function(content, method, /*reverse */ rev) {
@@ -374,8 +313,8 @@ hAzzle.define('manipulation', function() {
         return value === undefined ?
             hAzzle.require('text').getText(this.elements) :
             this.each(function(elem) {
-                if (elem !== null) {
-                    text(elem, value);
+                if (elem !== null && (this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9)) {
+                    this.textContent = value;
                 }
             });
     };
@@ -383,11 +322,26 @@ hAzzle.define('manipulation', function() {
     // HTML
 
     this.html = function(value) {
-        return this.elements[0] && (value === undefined && this.elements[0].nodeType === 1 ?
-            this.elements[0].innerHTML :
-            this.each(function() {
-                return html(this, value);
-            }));
+        var that = this,
+            elem = this.elements[0],
+            append = function(el, i) {
+                util.each(normalize(value, that, i), function(node) {
+                    el.append(node); // DOM Level 4
+                });
+            },
+            updateElement = function(el, i) {
+                try {
+                    if (el.nodeType === 1 && typeof value === 'string' && !scriptRegExp.test(value) &&
+                        !wrapMap[(tagRegExp.exec(value) || ['', ''])[1].toLowerCase()]) {
+                        value = value.replace(xhtmlRegxp, '<$1></$2>');
+                        // Remove element nodes and prevent memory leaks
+                        clearData(grab(el, false));
+                        return el.innerHTML = value;
+                    }
+                } catch (e) {}
+                append(el, i);
+            };
+        return typeof value != 'undefined' ? this.empty().each(updateElement) : elem ? elem.innerHTML : '';
     };
 
     this.deepEach = function(fn, scope) {
@@ -403,9 +357,18 @@ hAzzle.define('manipulation', function() {
         });
     };
 
+    //  Remove all child nodes of the set of matched elements from the DOM
+
     this.empty = function() {
         return this.each(function(elem) {
-            empty(elem);
+            if (elem != null && elem.nodeType === 1) {
+                // Do a 'deep each' and clear all listeners if any 
+                deepEach(elem.children, clearData);
+                // Remove children
+                while (elem.firstChild) {
+                    elem.removeChild(elem.firstChild);
+                }
+            }
         });
     };
 
@@ -491,15 +454,13 @@ hAzzle.define('manipulation', function() {
         insertBefore: 'before',
         insertAfter: 'after'
     }, function(method, prop) {
+
         this[prop] = function(content) {
             return this.domManip(content, method, reversable[method] || false);
         };
     }.bind(this));
 
     return {
-        empty: empty,
-        html: html,
-        text: text,
         create: create,
         clone: cloneElem,
         buildFragment: buildFragment
