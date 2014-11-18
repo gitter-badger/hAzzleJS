@@ -118,7 +118,9 @@ hAzzle.define('style', function() {
             }
             if (elem && (elem.nodeType !== 3 || elem.nodeType !== 8)) { // Text or Comment
 
-                var ret, style, hook, type, action, origName = strings.camelize(name);
+                var ret, style, hook, type, action, origName = name;
+                
+                name = strings.camelize(name);
 
                 name = cssProps[origName] || (cssProps[origName] = vendorPrefixes(name)[0]);
 
@@ -292,7 +294,6 @@ hAzzle.define('style', function() {
         vendor: vendorPrefixes,
         cssHooks: cssHooks,
         cssProps: cssProps,
-        swap: swap,
         unitless: unitless,
         getCSS: getCSS,
         setCSS: setCSS

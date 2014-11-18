@@ -256,27 +256,33 @@ hAzzle.define('dimensions', function() {
             
         offset.top -= parseFloat(css.css(elem, 'marginTop')) || 0;
         offset.left -= parseFloat(css.css(elem, 'marginLeft')) || 0;
-        alert(offset.top)
+
         parentOffset.top += parseFloat(css.css(offsetParent, 'borderTopWidth')) || 0;
         parentOffset.left += parseFloat(css.css(offsetParent, 'borderLeftWidth')) || 0;
 
+        parentOffset.top -= offsetParent.scrollTop();
+        parentOffset.left -= offsetParent.scrollLeft();
+        
         // Subtract the two offsets
         return {
             top: offset.top - parentOffset.top,
             left: offset.left - parentOffset.left
         };
     };
-
-    //  Get the closest ancestor element that is positioned.
-
+    
+    // Get the closest ancestor element that is positioned.
+    // Follows spec http://www.w3.org/TR/cssom-view/#offset-attributes
+   
     this.offsetParent = function() {
-        return this.map(function() {
+        return this.map(function(elem) {
             var offsetParent = this.offsetParent || docElem;
             if (util.nodeName(offsetParent, 'html') || css.css(this, 'position') === 'fixed') {
                 return null;
             }
             return offsetParent;
+
         });
+
     };
 
     this.getWidthHeight = function(dim) {

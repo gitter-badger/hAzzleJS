@@ -348,7 +348,7 @@ hAzzle.define('util', function() {
         // Return the elements nodeName
 
         nodeName = function(el, name) {
-            return el && el.nodeName && el.nodeName.toLowerCase() === name.toLowerCase();
+            return name && el && el.nodeName && el.nodeName.toLowerCase() === name.toLowerCase();
         },
 
         // Native solution for filtering arrays. 

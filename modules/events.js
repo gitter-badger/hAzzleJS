@@ -589,7 +589,6 @@ hAzzle.define('events', function() {
                                 (doc && doc.clientTop || body && body.clientTop || 0);
                         }
 
-
                         // click: 1 === left; 2 === middle; 3 === right
                         if (!event.which && button !== undefined) {
                             event.which = button & 1 ? 1 : (button & 2 ? 3 : (button & 4 ? 2 : 0));
@@ -827,6 +826,7 @@ hAzzle.define('events', function() {
     this.ready = function(callback) {
         this.elements[0].addEventListener('DOMContentLoaded', callback, false);
     };
+    
 
     util.each(('blur focus focusin focusout load resize scroll unload click dblclick ' +
         'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +

@@ -1,10 +1,10 @@
 /*!
  * hAzzle.js
  * Copyright (c) 2014 Kenny Flashlight
- * Version: 1.0.2c
+ * Version: 1.0.2d
  * Released under the MIT License.
  *
- * Date: 2014-11-18
+ * Date: 2014-11-19
  */
 (function() {
 
@@ -20,7 +20,7 @@
 
         // Version
 
-        version = '1.0.1b',
+        version = '1.0.1d',
 
         // Codename
 
@@ -64,7 +64,7 @@
         // Define a local copy of hAzzle
 
         hAzzle = function(sel, ctx) {
-alert(sel)
+
             // hAzzle(), hAzzle(null), hAzzle(undefined), hAzzle(false)
             if (!sel) {
                 return;
@@ -91,24 +91,26 @@ alert(sel)
             }
 
             if (typeof sel === 'string') {
+
                 if (installed.manipulation &&
                     sel[0] === '<' &&
                     sel[sel.length - 1] === '>' &&
                     sel.length >= 3) {
-                        alert(sel)
+
                     els = require('manipulation').create(
                         sel,
                         ctx && ctx.nodeType ? ctx.ownerDocument || ctx : document
                     );
+
                 } else {
                     els = this.find(sel, ctx, true);
                 }
                 // hAzzle([dom]) 
             } else if (Array.isArray(sel)) {
-                els = util.unique(util.filter(sel, validTypes));
+                els = util.unique( util.filter(sel, validTypes));
                 // hAzzle(dom)
             } else if (this.isNodeList(sel)) {
-                els = util.filter(util.makeArray(sel), validTypes);
+                els = util.filter( util.makeArray(sel), validTypes);
                 // hAzzle(dom)
             } else if (sel.nodeType) {
                 // If it's a html fragment, create nodes from it
@@ -126,14 +128,10 @@ alert(sel)
             }
 
             // Create a new hAzzle collection from the nodes found
+           
+           this.elements = (els === undefined) ? [] : els;
+           this.length = (els === undefined) ? 0 : els.length;
 
-            if (els === undefined) {
-                this.length = 0;
-                this.elements = [];
-            } else {
-                this.elements = els;
-                this.length = els.length;
-            }
             return this;
         };
 

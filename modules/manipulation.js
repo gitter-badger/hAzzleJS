@@ -10,6 +10,7 @@ hAzzle.define('manipulation', function() {
         util = hAzzle.require('util'),
         features = hAzzle.require('has'),
         collection = hAzzle.require('collection'),
+        types = hAzzle.require('types'),
         core = hAzzle.require('core'),
 
         // RegExp
@@ -141,7 +142,7 @@ hAzzle.define('manipulation', function() {
                     destElements = grab(source);
                     srcElements = grab(elem);
                     for (i = 0; i < srcElements.length; i++) {
-                        hAzzle.require('events').clone(destElements[i], srcElements[i], evtName);
+                        hAzzle.require('events').clone(destElements[i], srcElements[i], typeof evtName === 'string' ? evtName : '');
                     }
                 }
                 return source;
@@ -152,7 +153,7 @@ hAzzle.define('manipulation', function() {
             if (array) {
                 var index = array.length;
                 while (index--) {
-                    if (hAzzle.require('types').isNode(array[index])) {
+                    if (types.isNode(array[index])) {
                         deepEach(array[index].children, fn, context);
                         fn.call(context || array[index], array[index], index, array);
                     }
@@ -244,25 +245,14 @@ hAzzle.define('manipulation', function() {
                 ret;
         },
 
-        // Removes the data associated with an element
+        // Removes events associated with an element
 
         clearData = function(elems) {
-
-            // Check if the events.js module are installed, and clear events
-            // if it is, to prevent memory leaks
-
-            hAzzle.err(!hAzzle.installed.events, 17, 'events.js module are not installed');
-
-            var elem = getElem(elems),
-                el, i = 0;
-
-            // If instanceof hAzzle...
-
-            for (;
-                (el = elem[i]) !== undefined; i++) {
-                // Remove all eventListeners
-                hAzzle(el).off();
-            }
+            hAzzle.installed.events && util.each(getElem(elems), function(elem) {
+                if (elem && elem.nodeType === 1 || elem.nodeType === 9 || !(+owner.nodeType)) {
+                    hAzzle(elem).off();
+                }
+            });
         },
         normalize = function(node, clone) {
 
@@ -284,7 +274,6 @@ hAzzle.define('manipulation', function() {
             }
             return node;
         },
-
 
         html = function(elem, value) {
 
@@ -402,7 +391,8 @@ hAzzle.define('manipulation', function() {
     };
 
     this.deepEach = function(fn, scope) {
-        return deepEach(this.elements, fn, scope);
+        deepEach(this.elements, fn, scope);
+        return this;
     };
 
     this.detach = function() {
@@ -419,27 +409,22 @@ hAzzle.define('manipulation', function() {
         });
     };
 
+    // Remove the set of matched elements from the DOM.
+
     this.remove = function() {
-        this.deepEach(clearData);
-        return this.detach();
+        return this.deepEach(clearData).detach();
     };
 
-    // Creates a copy of a DOM element, and returns the clone.
+    // Creates a copy of a DOM element, and returns the clone
+    // If 'deep' it will clone all events OR the specified event 
 
-    this.clone = function( /*bool:true - event cloning*/ deep, evtName) {
-
-        // Better performance with a 'normal' for-loop then
-        // map() or each()       
-        var elems = this.elements,
-            ret = [],
-            i = 0,
-            l = this.length;
-
-        for (; i < l; i++) {
-            ret[i] = cloneElem(elems[i], deep, evtName);
-        }
-        return hAzzle(ret);
+    this.clone = function(deep, event) {
+        return this.map(function() {
+            return cloneElem(this, deep, event);
+        });
     };
+
+    // append / prepend / before and after methods
 
     util.each({
 
