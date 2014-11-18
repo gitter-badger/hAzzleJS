@@ -1,5 +1,5 @@
 // valhooks.js
-hAzzle.define('valHooks', function() {
+hAzzle.define('valhooks', function() {
 
     var util = hAzzle.require('util'),
         strings = hAzzle.require('strings'),
@@ -68,6 +68,7 @@ hAzzle.define('valHooks', function() {
             i = one ? index : 0;
             max = one ? index + 1 : options.length;
             for (; i < max; i++) {
+              // IE9
                 option = options[i];
                 // Traverse the option element when the elements needed to filter out disabled
                 if (option.selected && option.getAttribute('disabled') === null &&

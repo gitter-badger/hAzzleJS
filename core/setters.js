@@ -36,10 +36,6 @@ hAzzle.define('setters', function() {
             get: {},
             set: {}
         },
-        boolHooks = {
-            get: {},
-            set: {}
-        },
         getElem = function(elem) {
             return elem instanceof hAzzle ? elem.elements : elem;
         },
@@ -54,9 +50,9 @@ hAzzle.define('setters', function() {
         },
 
         // Check for valid nodetypes    
-       
+
         validTypes = function(nType) {
-           return nType && (nType !== 3 || nType !== 8 || nType !== 2)
+            return nType && (nType !== 3 || nType !== 8 || nType !== 2)
         },
 
         // Removes an attribute from an HTML element.
@@ -103,8 +99,7 @@ hAzzle.define('setters', function() {
                     name = name.toLowerCase();
                     hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
                         getBooleanAttrName(elem, name) ?
-                        boolHooks[value === 'undefined' ?
-                            'get' : 'set'][name] : nodeHooks[value === 'undefined' ? 'get' : 'set'][name];
+                        nodeHooks[value === 'undefined' ? 'get' : 'set'][name] : false;
                 }
 
                 // Get attribute
@@ -116,9 +111,9 @@ hAzzle.define('setters', function() {
                             return ret;
                         }
                     }
-                  
-                  // To avoid bugs in IE regarding href, we are adding the extra argument '2'
-      
+
+                    // To avoid bugs in IE regarding href, we are adding the extra argument '2'
+
                     ret = elem.getAttribute(name, 2);
                     // normalize non-existing attributes to undefined (as jQuery)
                     return ret == null ? undefined : ret;
@@ -310,7 +305,6 @@ hAzzle.define('setters', function() {
         attrHooks: attrHooks,
         propHooks: propHooks,
         valHooks: valHooks,
-        boolHooks: boolHooks,
         nodeHooks: nodeHooks,
         propMap: propMap,
         boolAttr: boolAttr,

@@ -107,10 +107,10 @@
                 }
                 // hAzzle([dom]) 
             } else if (Array.isArray(sel)) {
-                els = util.unique( util.filter(sel, validTypes));
+                els = util.unique(util.filter(sel, validTypes));
                 // hAzzle(dom)
             } else if (this.isNodeList(sel)) {
-                els = util.filter( util.makeArray(sel), validTypes);
+                els = util.filter(util.makeArray(sel), validTypes);
                 // hAzzle(dom)
             } else if (sel.nodeType) {
                 // If it's a html fragment, create nodes from it
@@ -128,9 +128,9 @@
             }
 
             // Create a new hAzzle collection from the nodes found
-           
-           this.elements = (els === undefined) ? [] : els;
-           this.length = (els === undefined) ? 0 : els.length;
+
+            this.elements = (els === undefined) ? [] : els;
+            this.length = (els === undefined) ? 0 : els.length;
 
             return this;
         };
@@ -626,7 +626,7 @@ hAzzle.define('util', function() {
                 for (; i < length; i++) {
                     source = arguments[i];
                     for (prop in source) {
-                    if (Object.prototype.hasOwnProperty.call(source, prop)) {
+                        if (Object.prototype.hasOwnProperty.call(source, prop)) {
                             obj[prop] = source[prop];
                         }
                     }
@@ -2480,10 +2480,6 @@ hAzzle.define('setters', function() {
             get: {},
             set: {}
         },
-        boolHooks = {
-            get: {},
-            set: {}
-        },
         getElem = function(elem) {
             return elem instanceof hAzzle ? elem.elements : elem;
         },
@@ -2495,6 +2491,12 @@ hAzzle.define('setters', function() {
             var booleanAttr = boolAttr[name.toLowerCase()];
             // booleanAttr is here twice to minimize DOM access
             return booleanAttr && boolElem[elem.nodeName] && booleanAttr;
+        },
+
+        // Check for valid nodetypes    
+
+        validTypes = function(nType) {
+            return nType && (nType !== 3 || nType !== 8 || nType !== 2)
         },
 
         // Removes an attribute from an HTML element.
@@ -2529,7 +2531,7 @@ hAzzle.define('setters', function() {
             var nodeType = elem ? elem.nodeType : undefined,
                 hooks, ret;
 
-            if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
+            if (validTypes(nodeType)) {
 
                 // Fallback to prop when attributes are not supported
                 if (typeof elem.getAttribute === 'undefined') {
@@ -2541,8 +2543,7 @@ hAzzle.define('setters', function() {
                     name = name.toLowerCase();
                     hooks = (attrHooks[value === 'undefined' ? 'get' : 'set'][name] || null) ||
                         getBooleanAttrName(elem, name) ?
-                        boolHooks[value === 'undefined' ?
-                            'get' : 'set'][name] : nodeHooks[value === 'undefined' ? 'get' : 'set'][name];
+                        nodeHooks[value === 'undefined' ? 'get' : 'set'][name] : false;
                 }
 
                 // Get attribute
@@ -2555,12 +2556,14 @@ hAzzle.define('setters', function() {
                         }
                     }
 
+                    // To avoid bugs in IE regarding href, we are adding the extra argument '2'
+
                     ret = elem.getAttribute(name, 2);
-                    // Non-existent attributes return null, we normalize to undefined
+                    // normalize non-existing attributes to undefined (as jQuery)
                     return ret == null ? undefined : ret;
                 }
 
-                // Set attribute
+                // Set / remove a attribute
 
                 if (!value) {
                     removeAttr(elem, name);
@@ -2580,7 +2583,7 @@ hAzzle.define('setters', function() {
             var nodeType = elem ? elem.nodeType : undefined,
                 hook, ret;
 
-            if (nodeType && (nodeType !== 3 || nodeType !== 8 || nodeType !== 2)) {
+            if (validTypes(nodeType)) {
 
                 if (nodeType !== 1 || core.isHTML) {
 
@@ -2746,7 +2749,6 @@ hAzzle.define('setters', function() {
         attrHooks: attrHooks,
         propHooks: propHooks,
         valHooks: valHooks,
-        boolHooks: boolHooks,
         nodeHooks: nodeHooks,
         propMap: propMap,
         boolAttr: boolAttr,
@@ -2755,23 +2757,6 @@ hAzzle.define('setters', function() {
         attr: attr,
         prop: prop
     };
-});
-// boolhooks.js
-hAzzle.define('boolhooks', function() {
-
-    var setters = hAzzle.require('setters');
-
-    setters.boolHooks.set = function(elem, value, name) {
-        // If value is false, remove the attribute
-        if (value === false) {
-            setters.removeAttr(elem, name);
-        } else {
-            elem.setAttribute(name, name);
-        }
-        return name;
-    };
-
-    return {};
 });
 // attrhooks.js
 hAzzle.define('attrHooks', function() {

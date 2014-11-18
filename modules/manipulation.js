@@ -22,7 +22,7 @@ hAzzle.define('manipulation', function() {
         scriptRegExp = /<(?:script|style|link)/i,
         xhtmlRegxp = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
 
-        validNodeTypes = {
+        validTypes = {
             '1': 1,
             '3': 1,
             '8': 1,
@@ -89,10 +89,6 @@ hAzzle.define('manipulation', function() {
             return res;
         }()),
 
-        getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements : [elem];
-        },
-
         fixInput = function(src, dest) {
             var nodeName = dest.nodeName.toLowerCase();
 
@@ -115,7 +111,7 @@ hAzzle.define('manipulation', function() {
                 return elem;
             }
 
-            elem = getElem(elem)[0];
+            elem = elem instanceof hAzzle ? elem.elements[0] ? elem.length : elem[0] : elem;
 
             var source = elem.nodeType && elem.cloneNode(true),
                 destElements,
@@ -430,7 +426,7 @@ hAzzle.define('manipulation', function() {
 
                 } else { // non-iAH method
 
-                    if (validNodeTypes[elem.nodeType]) {
+                    if (validTypes[elem.nodeType]) {
 
                         var node = normalize(content, index),
                             i = 0,

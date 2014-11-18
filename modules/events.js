@@ -836,7 +836,7 @@ hAzzle.define('events', function() {
         this[prop] = function(data, fn) {
             return arguments.length > 0 ?
                 this.on(prop, data, fn) :
-                this.fire(prop);
+                this.trigger(prop);
         };
 
     }.bind(this));
