@@ -8,16 +8,31 @@ hAzzle.define('manipulation', function() {
         // Dependencies
 
         util = hAzzle.require('util'),
-        types = hAzzle.require('types'),
         features = hAzzle.require('has'),
-        
+        collection = hAzzle.require('collection'),
+        core = hAzzle.require('core'),
+
         // RegExp
 
+        shortTag = /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
         checkradioRegExp = (/^(?:checkbox|radio)$/i),
         htmlRegexp = /<|&#?\w+;/,
         tagRegExp = /<([\w:]+)/,
         scriptRegExp = /<(?:script|style|link)/i,
         xhtmlRegxp = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
+
+        validNodeTypes = {
+            '1': 1,
+            '3': 1,
+            '8': 1,
+            '10': 1
+        },
+
+        // 'after' and 'insertAfter' methods need to be in reverse order
+
+        reversable = {
+            'after': 1
+        },
 
         // HTML stuff
 
@@ -108,7 +123,8 @@ hAzzle.define('manipulation', function() {
             if (source) {
                 // Fix IE cloning issues
                 if (!cloneChecked && (elem.nodeType === 1 || elem.nodeType === 11) &&
-                    !hAzzle.require('core').isXML(elem)) {
+                    // no XML document
+                    !core.isXML(elem)) {
 
                     destElements = grab(source);
                     srcElements = grab(elem);
@@ -146,10 +162,6 @@ hAzzle.define('manipulation', function() {
         },
 
         buildFragment = function(html, context) {
-          
-          if(!types.isPlainObject(context)) {
-            return
-           }
             var tmp, tag, wrap,
                 elem,
                 fragment = context.createDocumentFragment(),
@@ -183,13 +195,17 @@ hAzzle.define('manipulation', function() {
                 fragment.textContent = '';
                 fragment.innerHTML = ''; // Clear inner HTML
 
-                // Faster then internal each method
+                // Multiple elements return a NodeList
 
-                i = 0;
+                if (fragment.childNodes.length) {
 
-                while ((elem = nodes[i++])) {
-                    fragment.appendChild(elem);
+                    i = 0;
 
+                    while ((elem = nodes[i++])) {
+                        fragment.appendChild(elem);
+                    }
+                } else {
+                    fragment.appendChild(nodes[0]);
                 }
                 return fragment;
             }
@@ -197,25 +213,23 @@ hAzzle.define('manipulation', function() {
 
         create = function(html, context) {
 
-            // Mitigate XSS vulnerability
-
             var parsed, defaultContext;
-       
-       // create() will stop working in IE if we feature check for createHTMLDocument, so 
-       // only use this for non-ie browsers (same issue in IE 11 / 12 on the Windows 10tp )   
-       
-                if(features.ie || !imcHTML) {
-                    defaultContext = context || _doc;
-                 } else {
-                    defaultContext = context || imcHTML;                 
-                 }
 
-            if ((parsed = /^<(\w+)\s*\/?>(?:<\/\1>|)$/.exec(html))) {
-                return [context.createElement(parsed[1])];
+            // create() will stop working in IE if we feature check for createHTMLDocument, so 
+            // only use this for non-ie browsers (same issue in IE 11 / 12 on the Windows 10tp )   
+
+            if (features.ie || !imcHTML) {
+                defaultContext = context || _doc;
+            } else {
+                defaultContext = context || (imcHTML ? _doc.implementation.createHTMLDocument() : _doc);
+            }
+
+            if ((parsed = shortTag.exec(html))) {
+                return [defaultContext.createElement(parsed[1])];
             }
 
             if ((parsed = buildFragment(html, defaultContext))) {
-                 return hAzzle.require('collection').slice(parsed.childNodes);
+                return collection.slice(parsed.childNodes);
             }
 
             return [];
@@ -259,7 +273,7 @@ hAzzle.define('manipulation', function() {
             }
 
             node = getElem(node);
-            
+
             if (clone) {
                 ret = []; // Don't change original array
 
@@ -270,42 +284,13 @@ hAzzle.define('manipulation', function() {
             }
             return node;
         },
-        // Private method for inject HTML content for the global scope
-        inject = function(elem, content, pos, method) {
-            var node = normalize(content, pos ? pos : 0),
-                i = 0,
-                l = node.length;
 
-            // 'Normal' iteration faster then internal 'each'
-            for (; i < l; i++) {
-                elem[method](node[i]); // DOM Level 4
-            }
-        },
-        append = function(elem, content) {
-            util.each(getElem(elem), function(elem, pos) {
-                inject(elem, content, pos, 'append');
-            });
-        },
-        prepend = function(elem, content) {
-            util.each(getElem(elem), function(elem, pos) {
-                inject(elem, content, pos, 'prepend');
-            });
-        },
-        before = function(elem, content) {
-            util.each(getElem(elem), function(elem, pos) {
-                inject(elem, content, pos, 'before');
-            });
-        },
-        after = function(elem, content) {
-            util.each(getElem(elem), function(elem, pos) {
-                inject(elem, content, pos, 'after');
-            });
-        },
+
         html = function(elem, value) {
 
             var append = function(el, i) {
                     util.each(normalize(value, getElem(elem), i), function(node) {
-//                         el.append(node); // DOM Level 4
+                        el.append(node); // DOM Level 4
                     });
                 },
                 updateElement = function(el, i) {
@@ -337,11 +322,11 @@ hAzzle.define('manipulation', function() {
         text = function(elem, value) {
 
             elem = getElem(elem)[0];
-          
-          if(value === undefined) {
-           return hAzzle.require('text').getText(elem);
-          }
-        
+
+            if (value === undefined) {
+                return hAzzle.require('text').getText(elem);
+            }
+
             var nodeType = elem ? elem.nodeType : undefined;
 
             if (nodeType === 1 || nodeType === 11 || nodeType === 9) {
@@ -362,33 +347,17 @@ hAzzle.define('manipulation', function() {
             }
         };
 
-    // insertAdjacentHTML method for append, prepend, before and after
-
-    this.iAHMethod = function(method, html, fn) {
-        return this.each(function(elem, index) {
-            if (typeof html === 'string' &&
-                hAzzle.require('core').isHTML &&
-                elem.parentElement && elem.parentElement.nodeType === 1) {
-                elem.insertAdjacentHTML(method, html.replace(xhtmlRegxp, '<$1></$2>'));
-            } else {
-                fn(elem, index);
-            }
-        });
-    };
-
-    this.domManip = function(content, fn, /*reverse */ rev) {
+    this.domManip = function(content, method, /*reverse */ rev) {
         var i = 0,
             r = [],
             self = this.elements,
-            elems, nodes = hAzzle(content);
+            nodes = hAzzle(content);
+
         // Start the iteration and loop through the content
 
         util.each(normalize(nodes), function(elem, index) {
             util.each(self, function(el) {
-                elems = index > 0 ? el.cloneNode(true) : el;
-                if (elem) {
-                    fn(elem, elems);
-                }
+                elem && elem[method](index > 0 ? el.cloneNode(true) : el); // DOM Level 4
             }, null, rev);
 
         }, this, rev);
@@ -399,42 +368,15 @@ hAzzle.define('manipulation', function() {
         return self;
     };
 
-    this.appendTo = function(content) {
-        return this.domManip(content, function(element, node) {
-            element.appendChild(node);
-        });
-    };
-
-    this.prependTo = function(content) {
-        return this.domManip(content, function(element, node) {
-            element.insertBefore(node, element.firstChild);
-        });
-    };
-
-    this.insertBefore = function(content) {
-        return this.domManip(content, function(element, node) {
-            element.parentNode.insertBefore(node, element);
-        });
-    };
-
-    this.insertAfter = function(content) {
-        return this.domManip(content, function(element, node) {
-            var sibling = element.nextSibling;
-            sibling ?
-                element.parentNode.insertBefore(node, sibling) :
-                element.parentNode.appendChild(node);
-        }, 1);
-    };
-
     // Replace each element in the set of matched elements with the 
     // provided new content and return the set of elements that was removed
 
     this.replaceWith = function(node) {
-        return this.each(function (el, index) {
-          util.each(normalize(node, index), function (content) {
-              el.replace(content); // DOM Level 4
-          })
-        })
+        return this.each(function(el, index) {
+            util.each(normalize(node, index), function(content) {
+                el.replace(content); // DOM Level 4
+            });
+        });
     };
 
     // Text
@@ -522,25 +464,54 @@ hAzzle.define('manipulation', function() {
         after: 'afterend'
 
     }, function(iah, prop) {
+
         this[prop] = function(content) {
-            return this.iAHMethod(iah, content, function(elem) {
-                var nodeType = elem.nodeType;
-                if (nodeType !== 1 && nodeType !== 9 && nodeType !== 11) {
-                    return;
+
+            return this.each(function(elem, index) {
+
+                // Check if we can use insertAdjacentHTML,        
+                if (typeof content === 'string' &&
+                    // .. and make sure this is a HTML document
+                    core.isHTML &&
+                    // ... and the parentElement has nodeType 1
+                    elem.parentElement && elem.parentElement.nodeType === 1) {
+
+                    // Clean the HTML content and insert the content
+
+                    elem.insertAdjacentHTML(iah, content.replace(xhtmlRegxp, '<$1></$2>'));
+
+                } else { // non-iAH method
+
+                    if (validNodeTypes[elem.nodeType]) {
+
+                        var node = normalize(content, index),
+                            i = 0,
+                            l = node.length;
+
+                        // 'Normal' iteration faster then internal 'each'
+                        for (; i < l; i++) {
+                            elem[prop](node[i]); // DOM Level 4
+                        }
+                    }
                 }
-                util.each(getElem(elem), function(elem, pos) {
-                    inject(elem, content, pos, prop);
-                });
-            });
+            }, null, reversable[prop] || false);
         };
 
     }.bind(this));
 
+    //### jQuery / Zepto specific methods
+    util.each({
+        appendTo: 'append',
+        prependTo: 'prepend',
+        insertBefore: 'before',
+        insertAfter: 'after'
+    }, function(method, prop) {
+        this[prop] = function(content) {
+            return this.domManip(content, method, reversable[method] || false);
+        };
+    }.bind(this));
+
     return {
-        prepend: prepend,
-        append: append,
-        before: before,
-        after: after,
         empty: empty,
         html: html,
         text: text,
