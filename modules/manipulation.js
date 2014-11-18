@@ -244,7 +244,10 @@ hAzzle.define('manipulation', function() {
         // Removes events associated with an element
 
         clearData = function(elems) {
-            hAzzle.installed.events && util.each(getElem(elems), function(elem) {
+            hAzzle.installed.events && util.each(elems instanceof hAzzle ? 
+                     elem.elements ? elems.length : 
+                     elems : 
+                     [elems], function(elem) {
                 if (elem && elem.nodeType === 1 || elem.nodeType === 9 || !(+elem.nodeType)) {
                     hAzzle(elem).off();
                 }
@@ -326,6 +329,7 @@ hAzzle.define('manipulation', function() {
                 });
             },
             updateElement = function(el, i) {
+
                 try {
                     if (el.nodeType === 1 && typeof value === 'string' && !scriptRegExp.test(value) &&
                         !wrapMap[(tagRegExp.exec(value) || ['', ''])[1].toLowerCase()]) {
