@@ -39,6 +39,17 @@ hAzzle.define('setters', function() {
         getElem = function(elem) {
             return elem instanceof hAzzle ? elem.elements : elem;
         },
+        validTypes = {
+            '1': 1,
+            '4': 1,
+            '5': 1,
+            '6': 1,
+            '7': 1,
+            '9': 1,
+            '10': 1,
+            '11': 1,
+            '12': 1
+        },
 
         // Get names on the boolean attributes
 
@@ -47,12 +58,6 @@ hAzzle.define('setters', function() {
             var booleanAttr = boolAttr[name.toLowerCase()];
             // booleanAttr is here twice to minimize DOM access
             return booleanAttr && boolElem[elem.nodeName] && booleanAttr;
-        },
-
-        // Check for valid nodetypes    
-
-        validTypes = function(nType) {
-            return nType && (nType !== 3 || nType !== 8 || nType !== 2)
         },
 
         // Removes an attribute from an HTML element.
@@ -87,7 +92,7 @@ hAzzle.define('setters', function() {
             var nodeType = elem ? elem.nodeType : undefined,
                 hooks, ret;
 
-            if (validTypes(nodeType)) {
+            if (elem && validTypes[elem.nodeType]) {
 
                 // Fallback to prop when attributes are not supported
                 if (typeof elem.getAttribute === 'undefined') {
@@ -139,7 +144,7 @@ hAzzle.define('setters', function() {
             var nodeType = elem ? elem.nodeType : undefined,
                 hook, ret;
 
-            if (validTypes(nodeType)) {
+            if (elem && validTypes[elem.nodeType]) {
 
                 if (nodeType !== 1 || core.isHTML) {
 
