@@ -491,14 +491,7 @@ Core
       Provides basic getter / setter function for the <code>val()</code> method <code>setters.js</code> module.
     </td>
   </tr>
- <tr>
-    <th><a href="core/boolhooks.js#files">boolhooks</a></th>
-     <td>
-      Provides basic getter / setter function for methods in <code>setters.js</code> module.
-    </td>
-  </tr>
-  <tr>
-    <th><a href="core/doml4.js#files">doml4</a></th>
+     <th><a href="core/doml4.js#files">doml4</a></th>
      <td>
       DOM Level 4 pollify. See the <code>DOM Level 4 section</code>
     </td>
