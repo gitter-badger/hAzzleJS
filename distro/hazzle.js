@@ -222,25 +222,6 @@ hAzzle.define('has', function() {
         return mu;
     });
     
-    // IE9
-    
-    add('removeStyles', function() {
-        var div = document.createElement('div');
-            div.style.color = 'red';
-            div.style.color = null;
-        return div.style.color == 'red';
-    });
-
-    // IE9 returns borders in shorthand styles in the wrong 
-    // order (color-width-style instead of width-style-color)
-    
-    add('WrongOrder', function() {
-        var div = document.createElement('div'),
-            border = '1px solid #123abc';
-            div.style.border = border;            
-           return el.style.border != border;
-    });
-
     // mobile
 
     add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));

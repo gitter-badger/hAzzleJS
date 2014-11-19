@@ -21,9 +21,31 @@ hAzzle.define('style', function() {
             'scale3d reflect-x-y reflect-z reflect-y reflect ' +
             'background-color border-bottom-color border-left-color border-right-color border-top-color ' +
             'color column-rule-color outline-color text-decoration-color text-emphasis-color ' +
-            'alpha z-index font-weight opacity red green blue').split(' '),
+            'alpha z-index font-weight opacity red green blue').split(' ');
 
-        sNumbs = /^([+-])=([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(.*)/i,
+    //# Feature detection
+
+    // IE9
+
+    features.add('removeStyles', function() {
+        var div = document.createElement('div');
+        div.style.color = 'red';
+        div.style.color = null;
+        return div.style.color == 'red';
+    });
+
+    // IE9 returns borders in shorthand styles in the wrong 
+    // order (color-width-style instead of width-style-color)
+
+    features.add('WrongOrder', function() {
+        var div = document.createElement('div'),
+            border = '1px solid #123abc';
+        div.style.border = border;
+        return el.style.border != border;
+    });
+
+
+    var sNumbs = /^([+-])=([+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|))(.*)/i,
 
         // _vPrix regEx
 
