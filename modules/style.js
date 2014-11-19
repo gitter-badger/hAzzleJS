@@ -65,6 +65,11 @@ hAzzle.define('style', function() {
             '12': 1
         },
 
+        cssNormalTransform = {
+            letterSpacing: "0",
+            fontWeight: "400"
+        },
+
         vendorPrefixes = function(prop) {
             // Cache on first iteration to avoid multiple lookups
             if (prefixCache[prop]) {
@@ -92,13 +97,35 @@ hAzzle.define('style', function() {
             }
         },
 
-        // IE9
+        // Support: IE9
         removeStyle = function(style, property) {
             if (property == 'backgroundPosition') {
                 style.removeAttribute(property + 'X');
                 property += 'Y';
             }
             style.removeAttribute(property);
+        },
+
+        getStyle = function(elem, name) {
+
+            if (elem === null || elem === undefined) {
+                return;
+            } else {
+                elem = elem != null && elem instanceof hAzzle ? elem.elements : elem.length ? elem[0] : elem;
+            }
+
+            // Avoid hAzzle from throwing errors if the element doesn't exist
+
+            if (elem && /* internal */ elem.elements) {
+                return;
+            }
+
+            name = strings.camelize((cssProps[name] ? cssProps[name] : cssProps[name] = vendorPrefixes(name)[0]) || name);
+
+            var hooks = cssHooks.get[name];
+            cssNormalTransform
+
+            return hook ? hook(node, name) : css.css(node, name);
         },
 
         setStyle = function(elem, name, value) {
@@ -115,13 +142,11 @@ hAzzle.define('style', function() {
                 return;
             }
 
-            if (validTypes[elem.nodeType]) { // Text or Comment
+            if (validTypes[elem.nodeType]) {
 
-                var ret, style, hook, type, origName = name;
+                var ret, style, hook, type;
 
-                name = strings.camelize(name);
-
-                name = cssProps[origName] || (cssProps[origName] = vendorPrefixes(name)[0]);
+                name = strings.camelize((cssProps[name] ? cssProps[name] : cssProps[name] = vendorPrefixes(name)[0]) || name);
 
                 style = elem.style;
 
@@ -149,7 +174,8 @@ hAzzle.define('style', function() {
                         value += ret && ret[3] ? ret[3] : 'px';
                     }
 
-                    // IE9
+                    // Support: IE9
+
                     if ((value === '' || value === null) && features.has('removeStyles')) {
                         removeStyle(style, name);
                     }
@@ -255,7 +281,9 @@ hAzzle.define('style', function() {
                 value = util.reduce(nameType === 'string' ? [name] : name, function(memo, name) {
 
                     hook = cssHooks.get[name];
-                    value = hook ? hook(node, name) : css.css(node, strings.camelize(name));
+                    value = hook ? hook(node, name) :
+                        css.css(node, strings.camelize(strings.camelize((cssProps[name] ?
+                            cssProps[name] : cssProps[name] = vendorPrefixes(name)[0]) || name)));
 
                     memo[name] = value;
 
@@ -295,7 +323,10 @@ hAzzle.define('style', function() {
 
 
     return {
+        vendor: vendorPrefixes,
+        unitless: unitless,
         cssHooks: cssHooks,
-        setStyle: setStyle
+        setCSS: setStyle,
+        getCSS: getStyle
     };
 });
