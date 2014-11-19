@@ -152,8 +152,10 @@ hAzzle.define('dimensions', function() {
                 curLeft = parseFloat(curCSSLeft) || 0;
             }
 
-            if (types.isType('function')(opts)) {
-                opts = opts.call(elem, i, util.mixing({}, curOffset));
+            if (types.isType('Function')(opts)) {
+
+                opts = opts.call(elem, i, util.mixin({}, curOffset));
+
             }
 
             if (opts.top != null) {
@@ -167,6 +169,8 @@ hAzzle.define('dimensions', function() {
                 opts.using.call(elem, props);
 
             } else {
+
+
                 curElem.css(props);
             }
         };
@@ -176,6 +180,7 @@ hAzzle.define('dimensions', function() {
     // http://jsperf.com/getboundingclientrect-vs-offset
 
     this.offset = function(opts) {
+
         if (arguments.length) {
             return opts === undefined ?
                 this.elements :
@@ -253,7 +258,7 @@ hAzzle.define('dimensions', function() {
                 top: 0,
                 left: 0
             } : offsetParent.offset();
-            
+
         offset.top -= parseFloat(css.css(elem, 'marginTop')) || 0;
         offset.left -= parseFloat(css.css(elem, 'marginLeft')) || 0;
 
@@ -262,17 +267,17 @@ hAzzle.define('dimensions', function() {
 
         parentOffset.top -= offsetParent.scrollTop();
         parentOffset.left -= offsetParent.scrollLeft();
-        
+
         // Subtract the two offsets
         return {
             top: offset.top - parentOffset.top,
             left: offset.left - parentOffset.left
         };
     };
-    
+
     // Get the closest ancestor element that is positioned.
     // Follows spec http://www.w3.org/TR/cssom-view/#offset-attributes
-   
+
     this.offsetParent = function() {
         return this.map(function(elem) {
             var offsetParent = this.offsetParent || docElem;
