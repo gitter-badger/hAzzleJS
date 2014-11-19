@@ -65,11 +65,6 @@ hAzzle.define('style', function() {
             '12': 1
         },
 
-        cssNormalTransform = {
-            letterSpacing: "0",
-            fontWeight: "400"
-        },
-
         vendorPrefixes = function(prop) {
             // Cache on first iteration to avoid multiple lookups
             if (prefixCache[prop]) {
@@ -119,8 +114,6 @@ hAzzle.define('style', function() {
             if (elem && /* internal */ elem.elements) {
                 return false;
             }
-
-
         },
 
         getStyle = function(elem, name) {
