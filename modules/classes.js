@@ -1,21 +1,21 @@
 // classes.js
 var hAzzle = window.hAzzle || (window.hAzzle = {});
 
-hAzzle.define('Classes', function() {
+hAzzle.define('classes', function() {
 
     var // Dependencies 
-    
+
         features = hAzzle.require('has'),
-        util = hAzzle.require('Util'),
-        storage = hAzzle.require('Storage'),
-        strings = hAzzle.require('Strings'),
-        types = hAzzle.require('Types'),
+        util = hAzzle.require('util'),
+        storage = hAzzle.require('storage'),
+        strings = hAzzle.require('strings'),
+        types = hAzzle.require('types'),
         reSpace = /[\n\t\r]/g,
         witespace = /\s+/,
         a1 = [''],
-        
+
         // Convert a string - set of class names - to an array
-        
+
         str2array = function(classes) {
             if (typeof classes === 'string') {
                 if (classes && !witespace.test(classes)) {
@@ -44,60 +44,49 @@ hAzzle.define('Classes', function() {
         },
         addRemove = function(elem, classes, nativeMethodName, fn, done) {
 
-            if (!types.isEmptyObject(elem)) {
+            if (nativeMethodName === 'remove' && (classes === undefined || classes == null)) {
+                return elem.className = '';
+            }
 
-                var length, i, real = false;
+            // Array support (e.g. ['hello', 'world']  
 
-                if (nativeMethodName === 'remove' && (classes === undefined || classes == null)) {
-                    return elem.className = '';
-                }
+            classes = str2array(classes);
 
-                // Array support (e.g. ['hello', 'world']  
+            // Use native classList property if possible
 
-                classes = str2array(classes);
+            if (features.has('classlist')) {
 
-                // Use native classList property if possible
+                if (features.has('multiArgs')) {
 
-                if (!features.has('classlist')) {
+                    // Check if the 'elem' are a valid DOM elem and not a window object, by checking
+                    // if the classList exist on the 'elem'. 
 
-                    // Flag native
+                    return elem.classList[nativeMethodName].apply(elem.classList, classes);
 
-                    real = true;
+                } else {
 
                     fn = function(elem, cls) {
                         return elem.classList[nativeMethodName](cls);
                     };
                 }
+            }
+            var length = classes.length;
 
-                // Some browsers (e.g. IE) don't support multiple arguments
+            for (i = 0; i < length; i++) {
 
-                if (real && features.has('multiArgs')) {  
+                // Don't define a global className on the window or document object
 
-                  // Check if the 'elem' are a valid DOM elem and not a window object, by checking
-                  // if the classList exist on the 'elem'. 
-                
-                    elem.classList && elem.classList[nativeMethodName].apply(elem.classList, classes);
-    
-                } else { 
-
-                    length = classes.length;
-
-                    for (i = 0; i < length; i++) {
-
-                   // Don't define a global className on the window or document object
-                  
-                   if(elem.nodeType && elem.nodeType !== 9 ) {
-                        fn(elem, classes[i]);
-                       }
-                    }
-                }
-                // Callback function (if provided) that will be fired after the
-                // className value has been added / removed to / from the element 
-
-                if (types.isType('Function')(done)) {
-                    done.call(elem, elem);
+                if (elem.nodeType && elem.nodeType !== 9) {
+                    fn(elem, classes[i]);
                 }
             }
+            // Callback function (if provided) that will be fired after the
+            // className value has been added / removed to / from the element 
+
+            if (types.isType('Function')(done)) {
+                done.call(elem, elem);
+            }
+            //  }
         },
 
         // Check if the first element in the collection has classes
@@ -134,7 +123,7 @@ hAzzle.define('Classes', function() {
         addClass = function(elem, classes, /*optional*/ fn) {
             util.each(getElem(elem), function(elem) {
                 return addRemove(elem, classes, 'add', function(elem, cls) {
-                        
+
                     var cur = (' ' + elem.className + ' ').replace(reSpace, ' '),
                         finalValue;
 
@@ -235,6 +224,7 @@ hAzzle.define('Classes', function() {
                 hAzzle(elem).addClass(classes.call(elem, index, elem.className));
             }) : addClass(this.elements, classes, fn);
     };
+
 
     // Replace a given class with another
 
