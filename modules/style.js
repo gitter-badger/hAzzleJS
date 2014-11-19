@@ -106,93 +106,87 @@ hAzzle.define('style', function() {
             style.removeAttribute(property);
         },
 
-        getStyle = function(elem, name) {
+        getElem = function(elem) {
 
             if (elem === null || elem === undefined) {
-                return;
+                return false;
             } else {
-                elem = elem != null && elem instanceof hAzzle ? elem.elements : elem.length ? elem[0] : elem;
+                return elem != null && elem instanceof hAzzle ? elem.elements : elem.length ? elem[0] : elem;
             }
 
             // Avoid hAzzle from throwing errors if the element doesn't exist
 
             if (elem && /* internal */ elem.elements) {
-                return;
+                return false;
             }
 
-            name = strings.camelize((cssProps[name] ? cssProps[name] : cssProps[name] = vendorPrefixes(name)[0]) || name);
 
-            var hooks = cssHooks.get[name];
-            cssNormalTransform
+        },
 
-            return hook ? hook(node, name) : css.css(node, name);
+        getStyle = function(elem, name) {
+            if ((elem = getElem(elem))) {
+                name = strings.camelize((cssProps[name] ? cssProps[name] : cssProps[name] = vendorPrefixes(name)[0]) || name);
+                var hook = cssHooks.get[name];
+                return hook ? hook(elem, name) : css.css(elem, name);
+            }
         },
 
         setStyle = function(elem, name, value) {
 
-            if (elem === null || elem === undefined) {
-                return;
-            } else {
-                elem = elem != null && elem instanceof hAzzle ? elem.elements : elem.length ? elem[0] : elem;
-            }
+            if ((elem = getElem(elem))) {
 
-            // Avoid hAzzle from throwing errors if the element doesn't exist
+                if (validTypes[elem.nodeType]) {
 
-            if (elem && /* internal */ elem.elements) {
-                return;
-            }
+                    var ret, style, hook, type;
 
-            if (validTypes[elem.nodeType]) {
+                    name = strings.camelize((cssProps[name] ? cssProps[name] : cssProps[name] = vendorPrefixes(name)[0]) || name);
 
-                var ret, style, hook, type;
+                    style = elem.style;
 
-                name = strings.camelize((cssProps[name] ? cssProps[name] : cssProps[name] = vendorPrefixes(name)[0]) || name);
-
-                style = elem.style;
-
-                if (!style) {
-                    return;
-                }
-
-                if (value !== undefined) {
-
-                    type = typeof value;
-
-                    hook = cssHooks.set[name];
-
-                    // Convert '+=' or '-=' to relative numbers, and
-                    // and convert all unit types to PX (e.g. 10em will become 160px)
-
-                    if (type === 'string' && (ret = sNumbs.exec(value))) {
-                        value = units(parseFloat(css.css(elem, name)), ret[3], elem, name) + (ret[1] + 1) * ret[2];
-                        type = 'number';
+                    if (!style) {
+                        return;
                     }
 
-                    // If a number was passed in, add 'px' (except for certain CSS properties)
+                    if (value !== undefined) {
 
-                    if (type === 'number' && !unitless[name]) {
-                        value += ret && ret[3] ? ret[3] : 'px';
-                    }
+                        type = typeof value;
 
-                    // Support: IE9
+                        hook = cssHooks.set[name];
 
-                    if ((value === '' || value === null) && features.has('removeStyles')) {
-                        removeStyle(style, name);
-                    }
+                        // Convert '+=' or '-=' to relative numbers, and
+                        // and convert all unit types to PX (e.g. 10em will become 160px)
 
-                    if (hook) {
-                        hook(elem, name, value);
+                        if (type === 'string' && (ret = sNumbs.exec(value))) {
+                            value = units(parseFloat(css.css(elem, name)), ret[3], elem, name) + (ret[1] + 1) * ret[2];
+                            type = 'number';
+                        }
+
+                        // If a number was passed in, add 'px' (except for certain CSS properties)
+
+                        if (type === 'number' && !unitless[name]) {
+                            value += ret && ret[3] ? ret[3] : 'px';
+                        }
+
+                        // Support: IE9
+
+                        if ((value === '' || value === null) && features.has('removeStyles')) {
+                            removeStyle(style, name);
+                        }
+
+                        if (hook) {
+                            hook(elem, name, value);
+                        } else {
+                            style[name] = value;
+                        }
                     } else {
-                        style[name] = value;
-                    }
-                } else {
-                    hook = cssHooks.get[name];
+                        hook = cssHooks.get[name];
 
-                    if (cssHooks.get[name] && (ret = cssHooks.get[name](elem, false))) {
-                        return ret;
-                    }
+                        if (cssHooks.get[name] && (ret = cssHooks.get[name](elem, false))) {
+                            return ret;
+                        }
 
-                    return style[name];
+                        return style[name];
+                    }
                 }
             }
         },
@@ -321,10 +315,10 @@ hAzzle.define('style', function() {
         unitless[strings.camelize(prop)] = true;
     });
 
-
     return {
         vendor: vendorPrefixes,
         unitless: unitless,
+        cssProps: cssProps,
         cssHooks: cssHooks,
         setCSS: setStyle,
         getCSS: getStyle
