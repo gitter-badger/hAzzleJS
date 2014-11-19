@@ -92,6 +92,7 @@ hAzzle.define('style', function() {
             }
         },
 
+        // IE9
         removeStyle = function(style, property) {
             if (property == 'backgroundPosition') {
                 style.removeAttribute(property + 'X');
@@ -238,25 +239,23 @@ hAzzle.define('style', function() {
             return unit ? px / unit : px;
         };
 
-    this.css = function(prop, value) {
+    this.css = function(name, value) {
 
         var len = arguments.length,
             i, length = this.length,
-            node, nameType = typeof prop,
-            style, name = strings.camelize(prop),
+            node, nameType = typeof name,
             hook;
 
         for (i = 0; i < length; i++) {
 
             node = this.elements[i];
 
-            style = node.style;
-
             if (len === 1 && (nameType === 'string' || types.isArray(name))) {
+
                 value = util.reduce(nameType === 'string' ? [name] : name, function(memo, name) {
 
                     hook = cssHooks.get[name];
-                    value = hook ? hook(node, name) : css.css(node, name);
+                    value = hook ? hook(node, name) : css.css(node, strings.camelize(name));
 
                     memo[name] = value;
 
@@ -276,19 +275,19 @@ hAzzle.define('style', function() {
             }
 
             if (len === 1 && name && nameType === 'object') {
-                util.each(Object.keys(name), function(key) {
-                    appendCssText(key, name[key]);
+                util.each(name, function(key, prop) {
+                    setStyle(node, prop, key);
                 });
             } else if (len === 2 && nameType === 'string') {
                 appendCssText(name, value);
             } else {
-                hAzzle.error(true, 12, 'too few arguments in the css() method in style.js');
+                hAzzle.err(true, 12, 'too few arguments in the css() method in style.js');
             }
         }
         return this;
     };
 
-     // Populate the unitless properties list
+    // Populate the unitless properties list
 
     util.each(_unitlessProps, function(prop) {
         unitless[strings.camelize(prop)] = true;
@@ -297,5 +296,6 @@ hAzzle.define('style', function() {
 
     return {
         cssHooks: cssHooks,
+        setStyle: setStyle
     };
 });
