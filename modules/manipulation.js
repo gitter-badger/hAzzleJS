@@ -244,14 +244,14 @@ hAzzle.define('manipulation', function() {
         // Removes events associated with an element
 
         clearData = function(elems) {
-            hAzzle.installed.events && util.each(elems instanceof hAzzle ? 
-                     elem.elements ? elems.length : 
-                     elems : 
-                     [elems], function(elem) {
-                if (elem && elem.nodeType === 1 || elem.nodeType === 9 || !(+elem.nodeType)) {
-                    hAzzle(elem).off();
-                }
-            });
+            hAzzle.installed.events && util.each(elems instanceof hAzzle ?
+                elem.elements ? elems.length :
+                elems : [elems],
+                function(elem) {
+                    if (elem && elem.nodeType === 1 || elem.nodeType === 9 || !(+elem.nodeType)) {
+                        hAzzle(elem).off();
+                    }
+                });
         },
         normalize = function(node, clone) {
 
@@ -322,26 +322,22 @@ hAzzle.define('manipulation', function() {
 
     this.html = function(value) {
         var that = this,
-            elem = this.elements[0],
-            append = function(el, i) {
-                util.each(normalize(value, that, i), function(node) {
-                    el.append(node); // DOM Level 4
-                });
-            },
-            updateElement = function(el, i) {
+            elem = this.elements[0];
+        return typeof value != 'undefined' ? this.empty().each(function(el, i) {
 
-                try {
-                    if (el.nodeType === 1 && typeof value === 'string' && !scriptRegExp.test(value) &&
-                        !wrapMap[(tagRegExp.exec(value) || ['', ''])[1].toLowerCase()]) {
-                        value = value.replace(xhtmlRegxp, '<$1></$2>');
-                        // Remove element nodes and prevent memory leaks
-                        clearData(grab(el, false));
-                        return el.innerHTML = value;
-                    }
-                } catch (e) {}
-                append(el, i);
-            };
-        return typeof value != 'undefined' ? this.empty().each(updateElement) : elem ? elem.innerHTML : '';
+            try {
+                if (el.nodeType === 1 && typeof value === 'string' && !scriptRegExp.test(value) &&
+                    !wrapMap[(tagRegExp.exec(value) || ['', ''])[1].toLowerCase()]) {
+                    value = value.replace(xhtmlRegxp, '<$1></$2>');
+                    // Remove element nodes and prevent memory leaks
+                    clearData(grab(el, false));
+                    return el.innerHTML = value;
+                }
+            } catch (e) {}
+            util.each(normalize(value, that, i), function(node) {
+                el.append(node); // DOM Level 4
+            });
+        }) : elem ? elem.innerHTML : '';
     };
 
     this.deepEach = function(fn, scope) {
@@ -350,17 +346,26 @@ hAzzle.define('manipulation', function() {
     };
 
     this.detach = function() {
-        return this.each(function(elem) {
+        var els = this.elements,
+            i = this.length,
+            elem;
+        while (i--) {
+            elem = els[i];
             if (elem.parentElement) {
                 elem.parentElement.removeChild(elem);
             }
-        });
+        }
+        return this;
     };
 
     //  Remove all child nodes of the set of matched elements from the DOM
 
     this.empty = function() {
-        return this.each(function(elem) {
+        var els = this.elements,
+            i = this.length,
+            elem;
+        while (i--) {
+            elem = els[i];
             if (elem != null && elem.nodeType === 1) {
                 // Do a 'deep each' and clear all listeners if any 
                 deepEach(elem.children, clearData);
@@ -369,7 +374,8 @@ hAzzle.define('manipulation', function() {
                     elem.removeChild(elem.firstChild);
                 }
             }
-        });
+        }
+        return this;
     };
 
     // Remove the set of matched elements from the DOM.

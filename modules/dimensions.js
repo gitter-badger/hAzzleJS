@@ -169,8 +169,6 @@ hAzzle.define('dimensions', function() {
                 opts.using.call(elem, props);
 
             } else {
-
-
                 curElem.css(props);
             }
         };
@@ -383,7 +381,7 @@ hAzzle.define('dimensions', function() {
     util.each({
         scrollLeft: 'pageXOffset',
         scrollTop: 'pageYOffset'
-    }, function(method, prop) {
+    }, function(prop, method) {
         var top = 'pageYOffset' === prop;
 
         this[method] = function(val) {

@@ -16,8 +16,10 @@ hAzzle.define('traversing', function() {
                 types.isNumber(sel) ? sel : types.isNumber(index) ? index : null;
         },
         gather = function(els, fn) {
-            var ret = [], res, i = 0,
-                j, len = els.length, f;
+            var ret = [],
+                res, i = 0,
+                j, len = els.length,
+                f;
             for (; i < len;) {
                 for (j = 0, f = (res = fn(els[i], i++)).length; j < f;) {
                     ret.push(res[j++]);
@@ -53,7 +55,8 @@ hAzzle.define('traversing', function() {
     // Optionally takes a query to filter the sibling elements.
 
     this.siblings = function(selector) {
-        var ret = [], i, nodes;
+        var ret = [],
+            i, nodes;
         this.each(function(element) {
             nodes = element.parentElement.children;
             i = nodes.length;
@@ -164,7 +167,7 @@ hAzzle.define('traversing', function() {
     this.has = function(sel) {
         return hAzzle(util.filter(
             this.elements,
-            util.isElement(sel) ? function(el) {
+            types.isElement(sel) ? function(el) {
                 return core.contains(sel, el);
             } : typeof sel === 'string' && sel.length ? function(el) {
                 return jiesa.find(sel, el).length;
