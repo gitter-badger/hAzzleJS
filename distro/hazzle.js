@@ -20,7 +20,7 @@
 
         // Version
 
-        version = '1.0.1d',
+        version = '1.0.2d',
 
         // Codename
 
@@ -91,26 +91,23 @@
             }
 
             if (typeof sel === 'string') {
-
                 if (installed.manipulation &&
                     sel[0] === '<' &&
                     sel[sel.length - 1] === '>' &&
                     sel.length >= 3) {
-
                     els = require('manipulation').create(
                         sel,
                         ctx && ctx.nodeType ? ctx.ownerDocument || ctx : document
                     );
-
                 } else {
                     els = this.find(sel, ctx, true);
                 }
                 // hAzzle([dom]) 
             } else if (Array.isArray(sel)) {
-                els = util.unique(util.filter(sel, validTypes));
+                els = util.unique( util.filter(sel, validTypes));
                 // hAzzle(dom)
             } else if (this.isNodeList(sel)) {
-                els = util.filter(util.makeArray(sel), validTypes);
+                els = util.filter( util.makeArray(sel), validTypes);
                 // hAzzle(dom)
             } else if (sel.nodeType) {
                 // If it's a html fragment, create nodes from it
@@ -129,9 +126,13 @@
 
             // Create a new hAzzle collection from the nodes found
 
-            this.elements = (els === undefined) ? [] : els;
-            this.length = (els === undefined) ? 0 : els.length;
-
+            if (els === undefined) {
+                this.length = 0;
+                this.elements = [];
+            } else {
+                this.elements = els;
+                this.length = els.length;
+            }
             return this;
         };
 
@@ -219,6 +220,25 @@ hAzzle.define('has', function() {
         // release memory in IE
         div = null;
         return mu;
+    });
+    
+    // IE9
+    
+    add('removeStyles', function() {
+        var div = document.createElement('div');
+            div.style.color = 'red';
+            div.style.color = null;
+        return div.style.color == 'red';
+    });
+
+    // IE9 returns borders in shorthand styles in the wrong 
+    // order (color-width-style instead of width-style-color)
+    
+    add('WrongOrder', function() {
+        var div = document.createElement('div'),
+            border = '1px solid #123abc';
+            div.style.border = border;            
+           return el.style.border != border;
     });
 
     // mobile
@@ -1281,13 +1301,9 @@ hAzzle.define('Collection', function() {
 
     // Get the element at position specified by index from the current collection.
     this.eq = function(index) {
-
-        var elem = this.elements[0];
-        // Prevent hAzzle from throwing on a window or document object
-        if (elem && elem.nodeType && elem.nodeType !== 9) {
-            return typeof index === 'number' && hAzzle(index === -1 ? slice(this.elements, this.length - 1) : this.elements[index]);
-        }
-        return this;
+        var len = this.length,
+            j = +index + (index < 0 ? len : 0);
+        return hAzzle(j >= 0 && j < len ? [this.elements[j]] : []);
     };
 
     this.reduce = function(fn, accumulator, args) {
@@ -1437,7 +1453,7 @@ hAzzle.define('Collection', function() {
 
     return {
         makeArray: makeArray,
-       arrayRemove: arrayRemove,
+        arrayRemove: arrayRemove,
         slice: slice
     };
 });
@@ -1750,6 +1766,7 @@ hAzzle.define('Jiesa', function() {
         if (sel === undefined) {
             return this;
         }
+        
         if (typeof sel === 'function') {
             var els = [];
             this.each(function(el, index) {
@@ -2464,6 +2481,15 @@ hAzzle.define('setters', function() {
             'class': 'className',
             'for': 'htmlFor'
         },
+        
+        TAttribute = {
+    'contentNames': {},
+    'read':         {},
+    'write':        {},
+    'names': { 'htmlFor':'for', 'className':'class' }
+  },
+        
+        
         propHooks = {
             get: {},
             set: {}
@@ -2483,6 +2509,17 @@ hAzzle.define('setters', function() {
         getElem = function(elem) {
             return elem instanceof hAzzle ? elem.elements : elem;
         },
+        validTypes = {
+            '1': 1,
+            '4': 1,
+            '5': 1,
+            '6': 1,
+            '7': 1,
+            '9': 1,
+            '10': 1,
+            '11': 1,
+            '12': 1
+        },
 
         // Get names on the boolean attributes
 
@@ -2491,12 +2528,6 @@ hAzzle.define('setters', function() {
             var booleanAttr = boolAttr[name.toLowerCase()];
             // booleanAttr is here twice to minimize DOM access
             return booleanAttr && boolElem[elem.nodeName] && booleanAttr;
-        },
-
-        // Check for valid nodetypes    
-
-        validTypes = function(nType) {
-            return nType && (nType !== 3 || nType !== 8 || nType !== 2)
         },
 
         // Removes an attribute from an HTML element.
@@ -2531,7 +2562,7 @@ hAzzle.define('setters', function() {
             var nodeType = elem ? elem.nodeType : undefined,
                 hooks, ret;
 
-            if (validTypes(nodeType)) {
+            if (elem && validTypes[elem.nodeType]) {
 
                 // Fallback to prop when attributes are not supported
                 if (typeof elem.getAttribute === 'undefined') {
@@ -2565,7 +2596,7 @@ hAzzle.define('setters', function() {
 
                 // Set / remove a attribute
 
-                if (!value) {
+               if (value === false || value == null) {
                     removeAttr(elem, name);
                 } else if (hooks && (ret = hooks.set(elem, value, name)) !== undefined) {
                     return ret;
@@ -2583,7 +2614,7 @@ hAzzle.define('setters', function() {
             var nodeType = elem ? elem.nodeType : undefined,
                 hook, ret;
 
-            if (validTypes(nodeType)) {
+            if (elem && validTypes[elem.nodeType]) {
 
                 if (nodeType !== 1 || core.isHTML) {
 
