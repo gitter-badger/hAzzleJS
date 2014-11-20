@@ -55,18 +55,6 @@ hAzzle.define('has', function() {
             return elem;
         };
 
-    // Detect if the classList API supports multiple arguments
-    // IE11-- don't support it
-
-    add('multiArgs', function() {
-        var mu, div = document.createElement('div');
-        div.classList.add('a', 'b');
-        mu = /(^| )a( |$)/.test(div.className) && /(^| )b( |$)/.test(div.className);
-        // release memory in IE
-        div = null;
-        return mu;
-    });
-
     // mobile
 
     add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));

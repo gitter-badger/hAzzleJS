@@ -12,11 +12,25 @@ hAzzle.define('classes', function() {
         types = hAzzle.require('types'),
         reSpace = /[\n\t\r]/g,
         witespace = /\s+/,
-        a1 = [''],
+        a1 = [''];
+
+    //# Feature / bug detection
+    
+        // Detect if the classList API supports multiple arguments
+    // IE11-- don't support it
+
+    features.add('multiArgs', function() {
+        var mu, div = document.createElement('div');
+        div.classList.add('a', 'b');
+        mu = /(^| )a( |$)/.test(div.className) && /(^| )b( |$)/.test(div.className);
+        // release memory in IE
+        div = null;
+        return mu;
+    });
 
         // Convert a string - set of class names - to an array
 
-        str2array = function(classes) {
+   var  str2array = function(classes) {
             if (typeof classes === 'string') {
                 if (classes && !witespace.test(classes)) {
                     a1[0] = classes;
