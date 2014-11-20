@@ -20,6 +20,7 @@ hAzzle.define('setters', function() {
             'class': 'className',
             'for': 'htmlFor'
         },
+        
         propHooks = {
             get: {},
             set: {}
