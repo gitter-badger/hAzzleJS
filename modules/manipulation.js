@@ -261,7 +261,8 @@ hAzzle.define('manipulation', function() {
                 return create(node);
             }
 
-            node = getElem(node);
+            //     node = getElem(node);
+            node = node instanceof hAzzle ? node.elements : node.length ? node : node
 
             if (clone) {
                 ret = []; // Don't change original array
@@ -438,13 +439,13 @@ hAzzle.define('manipulation', function() {
 
                     if (validTypes[elem.nodeType]) {
 
-                        var node = normalize(content, index),
+                        var el = normalize(content, index),
                             i = 0,
-                            l = node.length;
+                            l = elem.length;
 
                         // 'Normal' iteration faster then internal 'each'
                         for (; i < l; i++) {
-                            elem[prop](node[i]); // DOM Level 4
+                            elem[prop](el[i]); // DOM Level 4
                         }
                     }
                 }
