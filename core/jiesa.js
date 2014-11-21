@@ -196,14 +196,10 @@ hAzzle.define('Jiesa', function() {
         // Many people uses "is(':hidden') / "is(':visible'), so to make them happy we introduced basic 
         // CSS2 / CSS3 pseudo support
 
-        matches = function(elem, sel, ctx) {
+           matches = function(elem, sel, ctx) {
 
             if (sel.nodeType) {
                 return elem === sel;
-            }
-            // Set document vars if needed
-            if ((elem.ownerDocument || elem) !== document) {
-                core.setDocument(elem);
             }
 
             // Make sure that attribute selectors are quoted
@@ -217,13 +213,9 @@ hAzzle.define('Jiesa', function() {
                 });
             }
 
-            if (elem === document) {
-                return false;
-            }
-
             var quick = quickMatch.exec(sel);
 
-            if (quick) {
+            if (quick) { 
                 //   0  1    2   3          4
                 // [ _, tag, id, attribute, class ]
                 if (quick[1]) {
@@ -244,9 +236,7 @@ hAzzle.define('Jiesa', function() {
                 );
             } else {
 
-                var m = pseudos[sel];
-
-                if (m) {
+                if ((m = pseudos[sel])) {
                     return !!m(elem);
                 } else {
 
@@ -271,6 +261,7 @@ hAzzle.define('Jiesa', function() {
                     }
                 }
             }
+
         };
 
     this.find = function(selector, context, /*internal*/ internal) {

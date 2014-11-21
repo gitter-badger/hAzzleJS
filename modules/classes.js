@@ -184,7 +184,7 @@ hAzzle.define('classes', function() {
 
         toggleClass = function(elem, value, condition) {
 
-            var els = getElem(elem)[0],
+            var els = getElem(elem),
                 type = typeof value;
 
             if (typeof condition === 'boolean' && type === 'string') {
