@@ -1,17 +1,25 @@
 {
-    "name": "hAzzle",
-    "description": "hAzzle",
-    "version": "1.0.0rc",
-    "main": "index.js",
-    "ignore": [
-        "test",
-        ".jshintrc",
-        ".travis.yml",
-        "CHANGELOG.md",
-        "karma.conf.js",
-        "package.json"
-    ],
-    "devDependencies": {
-        "chai": "*"
-    }
+  "name": "hAzzle",
+  "description": "hAzzle",
+  "version": "1.0.2d",
+  "authors": [
+    "Kenny Flashlight <kflash123@gmail.com>"
+  ],
+  "main": "distro/hazzle.js",
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "test",
+    ".gitignore",
+    ".jshintrc",
+    ".travis.yml",
+    "karma.conf.js",
+    "README.md",
+    "CHANGELOG.md",
+    "karma.conf.js",
+    "package.json"
+  ],
+  "devDependencies": {
+    "chai": "*"
+  }
 }
