@@ -261,8 +261,7 @@ hAzzle.define('manipulation', function() {
                 return create(node);
             }
 
-            //     node = getElem(node);
-            node = node instanceof hAzzle ? node.elements : node.length ? node : node
+           node = node instanceof hAzzle ? node.elements : node.length ? node : node
 
             if (clone) {
                 ret = []; // Don't change original array
