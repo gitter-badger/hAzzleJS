@@ -1,11 +1,12 @@
 /*!
  * hAzzle.js
  * Copyright (c) 2014 Kenny Flashlight
- * Version: 1.0.2b
+ * Version: 1.0.2d
  * Released under the MIT License.
  *
- * Date: 2014-11-16
+ * Date: 2014-11-22
  */
+ 
 (function() {
 
     var
@@ -20,7 +21,7 @@
 
         // Version
 
-        version = '1.0.1b',
+        version = '1.0.2d',
 
         // Codename
 
@@ -104,10 +105,10 @@
                 }
                 // hAzzle([dom]) 
             } else if (Array.isArray(sel)) {
-                els = util.unique( util.filter(sel, validTypes));
+                els = util.unique(util.filter(sel, validTypes));
                 // hAzzle(dom)
             } else if (this.isNodeList(sel)) {
-                els = util.filter( util.makeArray(sel), validTypes);
+                els = util.filter(util.makeArray(sel), validTypes);
                 // hAzzle(dom)
             } else if (sel.nodeType) {
                 // If it's a html fragment, create nodes from it
@@ -135,6 +136,18 @@
             }
             return this;
         };
+
+    var _hAzzle = window.hAzzle;
+
+    // Restores original hAzzle namespace  
+
+    hAzzle.noConflict = function() {
+        if (window.hAzzle === hAzzle) {
+            window.hAzzle = _hAzzle;
+        }
+
+        return window;
+    };
 
     // Expose
 
