@@ -167,6 +167,7 @@ hAzzle.define('css', function() {
             }
 
             // check the unit
+          if(value) {
             unit = (value.match(runit) || [])[2];
 
             if (unit === '%' && computedValueBug) {
@@ -188,7 +189,7 @@ hAzzle.define('css', function() {
                 // Firefox will pass back an unaltered value when it can't be set, like top on a static element
                 value = 0;
             }
-
+}
             return value !== undefined ? value + '' : value;
         },
 

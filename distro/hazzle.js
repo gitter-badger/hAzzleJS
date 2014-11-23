@@ -136,6 +136,18 @@
             return this;
         };
 
+    var _hAzzle = window.hAzzle;
+
+    // Restores original hAzzle namespace  
+
+    hAzzle.noConflict = function() {
+        if (window.hAzzle === hAzzle) {
+            window.hAzzle = _hAzzle;
+        }
+
+        return window;
+    };
+
     // Expose
 
     hAzzle.err = err;
@@ -571,10 +583,23 @@ hAzzle.define('util', function() {
             if (!fn) return identity;
         },
 
-        // Determine if at least one element in the object matches a truth test. 
-        // ECMAScript 5 15.4.4.17
+        every = function(obj, predicate, context) {
+            if (obj == null) return true;
+            predicate = iterate(predicate, context);
+            var keys = obj.length !== +obj.length && Object.keys(obj),
+                length = (keys || obj).length,
+                index, currentKey;
+            for (index = 0; index < length; index++) {
+                currentKey = keys ? keys[index] : index;
+                if (!predicate(obj[currentKey], currentKey, obj)) return false;
+            }
+            return true;
+        };
 
-        some = function(obj, fn, ctx) {
+    // Determine if at least one element in the object matches a truth test. 
+    // ECMAScript 5 15.4.4.17
+
+    some = function(obj, fn, ctx) {
             if (obj) {
                 fn = iterate(fn, ctx);
 
@@ -800,20 +825,17 @@ hAzzle.define('util', function() {
         // Return the results of applying the callback to each element.
         // ECMAScript 5 15.4.4.19
 
-        map = function(obj, fn, arg) {
-            if (obj) {
-                fn = iterate(fn, arg);
+        map = function(obj, fn, ctx) {
+            if (obj && fn) {
+                //   fn = iterate(fn, ctx);
                 var keys = obj.length !== +obj.length && oKeys(obj),
                     length = (keys || obj).length,
                     results = Array(length),
                     currentKey, index = 0;
-
                 for (; index < length; index++) {
                     currentKey = keys ? keys[index] : index;
-
-                    results[index] = fn(obj[currentKey], currentKey, obj);
+                    results[index] = fn.call(obj[currentKey], obj[currentKey], currentKey, obj);
                 }
-
                 return results;
             }
             return [];
@@ -848,18 +870,18 @@ hAzzle.define('util', function() {
         // Return the elements nodeName
 
         nodeName = function(el, name) {
-            return name && el && el.nodeName && el.nodeName.toLowerCase() === name.toLowerCase();
+            return el && el.nodeName && el.nodeName.toLowerCase() === name.toLowerCase();
         },
 
         // Native solution for filtering arrays. 
         // ECMAScript 5 15.4.4.20  
 
-        filter = function(arr, fn, arg) {
+        filter = function(arr, fn, ctx) {
             var results = [];
             if (!arr) {
                 return results;
             }
-            fn = iterate(fn, arg);
+            fn = iterate(fn, ctx);
             each(arr, function(val, index, list) {
                 if (fn(val, index, list)) {
                     results.push(val);
@@ -867,7 +889,7 @@ hAzzle.define('util', function() {
             });
             return results;
         },
-        // Bind a function to a context, optionally partially applying any
+        // Bind a function to a ctx, optionally partially applying any
         // Replacement for bind() - ECMAScript 5 15.3.4.5
 
         bind = function(fn, ctx) {
@@ -906,6 +928,7 @@ hAzzle.define('util', function() {
         reduce: reduce,
         each: each,
         mixin: mixin,
+        every: every,
         makeArray: makeArray,
         merge: merge,
         nodeName: nodeName,
@@ -1072,7 +1095,6 @@ hAzzle.define('Core', function() {
 
             return false;
         };
-
 
     sortOrder = (environment.compare) ? function(a, b) {
         // Flag for duplicate removal
@@ -2467,6 +2489,17 @@ hAzzle.define('setters', function() {
             'for': 'htmlFor'
         },
 
+        TAttribute = {
+            'contentNames': {},
+            'read': {},
+            'write': {},
+            'names': {
+                'htmlFor': 'for',
+                'className': 'class'
+            }
+        },
+
+
         propHooks = {
             get: {},
             set: {}
@@ -2865,6 +2898,7 @@ hAzzle.define('valHooks', function() {
     util.mixin(setters.valHooks.set, {
 
         'select': function(elem, value) {
+
             var optionSet, option,
                 options = elem.options,
                 values = collection.makeArray(value),
@@ -2890,6 +2924,12 @@ hAzzle.define('valHooks', function() {
 
     // Getter    
     util.mixin(setters.valHooks.get, {
+        // some browsers don't recognize input[type=email] etc.
+
+        'type': function(elem) {
+            return elem.getAttribute('type') || elem.type;
+
+        },
 
         'option': function(elem) {
             var val = elem.getAttribute(name, 2);
@@ -2897,7 +2937,7 @@ hAzzle.define('valHooks', function() {
         },
 
         'select': function(elem) {
-
+            alert("")
             var index = elem.selectedIndex,
 
                 one = elem.type === 'select-one',

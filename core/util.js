@@ -9,48 +9,34 @@ hAzzle.define('util', function() {
         // Optimized each function
         // Replacement for forEach - ECMAScript 5 15.4.4.18 
 
-        each = function(obj, fn, args, /*reverse*/ rev) {
+        each = function(collection, iterator, context) {
 
-            if (obj === undefined || obj == null) {
-                return obj;
-            }
+  var key, length;
+  
+  var index = -1, length = collection ? collection.length : 0;
 
-            hAzzle.err(typeof fn !== 'function', 5, "'fn' must be a function in util.each()");
+  if (collection) {
 
-            var i, length = obj.length,
-                key;
+   if(typeof length === 'number') {
+       
+        while (++index < length) {
+          if (iterator(collection[index], index, collection) === false) {
+            break;
+          }
+        }
+      } else {
 
-            if (typeof fn === 'function' &&
-                typeof args === 'undefined' &&
-                typeof rev === 'undefined' &&
-                types.isArray(obj)) {
+      for (key in collection) {
 
-                while (++i < length) {
-                    i = rev ? obj.length - i - 1 : i;
-                    if (fn.call(obj[i], obj[i], i, obj) === false) {
-                        break;
-                    }
-                }
-            }
+        if (collection.hasOwnProperty(key)) {
 
-            if (length === +length) {
-                for (i = 0; i < length; i++) {
-                    i = rev ? obj.length - i - 1 : i;
-                    if (fn.call(obj[i], obj[i], i, obj) === false) {
-                        break;
-                    }
-                }
-            } else {
-                if (obj) {
-                    for (key in obj) {
-                        if (fn.call(obj[key], obj[key], key, obj) === false) {
-                            break;
-                        }
-                    }
-                }
-            }
-            return obj;
-        },
+          iterator.call(context, collection[key], key);
+        }
+      }
+    }
+  }
+  return collection;
+},
         createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
                 if (arg === undefined) return fn;

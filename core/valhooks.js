@@ -46,8 +46,14 @@ hAzzle.define('valhooks', function() {
 
     // Getter    
     util.mixin(setters.valHooks.get, {
+        
+      'type': function(elem) {
+        // Some browsers don't recognize input[type=email] etc.
+        return elem.getAttribute('type') || elem.type;
+        
+        },
 
-        'option': function(elem) {
+        'option': function(elem) { 
             var val = elem.getAttribute(name, 2);
             return val !== null ? val : strings.trim(text.getText(elem));
         },

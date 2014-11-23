@@ -198,7 +198,7 @@ hAzzle.define('Jiesa', function() {
 
            matches = function(elem, sel, ctx) {
 
-            if (sel.nodeType) {
+            if (sel && sel.nodeType) {
                 return elem === sel;
             }
 
@@ -275,18 +275,19 @@ hAzzle.define('Jiesa', function() {
                     self = this.elements;
 
                 return hAzzle(util.filter(hAzzle(selector).elements, function(node) {
-                    for (; i < len; i++) {
+                    for (; i < len; i++) {  
                         if (core.contains(self[i], node)) {
                             return true;
                         }
                     }
                 }));
             }
-            return util.reduce(this.elements, function(els, element) {
+            return util.reduce(this.elements, function(els, element) { 
                 return hAzzle(els.concat(collection.slice(jiesa(selector, element))));
             }, []);
 
         }
+
         return jiesa(selector, context);
     };
 
@@ -313,7 +314,7 @@ hAzzle.define('Jiesa', function() {
             });
         }
     };
-
+   
     return {
         matchesSelector: matchesSelector,
         matches: matches,
