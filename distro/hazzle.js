@@ -104,10 +104,10 @@
                 }
                 // hAzzle([dom]) 
             } else if (Array.isArray(sel)) {
-                els = util.unique(util.filter(sel, validTypes));
+                els = util.unique( util.filter(sel, validTypes));
                 // hAzzle(dom)
             } else if (this.isNodeList(sel)) {
-                els = util.filter(util.makeArray(sel), validTypes);
+                els = util.filter( util.makeArray(sel), validTypes);
                 // hAzzle(dom)
             } else if (sel.nodeType) {
                 // If it's a html fragment, create nodes from it
@@ -135,18 +135,18 @@
             }
             return this;
         };
-
-    var _hAzzle = window.hAzzle;
-
+        
+        var _hAzzle = window.hAzzle;
+        
     // Restores original hAzzle namespace  
-
+    
     hAzzle.noConflict = function() {
-        if (window.hAzzle === hAzzle) {
-            window.hAzzle = _hAzzle;
-        }
+    if (window.hAzzle === hAzzle) {
+        window.hAzzle = _hAzzle;
+    }
 
-        return window;
-    };
+    return window;
+};
 
     // Expose
 
@@ -233,7 +233,7 @@ hAzzle.define('has', function() {
         div = null;
         return mu;
     });
-
+    
     // mobile
 
     add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
@@ -582,24 +582,24 @@ hAzzle.define('util', function() {
 
             if (!fn) return identity;
         },
+        
+    every = function(obj, predicate, context) {
+    if (obj == null) return true;
+    predicate = iterate(predicate, context);
+    var keys = obj.length !== +obj.length && Object.keys(obj),
+        length = (keys || obj).length,
+        index, currentKey;
+    for (index = 0; index < length; index++) {
+      currentKey = keys ? keys[index] : index;
+      if (!predicate(obj[currentKey], currentKey, obj)) return false;
+    }
+    return true;
+  };
 
-        every = function(obj, predicate, context) {
-            if (obj == null) return true;
-            predicate = iterate(predicate, context);
-            var keys = obj.length !== +obj.length && Object.keys(obj),
-                length = (keys || obj).length,
-                index, currentKey;
-            for (index = 0; index < length; index++) {
-                currentKey = keys ? keys[index] : index;
-                if (!predicate(obj[currentKey], currentKey, obj)) return false;
-            }
-            return true;
-        };
+        // Determine if at least one element in the object matches a truth test. 
+        // ECMAScript 5 15.4.4.17
 
-    // Determine if at least one element in the object matches a truth test. 
-    // ECMAScript 5 15.4.4.17
-
-    some = function(obj, fn, ctx) {
+        some = function(obj, fn, ctx) {
             if (obj) {
                 fn = iterate(fn, ctx);
 
@@ -827,7 +827,7 @@ hAzzle.define('util', function() {
 
         map = function(obj, fn, ctx) {
             if (obj && fn) {
-                //   fn = iterate(fn, ctx);
+             //   fn = iterate(fn, ctx);
                 var keys = obj.length !== +obj.length && oKeys(obj),
                     length = (keys || obj).length,
                     results = Array(length),
@@ -928,7 +928,7 @@ hAzzle.define('util', function() {
         reduce: reduce,
         each: each,
         mixin: mixin,
-        every: every,
+       every:every,
         makeArray: makeArray,
         merge: merge,
         nodeName: nodeName,
@@ -1773,7 +1773,7 @@ hAzzle.define('Jiesa', function() {
         if (sel === undefined) {
             return this;
         }
-
+        
         if (typeof sel === 'function') {
             var els = [];
             this.each(function(el, index) {
@@ -2488,18 +2488,7 @@ hAzzle.define('setters', function() {
             'class': 'className',
             'for': 'htmlFor'
         },
-
-        TAttribute = {
-            'contentNames': {},
-            'read': {},
-            'write': {},
-            'names': {
-                'htmlFor': 'for',
-                'className': 'class'
-            }
-        },
-
-
+       
         propHooks = {
             get: {},
             set: {}
@@ -2606,7 +2595,7 @@ hAzzle.define('setters', function() {
 
                 // Set / remove a attribute
 
-                if (value === false || value == null) {
+               if (value === false || value == null) {
                     removeAttr(elem, name);
                 } else if (hooks && (ret = hooks.set(elem, value, name)) !== undefined) {
                     return ret;
@@ -2703,7 +2692,7 @@ hAzzle.define('setters', function() {
             hooks = valHooks.set[elem.type] || valHooks.set[elem.nodeName.toLowerCase()];
 
             // If set returns undefined, fall back to normal setting
-            if (!hooks || hooks(elem, val, 'value') === undefined) {
+            if (!hooks || hooks(elem, val, 'value') === undefined) { 
                 elem.value = val;
             }
         });
@@ -2897,8 +2886,8 @@ hAzzle.define('valHooks', function() {
     // Setter
     util.mixin(setters.valHooks.set, {
 
-        'select': function(elem, value) {
-
+         'select': function(elem, value) {
+             
             var optionSet, option,
                 options = elem.options,
                 values = collection.makeArray(value),
@@ -2925,10 +2914,10 @@ hAzzle.define('valHooks', function() {
     // Getter    
     util.mixin(setters.valHooks.get, {
         // some browsers don't recognize input[type=email] etc.
-
+        
         'type': function(elem) {
-            return elem.getAttribute('type') || elem.type;
-
+        return  elem.getAttribute('type') || elem.type;
+        
         },
 
         'option': function(elem) {
@@ -2937,7 +2926,7 @@ hAzzle.define('valHooks', function() {
         },
 
         'select': function(elem) {
-            alert("")
+              alert("")
             var index = elem.selectedIndex,
 
                 one = elem.type === 'select-one',

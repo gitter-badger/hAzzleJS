@@ -4,7 +4,7 @@
  * Version: 1.0.2d
  * Released under the MIT License.
  *
- * Date: 2014-11-19
+ * Date: 2014-11-23
  */
  
 (function(){var h={},f={},k=function(a,b,c){if(a)throw Error("[hAzzle-"+b+"] "+c);},m=function(a){if(a&&"string"===typeof a)return h[a.toLowerCase()]},p=function(a){return a&&(a.ELEMENT_NODE||a.DOCUMENT_NODE)},c=function(a,b){if(a){if(!(this instanceof c))return new c(a,b);if(a instanceof c)return a;var e;e=m("Util");"function"===typeof a&&(f.ready?m("ready").ready(a):k(!0,6,"ready.js module not installed"));e="string"===typeof a?f.manipulation&&"<"===a[0]&&">"===a[a.length-1]&&3<=a.length?m("manipulation").create(a,
