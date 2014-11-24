@@ -1,10 +1,11 @@
 /*!
- * hAzzle.js
+ * hAzzle Javascript Library
  * Copyright (c) 2014 Kenny Flashlight
+ *
  * Version: 1.0.2d
  * Released under the MIT License.
  *
- * Date: 2014-11-19
+ * Date: 2014-11-24
  */
 (function() {
 
@@ -34,26 +35,20 @@
             }
         },
 
-        // Lower case 
-
-        tlc = function(str) {
-            return str.toLowerCase();
-        },
-
         // Require a module
 
         require = function(name) {
             if (name && typeof name === 'string') {
-                return modules[tlc(name)];
+                return modules[name.toLowerCase()];
             }
         },
 
-        // Defines a module
+        // Define a module
 
         define = function(name, fn) {
             if (typeof name === 'string' && typeof fn === 'function' && !modules[name]) {
-                installed[tlc(name)] = true;
-                modules[tlc(name)] = fn.call(hAzzle.prototype);
+                installed[name.toLowerCase()] = true;
+                modules[name.toLowerCase()] = fn.call(hAzzle.prototype);
             }
         },
 
@@ -63,90 +58,97 @@
 
         // Define a local copy of hAzzle
 
-        hAzzle = function(sel, ctx) {
+        hAzzle = function(selector, context) {
 
-            // hAzzle(), hAzzle(null), hAzzle(undefined), hAzzle(false)
-            if (!sel) {
-                return;
+            // hAzzle(), hAzzle(''), hAzzle(null), hAzzle(undefined), hAzzle(false)
+            if (!selector) {
+                return this;
             }
+
             // Allow instantiation without the 'new' keyword
+
             if (!(this instanceof hAzzle)) {
-                return new hAzzle(sel, ctx);
+                return new hAzzle(selector, context);
             }
 
-            if (sel instanceof hAzzle) {
-                return sel;
+            if (selector instanceof hAzzle) {
+                return selector;
             }
 
-            var els, util = require('Util');
+            // Handle HTML strings if the manipulation.js module are installed
 
-            // DOM ready
+            if (typeof selector === 'string') {
 
-            if (typeof sel === 'function') {
+                if (installed.manipulation &&
+                    selector[0] === '<' &&
+                    selector[selector.length - 1] === '>' &&
+                    selector.length >= 3) {
+
+                    // Require the manipualtion.js module, and create the HTML
+
+                    this.elements = require('manipulation').create(
+                        selector,
+                        context && context.nodeType ? context.ownerDocument || context : document
+                    );
+                    // If no HTML, fallback to Jiesa selector engine
+                } else {
+                    this.elements = require('jiesa').find(selector, context, true);
+                }
+                // Arrays
+            } else if (Array.isArray(selector)) {
+                var util = require('Util');
+                this.elements = util.unique(util.filter(selector, validTypes));
+                // nodeList
+            } else if (this.isNodeList(selector)) {
+                var util = require('Util');
+                this.elements = util.filter(util.makeArray(selector), validTypes);
+                // DOMElement
+            } else if (selector.nodeType) {
+                // If it's a html fragment, create nodes from it
+                if (selector.nodeType === 11) {
+                    this.elements = selector.children;
+                } else {
+                    this.elements = [selector];
+                }
+                this.length = 1;
+                return this;
+                // browser window     
+            } else if (selector === window) {
+                this.elements = [selector];
+                // DOM ready
+            } else if (typeof selector === 'function') {
                 if (installed.ready) {
-                    require('ready').ready(sel);
+                    return require('ready').ready(selector);
                 } else {
                     err(true, 6, 'ready.js module not installed');
                 }
-            }
 
-            if (typeof sel === 'string') {
-                if (installed.manipulation &&
-                    sel[0] === '<' &&
-                    sel[sel.length - 1] === '>' &&
-                    sel.length >= 3) {
-                    els = require('manipulation').create(
-                        sel,
-                        ctx && ctx.nodeType ? ctx.ownerDocument || ctx : document
-                    );
-                } else {
-                    els = this.find(sel, ctx, true);
-                }
-                // hAzzle([dom]) 
-            } else if (Array.isArray(sel)) {
-                els = util.unique( util.filter(sel, validTypes));
-                // hAzzle(dom)
-            } else if (this.isNodeList(sel)) {
-                els = util.filter( util.makeArray(sel), validTypes);
-                // hAzzle(dom)
-            } else if (sel.nodeType) {
-                // If it's a html fragment, create nodes from it
-                if (sel.nodeType === 11) {
-                    // This children? Are they an array or not?
-                    els = sel.children;
-                } else {
-                    els = [sel];
-                }
-                // window     
-            } else if (sel === window) {
-                els = [sel];
             } else {
-                els = [];
+                this.elements = [];
+                this.length = 0;
+                return this;
             }
 
             // Create a new hAzzle collection from the nodes found
+            //
+            // NOTE! hAzzle doesn't try to subclass Array in any way. A hAzzle instance is just a 
+            // standard object, with the current elements selection stored in the .elements array. 
 
-            if (els === undefined) {
-                this.length = 0;
-                this.elements = [];
-            } else {
-                this.elements = els;
-                this.length = els.length;
-            }
+            this.length = this.elements.length;
             return this;
         };
-        
-        var _hAzzle = window.hAzzle;
-        
-    // Restores original hAzzle namespace  
-    
-    hAzzle.noConflict = function() {
-    if (window.hAzzle === hAzzle) {
-        window.hAzzle = _hAzzle;
-    }
 
-    return window;
-};
+    var _hAzzle = window.hAzzle;
+
+    // Restores original hAzzle namespace  
+
+    hAzzle.noConflict = function() {
+        if (window.hAzzle === hAzzle) {
+            window.hAzzle = _hAzzle;
+        }
+
+        return window;
+    };
 
     // Expose
 
@@ -157,7 +159,7 @@
     hAzzle.codename = codename;
     hAzzle.version = version;
 
-    // Hook hAzzle on the window object
+    // Expose hAzzle to the global namespace
 
     window.hAzzle = hAzzle;
 
@@ -233,7 +235,7 @@ hAzzle.define('has', function() {
         div = null;
         return mu;
     });
-    
+
     // mobile
 
     add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
@@ -582,24 +584,24 @@ hAzzle.define('util', function() {
 
             if (!fn) return identity;
         },
-        
-    every = function(obj, predicate, context) {
-    if (obj == null) return true;
-    predicate = iterate(predicate, context);
-    var keys = obj.length !== +obj.length && Object.keys(obj),
-        length = (keys || obj).length,
-        index, currentKey;
-    for (index = 0; index < length; index++) {
-      currentKey = keys ? keys[index] : index;
-      if (!predicate(obj[currentKey], currentKey, obj)) return false;
-    }
-    return true;
-  };
 
-        // Determine if at least one element in the object matches a truth test. 
-        // ECMAScript 5 15.4.4.17
+        every = function(obj, predicate, context) {
+            if (obj == null) return true;
+            predicate = iterate(predicate, context);
+            var keys = obj.length !== +obj.length && Object.keys(obj),
+                length = (keys || obj).length,
+                index, currentKey;
+            for (index = 0; index < length; index++) {
+                currentKey = keys ? keys[index] : index;
+                if (!predicate(obj[currentKey], currentKey, obj)) return false;
+            }
+            return true;
+        };
 
-        some = function(obj, fn, ctx) {
+    // Determine if at least one element in the object matches a truth test. 
+    // ECMAScript 5 15.4.4.17
+
+    some = function(obj, fn, ctx) {
             if (obj) {
                 fn = iterate(fn, ctx);
 
@@ -827,7 +829,7 @@ hAzzle.define('util', function() {
 
         map = function(obj, fn, ctx) {
             if (obj && fn) {
-             //   fn = iterate(fn, ctx);
+                //   fn = iterate(fn, ctx);
                 var keys = obj.length !== +obj.length && oKeys(obj),
                     length = (keys || obj).length,
                     results = Array(length),
@@ -928,7 +930,7 @@ hAzzle.define('util', function() {
         reduce: reduce,
         each: each,
         mixin: mixin,
-       every:every,
+        every: every,
         makeArray: makeArray,
         merge: merge,
         nodeName: nodeName,
@@ -1248,12 +1250,8 @@ hAzzle.define('Collection', function() {
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
 
-        arrayRemove = function(array, value) {
-            var index = array.indexOf(value);
-            if (index >= 0)
-                array.splice(index, 1);
-            return value;
-        },
+        // Create array
+
         makeArray = function(arr, results) {
             var ret = results || [];
             if (arr !== undefined) {
@@ -1266,15 +1264,15 @@ hAzzle.define('Collection', function() {
 
             return ret;
         },
+
+        // Replacement for native slice ( better performance)
+
         slice = function(array, start, end) {
-            if (typeof start === 'undefined') {
-                start = 0;
-            }
-            if (typeof end === 'undefined') {
-                end = array ? array.length : 0;
-            }
+
+            start = typeof start === 'undefined' ? 0 : start;
+
             var index = -1,
-                length = end - start || 0,
+                length = (typeof end === 'undefined' ? (array ? array.length : 0) : end) - start || 0,
                 result = Array(length < 0 ? 0 : length);
 
             while (++index < length) {
@@ -1288,10 +1286,9 @@ hAzzle.define('Collection', function() {
     // will be kept, but it will be possible to run jQuery / Zepto functions
 
     this.toJqueryZepto = function() {
-        var i = this.length,
-            els = this.elements;
+        var i = this.length;
         while (i--) {
-            this[i] = els[i];
+            this[i] = this.elements[i];
         }
         return this;
     };
@@ -1365,7 +1362,7 @@ hAzzle.define('Collection', function() {
         return this.filter(sel, true);
     };
 
-    // Determine the position of an element within the set
+    // Search for a given element from among the matched elements
 
     this.index = function(node) {
         var els = this.elements;
@@ -1401,6 +1398,45 @@ hAzzle.define('Collection', function() {
         return num ? this.slice(this.length - num) : this.eq(-1);
     };
 
+    this.next = function(sel) {
+        return this.map(function() {
+            return this.nextElementSibling;
+        }).filter(sel);
+    };
+
+    this.prev = function(sel) {
+        return this.map(function() {
+            return this.previousElementSibling;
+        }).filter(sel);
+    };
+
+    // Get all preceding siblings of each element in 
+    // the set of matched elements, optionally filtered by a selector
+
+    this.prevAll = function() {
+        var matched = [];
+        this.each(function(elem) {
+            while ((elem = elem.previousElementSibling) &&
+                elem.nodeType !== 9) {
+                matched.push(elem);
+            }
+        });
+        return hAzzle(matched);
+    };
+    // Get all following siblings of each element in 
+    // the set of matched elements, optionally filtered by a selector.
+
+    this.nextAll = function() {
+        var matched = [];
+        this.each(function(elem) {
+            while ((elem = elem.nextElementSibling) &&
+                elem.nodeType !== 9) {
+                matched.push(elem);
+            }
+        });
+        return hAzzle(matched);
+    };
+
     // Return 'even' elements from the '.elements array'
     this.even = function() {
         return this.filter(function(i) {
@@ -1408,59 +1444,34 @@ hAzzle.define('Collection', function() {
         });
     };
     // Return 'odd' elements from the '.elements array'
+
     this.odd = function() {
         return this.filter(function(i) {
             return i % 2 === 0;
         });
     };
-
-    // First() and prev() methods
-    util.each({
-        next: 'nextElementSibling',
-        prev: 'previousElementSibling'
-    }, function(value, prop) {
-        this[prop] = function(sel) {
-            return this.map(function() {
-                return this[value];
-            }).filter(sel);
-        };
-    }.bind(this));
-
-    // prevAll() and nextAll() methods
-    util.each({
-        prevAll: 'previousElementSibling',
-        nextAll: 'nextElementSibling'
-    }, function(value, prop) {
-        this[prop] = function() {
-            var matched = [];
-            this.each(function(elem) {
-                while ((elem = elem[value]) && elem.nodeType !== 9) {
-                    matched.push(elem);
-                }
-            });
-            return hAzzle(matched);
-        };
-    }.bind(this));
-
     // Native prototype methods that return a usable value (ECMA 5+)
-
-    util.each(['shift',
-            'splice',
-            'unshift',
-            'join',
-            'lastIndexOf',
-            'forEach',
-            'reduceRight'
-        ],
-        function(method) {
-            this[method] = function() {
-                return this.elements[method].apply(this.elements, arguments)
-            }
-        }.bind(this))
+    this.shift = function() {
+        return this.elements[method].apply(this.elements, arguments);
+    };
+    this.lastIndexOf = function() {
+        return this.elements[method].apply(this.elements, arguments);
+    };
+    this.reduceRight = function() {
+        return this.elements[method].apply(this.elements, arguments);
+    };
+    this.forEach = function() {
+        return this.elements[method].apply(this.elements, arguments);
+    };
+    this.splice = function() {
+        return this.elements[method].apply(this.elements, arguments);
+    };
+    this.shift = function() {
+        return this.elements[method].apply(this.elements, arguments);
+    };
 
     return {
         makeArray: makeArray,
-        arrayRemove: arrayRemove,
         slice: slice
     };
 });
@@ -1773,7 +1784,7 @@ hAzzle.define('Jiesa', function() {
         if (sel === undefined) {
             return this;
         }
-        
+
         if (typeof sel === 'function') {
             var els = [];
             this.each(function(el, index) {
@@ -2362,28 +2373,29 @@ hAzzle.define('css', function() {
             }
 
             // check the unit
-            unit = (value.match(runit) || [])[2];
+            if (value) {
+                unit = (value.match(runit) || [])[2];
 
-            if (unit === '%' && computedValueBug) {
-                // WebKit won't convert percentages for top, bottom, left, right, margin and text-indent
-                if (prop === 'top' || prop === 'bottom') {
-                    // Top and bottom require measuring the innerHeight of the parent.
-                    innerHeight = (parent = elem.parentNode || elem).offsetHeight;
-                    while (i--) {
-                        innerHeight -= parseFloat(css(parent, outerProp[i]));
+                if (unit === '%' && computedValueBug) {
+                    // WebKit won't convert percentages for top, bottom, left, right, margin and text-indent
+                    if (prop === 'top' || prop === 'bottom') {
+                        // Top and bottom require measuring the innerHeight of the parent.
+                        innerHeight = (parent = elem.parentNode || elem).offsetHeight;
+                        while (i--) {
+                            innerHeight -= parseFloat(css(parent, outerProp[i]));
+                        }
+                        value = parseFloat(value) / 100 * innerHeight + 'px';
+                    } else {
+                        value = toPx(elem, value);
                     }
-                    value = parseFloat(value) / 100 * innerHeight + 'px';
-                } else {
-                    value = toPx(elem, value);
+                }
+
+                if ((value === 'auto' || (unit && unit !== 'px'))) {
+                    // WebKit and Opera will return auto in some cases
+                    // Firefox will pass back an unaltered value when it can't be set, like top on a static element
+                    value = 0;
                 }
             }
-
-            if ((value === 'auto' || (unit && unit !== 'px'))) {
-                // WebKit and Opera will return auto in some cases
-                // Firefox will pass back an unaltered value when it can't be set, like top on a static element
-                value = 0;
-            }
-
             return value !== undefined ? value + '' : value;
         },
 
@@ -2488,7 +2500,8 @@ hAzzle.define('setters', function() {
             'class': 'className',
             'for': 'htmlFor'
         },
-       
+
+
         propHooks = {
             get: {},
             set: {}
@@ -2595,7 +2608,7 @@ hAzzle.define('setters', function() {
 
                 // Set / remove a attribute
 
-               if (value === false || value == null) {
+                if (value === false || value == null) {
                     removeAttr(elem, name);
                 } else if (hooks && (ret = hooks.set(elem, value, name)) !== undefined) {
                     return ret;
@@ -2692,7 +2705,7 @@ hAzzle.define('setters', function() {
             hooks = valHooks.set[elem.type] || valHooks.set[elem.nodeName.toLowerCase()];
 
             // If set returns undefined, fall back to normal setting
-            if (!hooks || hooks(elem, val, 'value') === undefined) { 
+            if (!hooks || hooks(elem, val, 'value') === undefined) {
                 elem.value = val;
             }
         });
@@ -2886,8 +2899,8 @@ hAzzle.define('valHooks', function() {
     // Setter
     util.mixin(setters.valHooks.set, {
 
-         'select': function(elem, value) {
-             
+        'select': function(elem, value) {
+
             var optionSet, option,
                 options = elem.options,
                 values = collection.makeArray(value),
@@ -2914,10 +2927,10 @@ hAzzle.define('valHooks', function() {
     // Getter    
     util.mixin(setters.valHooks.get, {
         // some browsers don't recognize input[type=email] etc.
-        
+
         'type': function(elem) {
-        return  elem.getAttribute('type') || elem.type;
-        
+            return elem.getAttribute('type') || elem.type;
+
         },
 
         'option': function(elem) {
@@ -2926,7 +2939,7 @@ hAzzle.define('valHooks', function() {
         },
 
         'select': function(elem) {
-              alert("")
+            alert("")
             var index = elem.selectedIndex,
 
                 one = elem.type === 'select-one',
@@ -3253,6 +3266,7 @@ hAzzle.define('valHooks', function() {
                 return false;
             }
         });
+
     }
 
 }(window));
