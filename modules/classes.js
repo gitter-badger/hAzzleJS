@@ -76,7 +76,7 @@ hAzzle.define('classes', function() {
                     // Check if the 'elem' are a valid DOM elem and not a window object, by checking
                     // if the classList exist on the 'elem'. 
 
-                    return elem.classList[nativeMethodName].apply(elem.classList, classes);
+                    return elem.classList && elem.classList[nativeMethodName].apply(elem.classList, classes);
 
                 } else {
 

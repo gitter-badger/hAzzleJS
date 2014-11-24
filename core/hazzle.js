@@ -92,14 +92,7 @@
                     );
                     // If no HTML, fallback to Jiesa selector engine
                 } else {
-                    var matcher = /^#[\w-]*$/.test(selector);
-                    if (!context && matcher) {
-                        this.elements = [document.getElementById(selector.slice(1))];
-                        this.length = 1;
-                        return this;
-                    }
-                    this.elements = require('jiesa').find(selector, context, true);
-
+                   this.elements = this.find(selector, context, true);
                 }
                 // Arrays
             } else if (Array.isArray(selector)) {
@@ -140,8 +133,13 @@
             //
             // NOTE! hAzzle doesn't try to subclass Array in any way. A hAzzle instance is just a 
             // standard object, with the current elements selection stored in the .elements array. 
+            if (this.elements) {
+                this.length = this.elements.length;
+            } else {
+                this.elements = [];
+                this.length = 0;
 
-            this.length = this.elements.length;
+            }
             return this;
         };
 
