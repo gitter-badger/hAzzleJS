@@ -140,8 +140,13 @@
             //
             // NOTE! hAzzle doesn't try to subclass Array in any way. A hAzzle instance is just a 
             // standard object, with the current elements selection stored in the .elements array. 
+            if (this.elements) {
+                this.length = this.elements.length;
+            } else {
+                this.elements = [];
+                this.length = 0;
 
-            this.length = this.elements.length;
+            }
             return this;
         };
 
