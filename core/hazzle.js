@@ -92,7 +92,14 @@
                     );
                     // If no HTML, fallback to Jiesa selector engine
                 } else {
+                    var matcher = /^#[\w-]*$/.test(selector);
+                    if (!context && matcher) {
+                        this.elements = [document.getElementById(selector.slice(1))];
+                        this.length = 1;
+                        return this;
+                    }
                     this.elements = require('jiesa').find(selector, context, true);
+
                 }
                 // Arrays
             } else if (Array.isArray(selector)) {
@@ -159,7 +166,7 @@
     hAzzle.codename = codename;
     hAzzle.version = version;
 
-   // Expose hAzzle to the global namespace
+    // Expose hAzzle to the global namespace
 
     window.hAzzle = hAzzle;
 
