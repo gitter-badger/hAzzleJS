@@ -96,7 +96,8 @@
                 }
                 // Arrays
             } else if (Array.isArray(selector)) {
-                this.elements = require('Util').unique(util.filter(selector, validTypes));
+                var util = require('Util');
+                this.elements = util.unique(util.filter(selector, validTypes));
                 // nodeList
             } else if (this.isNodeList(selector)) {
                 var util = require('Util');
@@ -129,6 +130,9 @@
             }
 
             // Create a new hAzzle collection from the nodes found
+            //
+            // NOTE! hAzzle doesn't try to subclass Array in any way. A hAzzle instance is just a 
+            // standard object, with the current elements selection stored in the .elements array. 
 
             this.length = this.elements.length;
             return this;

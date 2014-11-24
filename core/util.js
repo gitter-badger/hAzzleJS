@@ -9,34 +9,49 @@ hAzzle.define('util', function() {
         // Optimized each function
         // Replacement for forEach - ECMAScript 5 15.4.4.18 
 
-        each = function(collection, iterator, context) {
+ each = function(obj, fn, args, /*reverse*/ rev) {
 
-  var key, length;
-  
-  var index = -1, length = collection ? collection.length : 0;
+            if (obj === undefined || obj == null) {
+                return obj;
+            }
 
-  if (collection) {
+            hAzzle.err(typeof fn !== 'function', 5, "'fn' must be a function in util.each()");
 
-   if(typeof length === 'number') {
-       
-        while (++index < length) {
-          if (iterator(collection[index], index, collection) === false) {
-            break;
-          }
-        }
-      } else {
+            var i, length = obj.length,
+                key;
 
-      for (key in collection) {
+            if (typeof fn === 'function' &&
+                typeof args === 'undefined' &&
+                typeof rev === 'undefined' &&
+                types.isArray(obj)) {
 
-        if (collection.hasOwnProperty(key)) {
+                while (++i < length) {
+                    i = rev ? obj.length - i - 1 : i;
+                    if (fn.call(obj[i], obj[i], i, obj) === false) {
+                        break;
+                    }
+                }
+            }
 
-          iterator.call(context, collection[key], key);
-        }
-      }
-    }
-  }
-  return collection;
-},
+            if (length === +length) {
+                for (i = 0; i < length; i++) {
+                    i = rev ? obj.length - i - 1 : i;
+                    if (fn.call(obj[i], obj[i], i, obj) === false) {
+                        break;
+                    }
+                }
+            } else {
+                if (obj) {
+                    for (key in obj) {
+                        if (fn.call(obj[key], obj[key], key, obj) === false) {
+                            break;
+                        }
+                    }
+                }
+            }
+            return obj;
+        },
+        
         createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
                 if (arg === undefined) return fn;

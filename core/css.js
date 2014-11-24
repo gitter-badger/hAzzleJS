@@ -167,29 +167,29 @@ hAzzle.define('css', function() {
             }
 
             // check the unit
-          if(value) {
-            unit = (value.match(runit) || [])[2];
+            if (value) {
+                unit = (value.match(runit) || [])[2];
 
-            if (unit === '%' && computedValueBug) {
-                // WebKit won't convert percentages for top, bottom, left, right, margin and text-indent
-                if (prop === 'top' || prop === 'bottom') {
-                    // Top and bottom require measuring the innerHeight of the parent.
-                    innerHeight = (parent = elem.parentNode || elem).offsetHeight;
-                    while (i--) {
-                        innerHeight -= parseFloat(css(parent, outerProp[i]));
+                if (unit === '%' && computedValueBug) {
+                    // WebKit won't convert percentages for top, bottom, left, right, margin and text-indent
+                    if (prop === 'top' || prop === 'bottom') {
+                        // Top and bottom require measuring the innerHeight of the parent.
+                        innerHeight = (parent = elem.parentNode || elem).offsetHeight;
+                        while (i--) {
+                            innerHeight -= parseFloat(css(parent, outerProp[i]));
+                        }
+                        value = parseFloat(value) / 100 * innerHeight + 'px';
+                    } else {
+                        value = toPx(elem, value);
                     }
-                    value = parseFloat(value) / 100 * innerHeight + 'px';
-                } else {
-                    value = toPx(elem, value);
+                }
+
+                if ((value === 'auto' || (unit && unit !== 'px'))) {
+                    // WebKit and Opera will return auto in some cases
+                    // Firefox will pass back an unaltered value when it can't be set, like top on a static element
+                    value = 0;
                 }
             }
-
-            if ((value === 'auto' || (unit && unit !== 'px'))) {
-                // WebKit and Opera will return auto in some cases
-                // Firefox will pass back an unaltered value when it can't be set, like top on a static element
-                value = 0;
-            }
-}
             return value !== undefined ? value + '' : value;
         },
 
