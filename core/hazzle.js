@@ -1,12 +1,12 @@
 /*!
- * hAzzle.js
+ * hAzzle Javascript Library
  * Copyright (c) 2014 Kenny Flashlight
+ *
  * Version: 1.0.2d
  * Released under the MIT License.
  *
- * Date: 2014-11-22
+ * Date: 2014-11-24
  */
- 
 (function() {
 
     var
@@ -35,26 +35,20 @@
             }
         },
 
-        // Lower case 
-
-        tlc = function(str) {
-            return str.toLowerCase();
-        },
-
         // Require a module
 
         require = function(name) {
             if (name && typeof name === 'string') {
-                return modules[tlc(name)];
+                return modules[name.toLowerCase()];
             }
         },
 
-        // Defines a module
+        // Define a module
 
         define = function(name, fn) {
             if (typeof name === 'string' && typeof fn === 'function' && !modules[name]) {
-                installed[tlc(name)] = true;
-                modules[tlc(name)] = fn.call(hAzzle.prototype);
+                installed[name.toLowerCase()] = true;
+                modules[name.toLowerCase()] = fn.call(hAzzle.prototype);
             }
         },
 
@@ -64,76 +58,79 @@
 
         // Define a local copy of hAzzle
 
-        hAzzle = function(sel, ctx) {
+        hAzzle = function(selector, context) {
 
-            // hAzzle(), hAzzle(null), hAzzle(undefined), hAzzle(false)
-            if (!sel) {
-                return;
+            // hAzzle(), hAzzle(''), hAzzle(null), hAzzle(undefined), hAzzle(false)
+            if (!selector) {
+                return this;
             }
+
             // Allow instantiation without the 'new' keyword
+
             if (!(this instanceof hAzzle)) {
-                return new hAzzle(sel, ctx);
+                return new hAzzle(selector, context);
             }
 
-            if (sel instanceof hAzzle) {
-                return sel;
+            if (selector instanceof hAzzle) {
+                return selector;
             }
 
-            var els, util = require('Util');
+            // Handle HTML strings if the manipulation.js module are installed
 
-            // DOM ready
+            if (typeof selector === 'string') {
 
-            if (typeof sel === 'function') {
+                if (installed.manipulation &&
+                    selector[0] === '<' &&
+                    selector[selector.length - 1] === '>' &&
+                    selector.length >= 3) {
+
+                    // Require the manipualtion.js module, and create the HTML
+
+                    this.elements = require('manipulation').create(
+                        selector,
+                        context && context.nodeType ? context.ownerDocument || context : document
+                    );
+                    // If no HTML, fallback to Jiesa selector engine
+                } else {
+                    this.elements = require('jiesa').find(selector, context, true);
+                }
+                // Arrays
+            } else if (Array.isArray(selector)) {
+                this.elements = require('Util').unique(util.filter(selector, validTypes));
+                // nodeList
+            } else if (this.isNodeList(selector)) {
+                var util = require('Util');
+                this.elements = util.filter(util.makeArray(selector), validTypes);
+                // DOMElement
+            } else if (selector.nodeType) {
+                // If it's a html fragment, create nodes from it
+                if (selector.nodeType === 11) {
+                    this.elements = selector.children;
+                } else {
+                    this.elements = [selector];
+                }
+                this.length = 1;
+                return this;
+                // browser window     
+            } else if (selector === window) {
+                this.elements = [selector];
+                // DOM ready
+            } else if (typeof selector === 'function') {
                 if (installed.ready) {
-                    require('ready').ready(sel);
+                    return require('ready').ready(selector);
                 } else {
                     err(true, 6, 'ready.js module not installed');
                 }
-            }
 
-            if (typeof sel === 'string') {
-                if (installed.manipulation &&
-                    sel[0] === '<' &&
-                    sel[sel.length - 1] === '>' &&
-                    sel.length >= 3) {
-                    els = require('manipulation').create(
-                        sel,
-                        ctx && ctx.nodeType ? ctx.ownerDocument || ctx : document
-                    );
-                } else {
-                    els = this.find(sel, ctx, true);
-                }
-                // hAzzle([dom]) 
-            } else if (Array.isArray(sel)) {
-                els = util.unique(util.filter(sel, validTypes));
-                // hAzzle(dom)
-            } else if (this.isNodeList(sel)) {
-                els = util.filter(util.makeArray(sel), validTypes);
-                // hAzzle(dom)
-            } else if (sel.nodeType) {
-                // If it's a html fragment, create nodes from it
-                if (sel.nodeType === 11) {
-                    // This children? Are they an array or not?
-                    els = sel.children;
-                } else {
-                    els = [sel];
-                }
-                // window     
-            } else if (sel === window) {
-                els = [sel];
             } else {
-                els = [];
+                this.elements = [];
+                this.length = 0;
+                return this;
             }
 
             // Create a new hAzzle collection from the nodes found
 
-            if (els === undefined) {
-                this.length = 0;
-                this.elements = [];
-            } else {
-                this.elements = els;
-                this.length = els.length;
-            }
+            this.length = this.elements.length;
             return this;
         };
 
@@ -158,7 +155,7 @@
     hAzzle.codename = codename;
     hAzzle.version = version;
 
-    // Hook hAzzle on the window object
+   // Expose hAzzle to the global namespace
 
     window.hAzzle = hAzzle;
 

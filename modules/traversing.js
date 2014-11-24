@@ -7,49 +7,7 @@ hAzzle.define('traversing', function() {
         collection = hAzzle.require('collection'),
         types = hAzzle.require('types'),
         core = hAzzle.require('core'),
-        util = hAzzle.require('util'),
-
-        // Return correct index value
-
-        inVal = function(sel, index) {
-            return typeof sel === 'undefined' && !types.isNumber(index) ? 0 :
-                types.isNumber(sel) ? sel : types.isNumber(index) ? index : null;
-        },
-        gather = function(els, fn) {
-            var ret = [],
-                res, i = 0,
-                j, len = els.length,
-                f;
-            for (; i < len;) {
-                for (j = 0, f = (res = fn(els[i], i++)).length; j < f;) {
-                    ret.push(res[j++]);
-                }
-            }
-            return ret;
-        },
-        traverse = function(els, method, sel, index) {
-            index = inVal(sel, index);
-            return gather(els, function(el) {
-                var i = index || 0,
-                    ret = [],
-                    elem = el[method];
-                while (elem && (index === null || i >= 0)) {
-                    if (types.isElement(elem) &&
-                        jiesa.matches(elem, typeof sel === 'string' ? sel : '*') &&
-                        (index === null || i-- === 0)) {
-                        if (index === null &&
-                            method !== 'nextElementSibling' &&
-                            method !== 'parentElement') {
-                            ret.unshift(elem);
-                        } else {
-                            ret.push(elem);
-                        }
-                    }
-                    elem = elem[method];
-                }
-                return ret;
-            });
-        };
+        util = hAzzle.require('util');
 
     // Returns all sibling elements for nodes
     // Optionally takes a query to filter the sibling elements.
@@ -84,7 +42,6 @@ hAzzle.define('traversing', function() {
         }
         return hAzzle(matched);
     };
-
 
     // Returns all parent elements for nodes
     // Optionally takes a query to filter the child elements.
@@ -124,9 +81,7 @@ hAzzle.define('traversing', function() {
             for (cur = this.elements[i]; cur && cur !== ctx; cur = cur.parentNode) {
                 // Always skip document fragments
 
-                if (cur.nodeType < 11 &&
-                    cur.nodeType === 1 &&
-                    jiesa.matches(cur, selector)) {
+                if (cur.nodeType === 1 &&+ jiesa.matches(cur, selector)) {
 
                     matched.push(cur);
                     break;
@@ -176,43 +131,6 @@ hAzzle.define('traversing', function() {
             }
         ));
     };
-
-    // Traverse up the DOM tree
-    // E.g hAzzle('test').up(2) or hAzzle('test').up('li', 2) 
-
-    this.up = function(sel, index) {
-        return hAzzle(traverse(this.elements, 'parentElement', sel, index));
-    };
-
-    // Traverse down the DOM tree 
-    // E.g hAzzle('test').down(2) or hAzzle('test').down('nav') 
-
-    this.down = function(sel, index) {
-        index = inVal(sel, index);
-        return hAzzle(gather(this.elements, function(elem) {
-            var jf = jiesa.find(typeof sel === 'string' ? sel : '*', elem);
-            return index === null ? jf : ([jf[index]] || []);
-        }));
-    };
-
-    // This methods will overwrite the existing first() and prev() methods already
-    // included in the Core, and add extra features.
-    // E.g hAzzle('test').next('nav', 4) or hAzzle('test').prev('nav') 
-
-    util.each({
-        next: 'nextElementSibling',
-        prev: 'previousElementSibling'
-    }, function(value, prop) {
-        this[prop] = function(sel, index) {
-            if (index) {
-                return hAzzle(traverse(this.elements, value, sel, index));
-            } else {
-                return this.map(function(elem) {
-                    return elem[value];
-                }).filter(sel);
-            }
-        };
-    }.bind(this));
 
     return {};
 });
