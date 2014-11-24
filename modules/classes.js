@@ -14,9 +14,9 @@ hAzzle.define('classes', function() {
         witespace = /\s+/,
         a1 = [''];
 
-    //# Feature / bug detection
-    
-        // Detect if the classList API supports multiple arguments
+    //# FEATURE / BUG DETECTION
+
+    // Detect if the classList API supports multiple arguments
     // IE11-- don't support it
 
     features.add('multiArgs', function() {
@@ -28,9 +28,9 @@ hAzzle.define('classes', function() {
         return mu;
     });
 
-        // Convert a string - set of class names - to an array
+    // Convert a string - set of class names - to an array
 
-   var  str2array = function(classes) {
+    var str2array = function(classes) {
             if (typeof classes === 'string') {
                 if (classes && !witespace.test(classes)) {
                     a1[0] = classes;
@@ -139,8 +139,8 @@ hAzzle.define('classes', function() {
 
                     var cur = (' ' + elem.className + ' ').replace(reSpace, ' '),
                         finalValue;
-
-                    if (cur.indexOf(' ' + cls + ' ') < 0) {
+                    // ECMA 7 - contains
+                    if (!cur.contains(' ' + cls + ' ')) {
                         cur += cls + ' ';
                     }
 
@@ -163,7 +163,8 @@ hAzzle.define('classes', function() {
                     var cur = (' ' + elem.className + ' ').replace(reSpace, ' '),
                         finalValue;
 
-                    if (cur.indexOf(' ' + cls + ' ') >= 0) {
+                    // ECMA 7 - contains
+                    if (cur.contains(' ' + cls + ' ')) {
                         cur = cur.replace(' ' + cls + ' ', ' ');
                     }
                     // Only assign if different to avoid unneeded rendering.
@@ -239,10 +240,10 @@ hAzzle.define('classes', function() {
     // Replace a given class with another
 
     this.replaceClass = function(firstClass, secondClass) {
-        return this.hasClass(firstClass) ? 
-              this.removeClass(firstClass).addClass(secondClass) ? 
-              this.hasClass(secondClass) : 
-              this.removeClass(secondClass).addClass(firstClass) : '';    
+        return this.hasClass(firstClass) ?
+            this.removeClass(firstClass).addClass(secondClass) ?
+            this.hasClass(secondClass) :
+            this.removeClass(secondClass).addClass(firstClass) : '';
     };
 
     // Removes CSS class `className` from `element`.
