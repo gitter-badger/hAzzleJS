@@ -253,18 +253,24 @@ hAzzle.define('manipulation', function() {
                     }
                 });
         },
-        normalize = function(node, clone) {
+         normalize = function(node, clone) {
 
-            var i, l, ret;
+           var i, l, ret;
 
             if (typeof node === 'string') {
                 return create(node);
             }
 
-           node = node instanceof hAzzle ? node.elements : node.length ? node : node
+            if (node instanceof hAzzle) {
+                node = node.elements;
+            }
+
+            if (types.isNode(node)) {
+                node = [node];
+            }
 
             if (clone) {
-                ret = []; // Don't change original array
+                ret = []; // don't change original array
 
                 for (i = 0, l = node.length; i < l; i++) {
                     ret[i] = cloneElem(node[i], true);
@@ -393,8 +399,18 @@ hAzzle.define('manipulation', function() {
         });
     };
 
-    // append / prepend / before and after methods
+  /**
+   * append / prepend / before and after methods
+   * @example
+   
+   var manip = hAzzle.require('Manipulation');
 
+hAzzle( "test" ).append( manip.create("<strong>Hello</strong>") );
+
+   * var link = DOM.create("a>`foo`");               // <a>foo</a>
+   * link.prepend(DOM.create("b"));                  // <a><b></b>foo</a>
+   * link.prepend(DOM.create("i"), DOM.create("u")); // <a><i></i><u></u><b></b>foo</a>
+   */
     util.each({
 
         // Insert content, specified by the parameter, to the end of 
