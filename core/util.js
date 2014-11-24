@@ -9,7 +9,7 @@ hAzzle.define('util', function() {
         // Optimized each function
         // Replacement for forEach - ECMAScript 5 15.4.4.18 
 
- each = function(obj, fn, args, /*reverse*/ rev) {
+        each = function(obj, fn, args, /*reverse*/ rev) {
 
             if (obj === undefined || obj == null) {
                 return obj;
@@ -51,7 +51,7 @@ hAzzle.define('util', function() {
             }
             return obj;
         },
-        
+
         createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
                 if (arg === undefined) return fn;
@@ -131,7 +131,7 @@ hAzzle.define('util', function() {
                 for (; i < length; i++) {
                     source = arguments[i];
                     for (prop in source) {
-                    if (Object.prototype.hasOwnProperty.call(source, prop)) {
+                        if (Object.prototype.hasOwnProperty.call(source, prop)) {
                             obj[prop] = source[prop];
                         }
                     }
@@ -311,10 +311,10 @@ hAzzle.define('util', function() {
                     length = (keys || obj).length,
                     results = Array(length),
                     currentKey, index = 0;
-                    
+
                 for (; index < length; index++) {
                     currentKey = keys ? keys[index] : index;
-                    
+
                     results[index] = fn(obj[currentKey], currentKey, obj);
                 }
 
@@ -401,6 +401,11 @@ hAzzle.define('util', function() {
 
             } else {
                 return ctx;
+            }
+        },
+        createElem = function(tag) {
+            if (typeof tag === 'string') {
+                return types.isSVGElem ? document.createElementNS("http://www.w3.org/2000/svg", "rect") : document.createElement(tag);
             }
         };
 

@@ -406,11 +406,15 @@ hAzzle.define('Types', function() {
             return isType('Object')(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype;
         },
 
+        isPromiseAlike = function(object) {
+            return isObject(object) && typeof object.then === 'function';
+        },
+
         isNode = function(elem) {
             return !!elem && typeof elem === 'object' && 'nodeType' in elem;
         },
-        isNodeList = function(nodes) {
-            var result = Object.prototype.toString.call(nodes);
+        isNodeList = function(elem) {
+            var result = Object.prototype.toString.call(elem);
             // Modern browser such as IE9 / firefox / chrome etc.
             if (result === '[object HTMLCollection]' ||
                 result === '[object NodeList]' ||
@@ -419,15 +423,20 @@ hAzzle.define('Types', function() {
                 return true;
             }
             // Detect length and item 
-            if (!('length' in nodes) || !('item' in nodes)) {
+            if (!('length' in elem) || !('item' in elem)) {
                 return false;
             }
             try {
-                if (nodes(0) === null || (nodes(0) && nodes(0).tagName)) return true;
+                if (elem(0) === null || (elem(0) && elem(0).tagName)) return true;
             } catch (e) {
                 return false;
             }
             return false;
+        },
+        // Check for SVG namespace
+        isSVGElem = function(elem) {
+            return (elem.nodeType === 1 && elem.namespaceURI === 'http://www.w3.org/2000/svg') ||
+                window.SVGElement && (elem instanceof window.SVGElement);
         };
 
     this.isNodeList = isNodeList;
@@ -543,6 +552,7 @@ hAzzle.define('util', function() {
             }
             return obj;
         },
+
         createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
                 if (arg === undefined) return fn;
@@ -566,23 +576,10 @@ hAzzle.define('util', function() {
             if (!fn) return identity;
         },
 
-        every = function(obj, predicate, context) {
-            if (obj == null) return true;
-            predicate = iterate(predicate, context);
-            var keys = obj.length !== +obj.length && Object.keys(obj),
-                length = (keys || obj).length,
-                index, currentKey;
-            for (index = 0; index < length; index++) {
-                currentKey = keys ? keys[index] : index;
-                if (!predicate(obj[currentKey], currentKey, obj)) return false;
-            }
-            return true;
-        };
+        // Determine if at least one element in the object matches a truth test. 
+        // ECMAScript 5 15.4.4.17
 
-    // Determine if at least one element in the object matches a truth test. 
-    // ECMAScript 5 15.4.4.17
-
-    some = function(obj, fn, ctx) {
+        some = function(obj, fn, ctx) {
             if (obj) {
                 fn = iterate(fn, ctx);
 
@@ -808,17 +805,20 @@ hAzzle.define('util', function() {
         // Return the results of applying the callback to each element.
         // ECMAScript 5 15.4.4.19
 
-        map = function(obj, fn, ctx) {
-            if (obj && fn) {
-                //   fn = iterate(fn, ctx);
+        map = function(obj, fn, arg) {
+            if (obj) {
+                fn = iterate(fn, arg);
                 var keys = obj.length !== +obj.length && oKeys(obj),
                     length = (keys || obj).length,
                     results = Array(length),
                     currentKey, index = 0;
+
                 for (; index < length; index++) {
                     currentKey = keys ? keys[index] : index;
-                    results[index] = fn.call(obj[currentKey], obj[currentKey], currentKey, obj);
+
+                    results[index] = fn(obj[currentKey], currentKey, obj);
                 }
+
                 return results;
             }
             return [];
@@ -853,7 +853,7 @@ hAzzle.define('util', function() {
         // Return the elements nodeName
 
         nodeName = function(el, name) {
-            return el && el.nodeName && el.nodeName.toLowerCase() === name.toLowerCase();
+            return name && el && el.nodeName && el.nodeName.toLowerCase() === name.toLowerCase();
         },
 
         // Native solution for filtering arrays. 
@@ -903,6 +903,11 @@ hAzzle.define('util', function() {
             } else {
                 return ctx;
             }
+        },
+        createElem = function(tag) {
+            if (typeof tag === 'string') {
+                return types.isSVGElem ? document.createElementNS("http://www.w3.org/2000/svg", "rect") : document.createElement(tag);
+            }
         };
 
     return {
@@ -911,7 +916,6 @@ hAzzle.define('util', function() {
         reduce: reduce,
         each: each,
         mixin: mixin,
-        every: every,
         makeArray: makeArray,
         merge: merge,
         nodeName: nodeName,
@@ -2457,9 +2461,11 @@ hAzzle.define('setters', function() {
 
     var util = hAzzle.require('util'),
         core = hAzzle.require('core'),
+        features = hAzzle.require('has'),
         types = hAzzle.require('types'),
         whiteSpace = /\S+/g,
         wreturn = /\r/g,
+        SVGAttributes = 'width|height|x|y|cx|cy|r|rx|ry|x1|x2|y1|y2',
 
         boolElemArray = ('input select option textarea button form details').split(' '),
         boolAttrArray = ('multiple selected checked disabled readonly required ' +
@@ -2474,7 +2480,6 @@ hAzzle.define('setters', function() {
             'class': 'className',
             'for': 'htmlFor'
         },
-
 
         propHooks = {
             get: {},
@@ -2515,7 +2520,14 @@ hAzzle.define('setters', function() {
             // booleanAttr is here twice to minimize DOM access
             return booleanAttr && boolElem[elem.nodeName] && booleanAttr;
         },
+       // Return a boolean value (true / false) 
+        SVGAttr = function(prop) {
+            if (features.ie || (features.has('android') && !features.has('chrome'))) {
+                SVGAttributes += '|transform';
+            }
 
+            return new RegExp('^(' + SVGAttributes + ')$', 'i').test(prop);
+        },
         // Removes an attribute from an HTML element.
 
         removeAttr = function(elem, value) {
@@ -2582,7 +2594,7 @@ hAzzle.define('setters', function() {
 
                 // Set / remove a attribute
 
-                if (value === false || value == null) {
+                if (!value) {
                     removeAttr(elem, name);
                 } else if (hooks && (ret = hooks.set(elem, value, name)) !== undefined) {
                     return ret;
@@ -2771,6 +2783,7 @@ hAzzle.define('setters', function() {
         boolAttr: boolAttr,
         boolElem: boolElem,
         removeAttr: removeAttr,
+        SVGAttr: SVGAttr,
         attr: attr,
         prop: prop
     };

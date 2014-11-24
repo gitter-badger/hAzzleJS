@@ -3,9 +3,11 @@ hAzzle.define('setters', function() {
 
     var util = hAzzle.require('util'),
         core = hAzzle.require('core'),
+        features = hAzzle.require('has'),
         types = hAzzle.require('types'),
         whiteSpace = /\S+/g,
         wreturn = /\r/g,
+        SVGAttributes = 'width|height|x|y|cx|cy|r|rx|ry|x1|x2|y1|y2',
 
         boolElemArray = ('input select option textarea button form details').split(' '),
         boolAttrArray = ('multiple selected checked disabled readonly required ' +
@@ -20,7 +22,7 @@ hAzzle.define('setters', function() {
             'class': 'className',
             'for': 'htmlFor'
         },
-        
+
         propHooks = {
             get: {},
             set: {}
@@ -60,10 +62,17 @@ hAzzle.define('setters', function() {
             // booleanAttr is here twice to minimize DOM access
             return booleanAttr && boolElem[elem.nodeName] && booleanAttr;
         },
+       // Return a boolean value (true / false) 
+        SVGAttr = function(prop) {
+            if (features.ie || (features.has('android') && !features.has('chrome'))) {
+                SVGAttributes += '|transform';
+            }
 
+            return new RegExp('^(' + SVGAttributes + ')$', 'i').test(prop);
+        }
         // Removes an attribute from an HTML element.
 
-        removeAttr = function(elem, value) {
+        var removeAttr = function(elem, value) {
             elem = getElem(elem);
             var name, propName,
                 i = 0,
@@ -316,6 +325,7 @@ hAzzle.define('setters', function() {
         boolAttr: boolAttr,
         boolElem: boolElem,
         removeAttr: removeAttr,
+        SVGAttr: SVGAttr,
         attr: attr,
         prop: prop
     };

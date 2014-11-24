@@ -2,17 +2,17 @@
 hAzzle.define('Types', function() {
 
     var oString = Object.prototype.toString,
-        
+
         // Determines if a reference is an `Array`
-        
+
         isArray = Array.isArray,
 
         // Determines if a reference is a `String`
-        
+
         isString = function(value) {
             return typeof value === 'string';
         },
-       // Returns true if `obj` is an array or array-like object (NodeList, Arguments, String ...)
+        // Returns true if `obj` is an array or array-like object (NodeList, Arguments, String ...)
         isArrayLike = function(obj) {
             if (obj == null || isWindow(obj)) {
                 return false;
@@ -52,8 +52,8 @@ hAzzle.define('Types', function() {
         },
 
         isElement = function(node) {
-            return !!(node && 
-              node.nodeName // we are a direct element
+            return !!(node &&
+                node.nodeName // we are a direct element
             );
         },
         isNaN = function(value) {
@@ -88,41 +88,50 @@ hAzzle.define('Types', function() {
                 return oString.call(arg) === '[object ' + type + ']';
             } : function() {};
         },
-        
+
         // Determines if a reference is an `Object`. Unlike `typeof` in JavaScript, `null`s are not
         // considered to be objects. Note that JavaScript arrays are objects.
 
         isObject = function(value) {
-             // http://jsperf.com/isobject4
-           return value !== null && typeof value === 'object';
+            // http://jsperf.com/isobject4
+            return value !== null && typeof value === 'object';
         },
 
         isPlainObject = function(obj) {
             return isType('Object')(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype;
         },
 
+        isPromiseAlike = function(object) {
+            return isObject(object) && typeof object.then === 'function';
+        },
+
         isNode = function(elem) {
             return !!elem && typeof elem === 'object' && 'nodeType' in elem;
         },
-        isNodeList = function(nodes) {
-            var result = Object.prototype.toString.call(nodes);
+        isNodeList = function(elem) {
+            var result = Object.prototype.toString.call(elem);
             // Modern browser such as IE9 / firefox / chrome etc.
-            if (result === '[object HTMLCollection]' || 
-                result === '[object NodeList]' || 
+            if (result === '[object HTMLCollection]' ||
+                result === '[object NodeList]' ||
                 // https://developer.mozilla.org/en/docs/Web/API/HTMLFormControlsCollection
                 result === '[object HTMLFormControlsCollection]') {
                 return true;
             }
             // Detect length and item 
-            if (!('length' in nodes) || !('item' in nodes)) {
+            if (!('length' in elem) || !('item' in elem)) {
                 return false;
             }
             try {
-                if (nodes(0) === null || (nodes(0) && nodes(0).tagName)) return true;
+                if (elem(0) === null || (elem(0) && elem(0).tagName)) return true;
             } catch (e) {
                 return false;
             }
             return false;
+        },
+        // Check for SVG namespace
+        isSVGElem = function(elem) {
+            return (elem.nodeType === 1 && elem.namespaceURI === 'http://www.w3.org/2000/svg') ||
+                window.SVGElement && (elem instanceof window.SVGElement);
         };
 
     this.isNodeList = isNodeList;
