@@ -172,14 +172,16 @@ hAzzle.define('dimensions', function() {
                 curElem.css(props);
             }
         };
+// As default hAzzle are not using getBoundingClientRect() due to the fact
+// it's terrible slow. This solution returned rounded decimals (e.g. 124) and 
+// not 123,349535 as gBCR() would have done. Therefor if we pass in a 'boolean'
+// value to the offset(), we are allowing use of gBCR().
 
-    // BIG NOTE!! getBoundingClientRect() should have been the best solution for this method, but
-    // it's terrible slow, and hAzzle need to be fast.
-    // http://jsperf.com/getboundingclientrect-vs-offset
+ this.offset = function(opts) {
 
-    this.offset = function(opts) {
+  var gBCR = arguments.length && typeof opts === 'boolean'
 
-        if (arguments.length) {
+        if (arguments.length && !gBCR) {
             return opts === undefined ?
                 this.elements :
                 this.each(function(elem, i) {
@@ -203,10 +205,34 @@ hAzzle.define('dimensions', function() {
         if (!hAzzle.require('Core').contains(docElem, elem)) {
             return {
                 top: 0,
-                left: 0
+                left: 0,
+                height:0,
+                width:0
             };
         }
 
+      if(gBCR && opts) {
+          
+        var box = elem.getBoundingClientRect(),
+	    	win = getWindow( doc ), position = {x: 0, y: 0},
+            isFixed = (css.css(elem, 'position') == 'fixed'),
+		    element = elem.parentNode;
+        
+		while (element && util.nodeName(element, 'html')){
+			position.x += element.scrollLeft;
+			position.y += element.scrollTop;
+			element = element.parentNode;
+		}
+
+		return {
+			top: box.top + position.x + ((isFixed) ? 0 : win.pageXOffset) - docElem.clientLeft,
+			left: box.left + position.y + ((isFixed) ? 0 : win.pageYOffset) - docElem.clientTop,
+            right: box.right + position.y + ((isFixed) ? 0 : win.pageYOffset) - docElem.clientLeft,
+            bottom: box.bottom + ((isFixed) ? 0 : win.pageXOffset) - docElem.clientTop,
+            width: box.right - box.left,
+            height: box.bottom - box.top
+          } 
+     }
         while (elem && elem !== document.body && elem !== document.documentElement) {
 
             left += elem.offsetLeft;
@@ -235,7 +261,9 @@ hAzzle.define('dimensions', function() {
 
         return {
             top: top,
-            left: left
+            left: left,
+            height:elem.offsetWidth,
+            width:elem.offsetHeight
         };
     };
 
@@ -279,7 +307,7 @@ hAzzle.define('dimensions', function() {
     this.offsetParent = function() {
         return this.map(function(elem) {
             var offsetParent = this.offsetParent || docElem;
-            if (util.nodeName(offsetParent, 'html') || css.css(this, 'position') === 'fixed') {
+            if (util.nodeName(offsetParent.nodeName, 'html') || css.css(this, 'position') === 'fixed') {
                 return null;
             }
             return offsetParent;
@@ -385,6 +413,7 @@ hAzzle.define('dimensions', function() {
         var top = 'pageYOffset' === prop;
 
         this[method] = function(val) {
+            
             var elem = this.elements[0],
                 win = getWindow(elem);
 

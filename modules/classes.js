@@ -100,10 +100,9 @@ hAzzle.define('classes', function() {
             if (types.isType('Function')(done)) {
                 done.call(elem, elem);
             }
-            //  }
         },
 
-        // Check if the first element in the collection has classes
+        // Check if element contains class name(s)
 
         hasClass = function(elem, classes) {
 
@@ -132,7 +131,7 @@ hAzzle.define('classes', function() {
             return false;
         },
 
-        // Add classes to element collection
+        //  Add class(es) to element
 
         addClass = function(elem, classes, /*optional*/ fn) {
             util.each(getElem(elem), function(elem) {
@@ -155,7 +154,7 @@ hAzzle.define('classes', function() {
             return elem;
         },
 
-        // Remove classes from element collection
+        // Remove class(es) from element
 
         removeClass = function(elem, classes, /*optional*/ fn) {
             util.each(getElem(elem), function(elem) {
@@ -177,10 +176,7 @@ hAzzle.define('classes', function() {
             });
         },
 
-        // Toggles the presence of CSS class `className` on `element`.
-        // NOTE! Use use non-native classList solution for 'toggleClass'
-        // because of bugs in IE and some other browsers ( IE10, iOS, Nokia phones e.g.) 
-        // One nasty exaple is the fact that IE10+ doesn't support the toggle boolean flag.
+        // Toggle class(es) on element
 
         toggleClass = function(elem, value, condition) {
 
@@ -243,11 +239,10 @@ hAzzle.define('classes', function() {
     // Replace a given class with another
 
     this.replaceClass = function(firstClass, secondClass) {
-        if (this.hasClass(firstClass)) {
-            return this.removeClass(firstClass).addClass(secondClass);
-        } else if (this.hasClass(secondClass)) {
-            return this.removeClass(secondClass).addClass(firstClass);
-        }
+        return this.hasClass(firstClass) ? 
+              this.removeClass(firstClass).addClass(secondClass) ? 
+              this.hasClass(secondClass) : 
+              this.removeClass(secondClass).addClass(firstClass) : '';    
     };
 
     // Removes CSS class `className` from `element`.
