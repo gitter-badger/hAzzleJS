@@ -1,3 +1,4 @@
+// ECMA 7 - Contains() shim
 if (![].contains) {
     Object.defineProperty(Array.prototype, 'contains', {
         enumerable: false,

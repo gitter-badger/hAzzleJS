@@ -223,28 +223,18 @@ hAzzle.define('has', function() {
             elem.innerHTML = '';
             return elem;
         };
-
-    // Detect if the classList API supports multiple arguments
-    // IE11-- don't support it
-
-    add('multiArgs', function() {
-        var mu, div = document.createElement('div');
-        div.classList.add('a', 'b');
-        mu = /(^| )a( |$)/.test(div.className) && /(^| )b( |$)/.test(div.className);
-        // release memory in IE
-        div = null;
-        return mu;
-    });
-
-    // mobile
+   
+   //# FEATURE DETECTION
+   
+    // Mobile
 
     add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
 
-    // android
+    // Android
 
     add('android', /^Android/i.test(ua));
 
-    // opera
+    // Opera
     add('opera',
         // Opera 8.x+ can be detected with `window.opera`
         // This is a safer inference than plain boolean type conversion of `window.opera`
@@ -295,24 +285,10 @@ hAzzle.define('has', function() {
 
     add('promise', !!win.Promise);
 
-    // Touch support
-
-    add('touch', "ontouchstart" in document ||
-        ("onpointerdown" in document && navigator.maxTouchPoints > 0) ||
-        window.navigator.msMaxTouchPoints);
-
-    // Touch events 
-
-    add('touchEvents', 'ontouchstart' in document);
-
-    // Pointer Events
-
-    add('pointerEvents', 'onpointerdown' in document);
-
-    add('MSPointer', 'msMaxTouchPoints' in navigator); //IE10+
-
+   
     // querySelectorAll
     add('qsa', !!document.querySelectorAll);
+    
     return {
         has: has,
         add: add,
@@ -948,8 +924,7 @@ hAzzle.define('Core', function() {
         document = window.document,
         winDoc = window.document,
         expando = 'hAzzle_' + 1 * new Date(),
-        cur,
-        environment,
+        cur, environment,
         indexOf = Array.prototype.indexOf,
         envsCache = {},
         sortInput,
@@ -1028,7 +1003,6 @@ hAzzle.define('Core', function() {
             environment.qsa = isNative(doc.querySelectorAll);
             environment.compare = isNative(root.compareDocumentPosition);
             environment.contains = isNative(root.contains);
-
             environment.QSABugs = QSABugs = [];
             environment.matchesBugs = matchesBugs = [];
 
@@ -1088,13 +1062,11 @@ hAzzle.define('Core', function() {
         } : function(a, b) {
             if (b) {
                 while ((b = b.parentElement)) {
-
                     if (b === a) {
                         return true;
                     }
                 }
             }
-
             return false;
         };
 
@@ -1227,7 +1199,7 @@ hAzzle.define('Core', function() {
         environment: environment,
         expando: expando,
         addFeature: addFeature,
-        setDocument: setDocument,
+        setDocument:setDocument,
         isXML: isXML,
         isHTML: !isXML(document),
         contains: contains,
@@ -2221,9 +2193,9 @@ hAzzle.define('css', function() {
         docElement = document.documentElement,
         computedValueBug,
 
-        convert = {};
+        convert = {},
 
-    var computedValues = function(elem) {
+        computedValues = function(elem) {
             // Avoid getting style values on the window object
             if (elem && elem.nodeType && elem.ownerDocument !== null) {
                 var view = false;
@@ -2344,10 +2316,7 @@ hAzzle.define('css', function() {
             var computedStyle = getStyles(elem);
 
             if (prop === 'fontSize') {
-                // correct IE issues with font-size
-                // @see http://bugs.jquery.com/ticket/760
                 value = toPx(elem, '1em', 'left', 1) + 'px';
-
             } else if (computedStyle) {
 
                 // IE and Firefox do not return a value for the generic borderColor -- they only return 

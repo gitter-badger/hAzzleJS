@@ -4,8 +4,7 @@ hAzzle.define('Core', function() {
         document = window.document,
         winDoc = window.document,
         expando = 'hAzzle_' + 1 * new Date(),
-        cur,
-        environment,
+        cur, environment,
         indexOf = Array.prototype.indexOf,
         envsCache = {},
         sortInput,
@@ -84,7 +83,6 @@ hAzzle.define('Core', function() {
             environment.qsa = isNative(doc.querySelectorAll);
             environment.compare = isNative(root.compareDocumentPosition);
             environment.contains = isNative(root.contains);
-
             environment.QSABugs = QSABugs = [];
             environment.matchesBugs = matchesBugs = [];
 

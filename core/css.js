@@ -15,9 +15,9 @@ hAzzle.define('css', function() {
         docElement = document.documentElement,
         computedValueBug,
 
-        convert = {};
+        convert = {},
 
-    var computedValues = function(elem) {
+        computedValues = function(elem) {
             // Avoid getting style values on the window object
             if (elem && elem.nodeType && elem.ownerDocument !== null) {
                 var view = false;
@@ -138,10 +138,7 @@ hAzzle.define('css', function() {
             var computedStyle = getStyles(elem);
 
             if (prop === 'fontSize') {
-                // correct IE issues with font-size
-                // @see http://bugs.jquery.com/ticket/760
                 value = toPx(elem, '1em', 'left', 1) + 'px';
-
             } else if (computedStyle) {
 
                 // IE and Firefox do not return a value for the generic borderColor -- they only return 

@@ -54,16 +54,18 @@ hAzzle.define('has', function() {
             elem.innerHTML = '';
             return elem;
         };
-
-    // mobile
+   
+   //# FEATURE DETECTION
+   
+    // Mobile
 
     add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
 
-    // android
+    // Android
 
     add('android', /^Android/i.test(ua));
 
-    // opera
+    // Opera
     add('opera',
         // Opera 8.x+ can be detected with `window.opera`
         // This is a safer inference than plain boolean type conversion of `window.opera`
@@ -114,22 +116,7 @@ hAzzle.define('has', function() {
 
     add('promise', !!win.Promise);
 
-    // Touch support
-
-    add('touch', "ontouchstart" in document ||
-        ("onpointerdown" in document && navigator.maxTouchPoints > 0) ||
-        window.navigator.msMaxTouchPoints);
-
-    // Touch events 
-
-    add('touchEvents', 'ontouchstart' in document);
-
-    // Pointer Events
-
-    add('pointerEvents', 'onpointerdown' in document);
-
-    add('MSPointer', 'msMaxTouchPoints' in navigator); //IE10+
-
+   
     // querySelectorAll
     add('qsa', !!document.querySelectorAll);
     return {
