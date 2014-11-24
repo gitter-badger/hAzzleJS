@@ -129,6 +129,37 @@ var cls = hAzzle.require('classes')
 // Set the class names
 cls.addClass( document.getElementsByTagName('div'), 'hello!') 
 ```
+SVG
+--------------------
+
+hAzzle doesn't support any 'heavy' SVG modules, but has build in the Core features for detection SVG and create SVG elements.
+
+Examples on the SVG features inside the Core:
+
+```javascript
+// Detect if SVG element
+var types = hAzzle.require('types')
+console.log(types.isSVGElem( ELEM ))
+```
+
+```javascript
+// Create SVG elements
+var util = hAzzle.require('util')
+
+util.createElem('div');
+
+// NOTE! This function has auto-detection and will only create SVG elements if SVG detected, if
+// not fallback to document.createElement
+
+```
+
+```javascript
+// Get SVG attributes
+var setters = hAzzle.require('setters')
+
+console.log(setters.SVGAttr( PROPERTY ))
+```
+
 Units and dimensions
 --------------------
 
@@ -570,6 +601,12 @@ Modules
     <th><a href="modules/ecma7.js#files">ecma7</a></th>
      <td>
       Provides a few <code>ECMA 7 (ecma262)</code> methids. This is experimentell and not supported by browsers!
+    </td>
+  </tr>
+  <tr>
+    <th><a href="modules/touch.js#files">ecma7</a></th>
+     <td>
+      Provides touch feature detection on various platforms
     </td>
   </tr>
 </tbody>
