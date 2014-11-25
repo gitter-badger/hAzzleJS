@@ -805,25 +805,21 @@ hAzzle.define('util', function() {
         // Return the results of applying the callback to each element.
         // ECMAScript 5 15.4.4.19
 
-        map = function(obj, fn, arg) {
+ map = function(obj, fn, ctx) {
             if (obj) {
-                fn = iterate(fn, arg);
+                fn = iterate(fn, ctx);
                 var keys = obj.length !== +obj.length && oKeys(obj),
                     length = (keys || obj).length,
                     results = Array(length),
                     currentKey, index = 0;
-
                 for (; index < length; index++) {
                     currentKey = keys ? keys[index] : index;
-
-                    results[index] = fn(obj[currentKey], currentKey, obj);
+                    results[index] = fn.call(obj[currentKey], obj[currentKey], currentKey, obj);
                 }
-
                 return results;
             }
             return [];
         },
-
         // Reduces a collection
         // ECMAScript 5 15.4.4.21     
         reduce = function(collection, fn, accumulator, args) {
