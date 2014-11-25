@@ -178,15 +178,15 @@ hAzzle.define('classes', function() {
 
         // Toggle class(es) on element
 
-        toggleClass = function(elem, value, condition) {
+        toggleClass = function(elem, value, state) {
 
             var els = getElem(elem),
                 i = 0,
                 len = els.length,
                 type = typeof value;
 
-            if (typeof condition === 'boolean' && type === 'string') {
-                return condition ? addClass(els, value) : removeClass(els, value);
+            if (typeof state === 'boolean' && type === 'string') {
+                return state ? addClass(els, value) : removeClass(els, value);
             }
 
             for (; i < len; i++) {
@@ -243,8 +243,8 @@ hAzzle.define('classes', function() {
             }) : removeClass(this.elements, classes, fn);
     };
 
-    this.toggleClass = function(value, condition) {
-        toggleClass(this.elements, value, condition);
+    this.toggleClass = function(value, state) {
+        toggleClass(this.elements, value, state);
         return this;
     };
 

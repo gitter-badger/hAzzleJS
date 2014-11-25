@@ -1,6 +1,8 @@
 // svg.js
 hAzzle.define('svg', function() {
 
+ // Main hAzzle module methods for SVG ( Scalable Vector Graphics. )
+
     var // Dependencies
         features = hAzzle.require('has'),
         storage = hAzzle.require('storage'),
@@ -11,7 +13,11 @@ hAzzle.define('svg', function() {
         // Whitespace regEx
 
         whiteSpace = /\s+/,
+       
+       // SVG prefix regEx
 
+        svgPrefix = /^svg.*/,
+       
         // SVG namespace
 
         svgNS = 'http://www.w3.org/2000/svg',
@@ -36,6 +42,17 @@ hAzzle.define('svg', function() {
     var create = function(name) {
             return document.createElementNS(svgNS, name);
         },
+        
+ // Determine if any nodes are SVG nodes
+ anySVG = function(checkSet) {
+     var i = 0, len = checkSet.length;
+	for (; i < len; i++) {
+		if (checkSet[i].nodeType == 1 && checkSet[i].namespaceURI === svgNS) {
+			return true;
+		}
+	}
+	return false;
+},
         grep = function(elems, callback, arg) {
             var callbackInverse,
                 matches = [],
@@ -156,22 +173,21 @@ hAzzle.define('svg', function() {
                     });
                 }
                 var origArgs = arguments,
-                    els = this.elements, elem,
+                    els = this.elements,
                     classNames = clazz || '',
                     i = 0,
                     len = els.length;
                 // Faster then each() 
                 for (; i < len; i++) {
-                    elem = els[i];
-                    if (types.isSVGElem(elem)) {
+                    if (types.isSVGElem(els[i])) {
                         util.each(classNames.split(whiteSpace), function(className) {
-                            var classes = getClasses(elem);
+                            var classes = getClasses(els[i]);
                             if (!classes.split(whiteSpace).contains(className)) {
-                                setClassNames(elem, classes += (classes ? ' ' : '') + className);
+                                setClassNames(els[i], classes += (classes ? ' ' : '') + className);
                             }
                         });
                     } else { // Use original Core methods
-                        origAddClass.apply(hAzzle(elem), origArgs);
+                        origAddClass.apply(hAzzle(els[i]), origArgs);
                     }
                 }
             };
@@ -188,21 +204,19 @@ hAzzle.define('svg', function() {
                 var origArgs = arguments,
                     els = this.elements,
                     classNames = clazz || '',
-                    i = 0,
-                    len = els.length, elem;
+                    i = 0, len = els.length;
                 // Faster then each()
                 for (; i < len; i++) {
-                    elem = els[i];
-                    if (types.isSVGElem(elem)) {
+                    if (types.isSVGElem(els[i])) {
                         util.each(classNames.split(whiteSpace), function(className) {
-                            var cls = getClasses(elem);
+                            var cls = getClasses(els[i]);
                             cls = grep(cls.split(whiteSpace), function(n) {
                                 return n !== className;
                             }).join(' ');
-                            setClassNames(elem, cls);
+                            setClassNames(els[i], cls);
                         });
                     } else { // Use original Core methods
-                        origRemoveClass.apply(hAzzle(elem), origArgs);
+                        origRemoveClass.apply(hAzzle(els[i]), origArgs);
                     }
                 }
             };
@@ -210,10 +224,10 @@ hAzzle.define('svg', function() {
 
         // Toggle class(es) on element
         this.toggleClass = function(origToggleClass) {
-            return function(classNames, state) {
-                if (types.isType('Function')(classNames)) {
+            return function(clazz, state) {
+                if (types.isType('Function')(clazz)) {
                     return this.each(function(elem, index) {
-                        hAzzle(elem).toggleClass(classNames.call(elem, index, getClasses(elem), state), state);
+                        hAzzle(elem).toggleClass(clazz.call(elem, index, getClasses(elem), state), state);
                     });
                 }
                 var origArgs = arguments,
@@ -221,21 +235,22 @@ hAzzle.define('svg', function() {
 
                 return this.each(function() {
                     if (types.isSVGElem(this)) {
-                        if (typeof classNames === 'string') {
-                            var node = hAzzle(this);
-                            util.each(classNames.split(whiteSpace), function(className) {
+                        if (typeof clazz === 'string') {
+                            var elem = hAzzle(this);
+                            util.each(clazz.split(whiteSpace), function(className) {
                                 if (!hasState) {
-                                    state = !node.hasClass(className);
+                                    state = !elem.hasClass(className);
                                 }
-                                node[(state ? 'add' : 'remove') + 'Class'](className);
+                                elem[(state ? 'add' : 'remove') + 'Class'](className);
                             });
                         } else {
                             var cls = getClasses(this);
                             if (cls) {
                                 storage.private.get(this, '__className__', cls);
                             }
-                            // toggle whole className
-                            setClassNames(this, cls || classNames === false ? '' : storage.private.set(this, '__className__') || '');
+                            // Toggle whole className
+                            setClassNames(this, cls || clazz === false ? '' : 
+                            storage.private.set(this, '__className__') || '');
                         }
                     } else { // Use original Core methods                        
                         origToggleClass.apply(hAzzle(this), origArgs);
@@ -264,17 +279,18 @@ hAzzle.define('svg', function() {
 
     //#CSS
 
-    this.css = function(origCSS) {
-        return function(elem, name) {
-            var value = (name.match(/^svg.*/) ? hAzzle(elem).attr(style.cssProps[name] || name) : '');
-            return value || origCSS(elem, name);
-        };
-    }(this.css);
+  this.css = function(origCSS) {
+		return function(elem, name) {
+			var value = name ? (name.match(svgPrefix) ? hAzzle(elem).attr(style.cssProps[name] || name) : '') : false;
+			return value || origCSS(elem, name);
+		};
+	}(this.css);
 
     return {
         svgNS: svgNS,
         xmlNS: xmlNS,
         xlinkNS: xlinkNS,
+        anySVG:anySVG,
         support: features.has('SVG'),
         create: create,
     };
