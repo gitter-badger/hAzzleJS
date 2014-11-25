@@ -5,6 +5,7 @@ hAzzle.define('svg', function() {
         features = hAzzle.require('has'),
         storage = hAzzle.require('storage'),
         util = hAzzle.require('util'),
+        style = hAzzle.require('style'),
         types = hAzzle.require('types'),
 
         // Whitespace regEx
@@ -31,28 +32,10 @@ hAzzle.define('svg', function() {
         !!document.createElementNS(svgNS, 'svg').createSVGRect
     );
 
-    // Method for element creation
+    // Create SVG element
     var create = function(name) {
-            // create element
             return document.createElementNS(svgNS, name);
         },
-
-        // Get id from reference string
-        idFromReference = function(url) {
-            var m = url.toString().match(/#([a-z0-9\-_]+)/i);
-
-            if (m) {
-                return m[1];
-            }
-        },
-
-        getID = function(id) {
-            var node = document.getElementById(idFromReference(id) || id);
-            if (node) {
-                return node.instance;
-            }
-        },
-
         grep = function(elems, callback, invert) {
             var callbackInverse,
                 matches = [],
@@ -71,11 +54,8 @@ hAzzle.define('svg', function() {
 
             return matches;
         },
-        inArray = function(elem, arr, i) {
-            return arr == null ? -1 : Array.prototype.indexOf.call(arr, elem, i);
-        },
 
-        getClassNames = function(elem) {
+        getClasses = function(elem) {
             return (!types.isSVGElem(elem) ? elem.className :
                 (elem.className ? elem.className.baseVal : elem.getAttribute('class'))) || '';
         },
@@ -91,37 +71,32 @@ hAzzle.define('svg', function() {
         this.attr = function(origAttr) {
             return function(name, value, type) {
                 if (typeof name === 'string' && value === undefined) { // Return attribute value
-                    var val = origAttr.apply(this, arguments);
+                    var val = origAttr.apply(this, arguments),
+                        i = 0;
                     if (val && val.baseVal && val.baseVal.numberOfItems != null) { // Multiple values
                         value = '';
                         val = val.baseVal;
                         if (name === 'transform') {
-                            for (var i = 0; i < val.numberOfItems; i++) {
-                                var item = val.getItem(i);
-                                switch (item.type) {
-                                    case 1:
-                                        value += ' matrix(' + item.matrix.a + ',' + item.matrix.b + ',' +
-                                            item.matrix.c + ',' + item.matrix.d + ',' +
-                                            item.matrix.e + ',' + item.matrix.f + ')';
-                                        break;
-                                    case 2:
-                                        value += ' translate(' + item.matrix.e + ',' + item.matrix.f + ')';
-                                        break;
-                                    case 3:
-                                        value += ' scale(' + item.matrix.a + ',' + item.matrix.d + ')';
-                                        break;
-                                    case 4:
-                                        value += ' rotate(' + item.angle + ')';
-                                        break; // Doesn't handle new origin
-                                    case 5:
-                                        value += ' skewX(' + item.angle + ')';
-                                        break;
-                                    case 6:
-                                        value += ' skewY(' + item.angle + ')';
-                                        break;
+                            for (; i < val.numberOfItems; i++) {
+                                var itm = val.getItem(i);
+
+                                if (itm.type === 1) {
+                                    value += ' matrix(' + itm.matrix.a + ',' + itm.matrix.b + ',' +
+                                        itm.matrix.c + ',' + itm.matrix.d + ',' +
+                                        itm.matrix.e + ',' + itm.matrix.f + ')';
+                                } else if (itm.type === 2) {
+                                    value += ' translate(' + itm.matrix.e + ',' + itm.matrix.f + ')';
+                                } else if (itm.type === 3) {
+                                    value += ' scale(' + itm.matrix.a + ',' + itm.matrix.d + ')';
+                                } else if (itm.type === 4) {
+                                    value += ' rotate(' + itm.angle + ')';
+                                } else if (itm.type === 5) {
+                                    value += ' skewX(' + itm.angle + ')';
+                                } else if (itm.type === 6) {
+                                    value += ' skewY(' + itm.angle + ')';
                                 }
                             }
-                            val = value.substring(1);
+                            val = value.substr(1);
                         } else {
                             val = val.getItem(0).valueAsString;
                         }
@@ -173,12 +148,12 @@ hAzzle.define('svg', function() {
     //# CLASS MANIPULATION
 
     if (hAzzle.installed.classes) {
-
+        //  Add class(es) to element
         this.addClass = function(origAddClass) {
             return function(classNames) {
                 if (types.isType('Function')(classNames)) {
                     return this.each(function(elem, index) {
-                        hAzzle(elem).addClass(classNames.call(elem, index, getClassNames(elem)));
+                        hAzzle(elem).addClass(classNames.call(elem, index, getClasses(elem)));
                     });
                 }
                 var origArgs = arguments;
@@ -187,8 +162,8 @@ hAzzle.define('svg', function() {
                     if (types.isSVGElem(this)) {
                         var node = this;
                         util.each(classNames.split(whiteSpace), function(className) {
-                            var classes = getClassNames(node);
-                            if (inArray(className, classes.split(whiteSpace)) === -1) {
+                            var classes = getClasses(node);
+                            if (!classes.split(whiteSpace).contains(className)) {
                                 setClassNames(node, classes += (classes ? ' ' : '') + className);
                             }
                         });
@@ -198,12 +173,12 @@ hAzzle.define('svg', function() {
                 });
             };
         }(this.addClass);
-
+        // Remove class(es) from element
         this.removeClass = function(origRemoveClass) {
             return function(classNames) {
                 if (types.isType('Function')(classNames)) {
                     return this.each(function(i) {
-                        hAzzle(this).removeClass(classNames.call(this, i, getClassNames(this)));
+                        hAzzle(this).removeClass(classNames.call(this, i, getClasses(this)));
                     });
                 }
                 var origArgs = arguments;
@@ -212,7 +187,7 @@ hAzzle.define('svg', function() {
                     if (types.isSVGElem(this)) {
                         var node = this;
                         util.each(classNames.split(whiteSpace), function(className) {
-                            var classes = getClassNames(node);
+                            var classes = getClasses(node);
                             classes = grep(classes.split(whiteSpace), function(n) {
                                 return n !== className;
                             }).join(' ');
@@ -224,12 +199,12 @@ hAzzle.define('svg', function() {
                 });
             };
         }(this.removeClass);
-
+        // Toggle class(es) on element
         this.toggleClass = function(origToggleClass) {
             return function(classNames, state) {
                 if (types.isType('Function')(classNames)) {
                     return this.each(function(i) {
-                        hAzzle(this).toggleClass(classNames.call(this, i, getClassNames(this), state), state);
+                        hAzzle(this).toggleClass(classNames.call(this, i, getClasses(this), state), state);
                     });
                 }
                 var origArgs = arguments,
@@ -246,7 +221,7 @@ hAzzle.define('svg', function() {
                                 node[(state ? 'add' : 'remove') + 'Class'](className);
                             });
                         } else {
-                            var classes = getClassNames(this);
+                            var classes = getClasses(this);
                             if (classes) {
                                 storage.private.get(this, '__className__', classes); // store className if set
                             }
@@ -260,13 +235,15 @@ hAzzle.define('svg', function() {
             };
         }(this.toggleClass);
 
+        // Check if element contains class name(s)
+
         this.hasClass = function(origHasClass) {
             return function(className) {
                 className = className || '';
                 var found = false;
                 this.each(function() {
                     if (types.isSVGElem(this)) {
-                        found = getClassNames(this).split(whiteSpace).cointains(getClassNames(this));
+                        found = getClasses(this).split(whiteSpace).cointains(getClasses(this));
                     } else {
                         found = (origHasClass.apply(hAzzle(this), [className]));
                     }
@@ -276,12 +253,21 @@ hAzzle.define('svg', function() {
             };
         }(this.hasClass);
     }
+    
+    //#CSS
+    
+    this.css = function(origCSS) {
+		return function(elem, name, numeric, extra) {
+			var value = (name.match(/^svg.*/) ? hAzzle(elem).attr(style.cssProps[name] || name) : '');
+			return value || origCSS(elem, name);
+		};
+	}(this.css);
+    
     return {
         svgNS: svgNS,
         xmlNS: xmlNS,
         xlinkNS: xlinkNS,
         support: features.has('SVG'),
         create: create,
-        get: getID
     };
 });
