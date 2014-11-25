@@ -1,7 +1,7 @@
 // svg.js
 hAzzle.define('svg', function() {
 
- // Main hAzzle module methods for SVG ( Scalable Vector Graphics. )
+    // Main hAzzle module methods for SVG ( Scalable Vector Graphics. )
 
     var // Dependencies
         features = hAzzle.require('has'),
@@ -13,11 +13,11 @@ hAzzle.define('svg', function() {
         // Whitespace regEx
 
         whiteSpace = /\s+/,
-       
-       // SVG prefix regEx
+
+        // SVG prefix regEx
 
         svgPrefix = /^svg.*/,
-       
+
         // SVG namespace
 
         svgNS = 'http://www.w3.org/2000/svg',
@@ -42,17 +42,18 @@ hAzzle.define('svg', function() {
     var create = function(name) {
             return document.createElementNS(svgNS, name);
         },
-        
- // Determine if any nodes are SVG nodes
- anySVG = function(checkSet) {
-     var i = 0, len = checkSet.length;
-	for (; i < len; i++) {
-		if (checkSet[i].nodeType == 1 && checkSet[i].namespaceURI === svgNS) {
-			return true;
-		}
-	}
-	return false;
-},
+
+        // Determine if any nodes are SVG nodes
+        anySVG = function(checkSet) {
+            var i = 0,
+                len = checkSet.length;
+            for (; i < len; i++) {
+                if (checkSet[i].nodeType == 1 && checkSet[i].namespaceURI === svgNS) {
+                    return true;
+                }
+            }
+            return false;
+        },
         grep = function(elems, callback, arg) {
             var callbackInverse,
                 matches = [],
@@ -204,7 +205,8 @@ hAzzle.define('svg', function() {
                 var origArgs = arguments,
                     els = this.elements,
                     classNames = clazz || '',
-                    i = 0, len = els.length;
+                    i = 0,
+                    len = els.length;
                 // Faster then each()
                 for (; i < len; i++) {
                     if (types.isSVGElem(els[i])) {
@@ -249,8 +251,8 @@ hAzzle.define('svg', function() {
                                 storage.private.get(this, '__className__', cls);
                             }
                             // Toggle whole className
-                            setClassNames(this, cls || clazz === false ? '' : 
-                            storage.private.set(this, '__className__') || '');
+                            setClassNames(this, cls || clazz === false ? '' :
+                                storage.private.set(this, '__className__') || '');
                         }
                     } else { // Use original Core methods                        
                         origToggleClass.apply(hAzzle(this), origArgs);
@@ -263,7 +265,8 @@ hAzzle.define('svg', function() {
 
         this.hasClass = function(origHasClass) {
             return function(clazz) {
-                var found = false, className = clazz || '';
+                var found = false,
+                    className = clazz || '';
                 this.each(function() {
                     if (types.isSVGElem(this)) {
                         found = getClasses(this).split(whiteSpace).cointains(getClasses(this));
@@ -279,18 +282,18 @@ hAzzle.define('svg', function() {
 
     //#CSS
 
-  this.css = function(origCSS) {
-		return function(elem, name) {
-			var value = name ? (name.match(svgPrefix) ? hAzzle(elem).attr(style.cssProps[name] || name) : '') : false;
-			return value || origCSS(elem, name);
-		};
-	}(this.css);
+    this.css = function(origCSS) {
+        return function(elem, name) {
+            var value = name ? (name.match(svgPrefix) ? hAzzle(elem).attr(style.cssProps[name] || name) : '') : false;
+            return value || origCSS(elem, name);
+        };
+    }(this.css);
 
     return {
         svgNS: svgNS,
         xmlNS: xmlNS,
         xlinkNS: xlinkNS,
-        anySVG:anySVG,
+        anySVG: anySVG,
         support: features.has('SVG'),
         create: create,
     };
