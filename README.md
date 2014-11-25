@@ -159,6 +159,7 @@ var setters = hAzzle.require('setters')
 
 console.log(setters.SVGAttr( PROPERTY ))
 ```
+**Note!** From v. 1.02d hAzzle Core supports SVG attributes through the **this.attr()** method. This is still a experimental feature, and feedback wanted!!
 
 Units and dimensions
 --------------------
