@@ -132,7 +132,7 @@ cls.addClass( document.getElementsByTagName('div'), 'hello!')
 SVG
 --------------------
 
-hAzzle doesn't support any 'heavy' SVG modules, but has build in the Core features for detection SVG and create SVG elements.
+**hAzzle Core** doesn't support SVG, except a few methods for detection SVG and getting SVG attributes.
 
 Examples on the SVG features inside the Core:
 
@@ -143,23 +143,13 @@ console.log(types.isSVGElem( ELEM ))
 ```
 
 ```javascript
-// Create SVG elements
-var util = hAzzle.require('util')
-
-util.createElem('div');
-
-// NOTE! This function has auto-detection and will only create SVG elements if SVG detected, if
-// not fallback to document.createElement
-
-```
-
-```javascript
 // Get SVG attributes
 var setters = hAzzle.require('setters')
 
 console.log(setters.SVGAttr( PROPERTY ))
 ```
-**Note!** From v. 1.02d hAzzle Core supports SVG attributes through the **this.attr()** method. This is still a experimental feature, and feedback wanted!!
+
+**svg.js** module has a few more **SVG methods**.
 
 Units and dimensions
 --------------------
