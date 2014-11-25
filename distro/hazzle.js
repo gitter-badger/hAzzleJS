@@ -2520,17 +2520,17 @@ hAzzle.define('setters', function() {
             // booleanAttr is here twice to minimize DOM access
             return booleanAttr && boolElem[elem.nodeName] && booleanAttr;
         },
-       // Return a boolean value (true / false) 
+        // Return a boolean value (true / false) 
         SVGAttr = function(prop) {
             if (features.ie || (features.has('android') && !features.has('chrome'))) {
                 SVGAttributes += '|transform';
             }
 
             return new RegExp('^(' + SVGAttributes + ')$', 'i').test(prop);
-        },
+        }
         // Removes an attribute from an HTML element.
 
-        removeAttr = function(elem, value) {
+    var removeAttr = function(elem, value) {
             elem = getElem(elem);
             var name, propName,
                 i = 0,
@@ -2641,7 +2641,10 @@ hAzzle.define('setters', function() {
         var hooks, ret, isFunction,
             elem = this.elements[0];
 
+        // Return attribute value
+
         if (!arguments.length) {
+
             if (elem) {
                 hooks = valHooks.get[elem.type] ||
                     valHooks.get[elem.nodeName.toLowerCase()];
@@ -2737,9 +2740,59 @@ hAzzle.define('setters', function() {
         });
     };
 
-    this.attr = function(name, value) {
+    this.attr = function(name, value, type) {
 
         var elem = this.elements;
+
+        // EXPERIMENTAL - Need heavy testing!        
+
+        if (types.isSVGElem(elem[0])) {
+
+            if (typeof name === 'string' && value === undefined) { // Return attribute value
+                if (value && value.baseVal && value.baseVal.numberOfItems != null) { // Multiple values
+                    value = '';
+                    var val = val.baseVal;
+                    if (name === 'transform') {
+                        for (var i = 0; i < val.numberOfItems; i++) {
+                            var item = val.getItem(i);
+
+                            if (item.type === 1) {
+                                value += ' matrix(' + item.matrix.a + ',' + item.matrix.b + ',' +
+                                    item.matrix.c + ',' + item.matrix.d + ',' +
+                                    item.matrix.e + ',' + item.matrix.f + ')';
+                            } else if (item.type === 2) {
+                                value += ' translate(' + item.matrix.e + ',' + item.matrix.f + ')';
+                            } else if (item.type === 3) {
+                                value += ' scale(' + item.matrix.a + ',' + item.matrix.d + ')';
+                            } else if (item.type === 4) {
+                                value += ' rotate(' + item.angle + ')';
+                            } else if (item.type === 5) {
+                                value += ' skewX(' + item.angle + ')';
+                            } else if (item.type === 6) {
+                                value += ' skewY(' + item.angle + ')';
+                            }
+
+                        }
+                        val = value.substr(1);
+                    } else {
+                        val = val.getItem(0).valueAsString;
+                    }
+                }
+                return (value && value.baseVal ? value.baseVal.valueAsString : val);
+            }
+
+            var options = name;
+            if (typeof name === 'string') {
+                options = {};
+                options[name] = value;
+            }
+
+            return this.each(function() {
+                for (var n in options) {
+                    (type ? this.style[n] = options[n] : this.setAttribute(n, options[n]));
+                }
+            });
+        }
 
         if (typeof name === 'object') {
             return this.each(function(elem) {
@@ -2748,6 +2801,7 @@ hAzzle.define('setters', function() {
                 });
             });
         }
+
         return typeof value === 'undefined' ?
             attr(elem[0], name) :
             this.each(function(elem) {
