@@ -36,15 +36,13 @@ hAzzle.define('svg', function() {
     var create = function(name) {
             return document.createElementNS(svgNS, name);
         },
-        grep = function(elems, callback, invert) {
+        grep = function(elems, callback, arg) {
             var callbackInverse,
                 matches = [],
                 i = 0,
                 length = elems.length,
-                callbackExpect = !invert;
+                callbackExpect = !arg;
 
-            // Go through the array, only saving the items
-            // that pass the validator function
             for (; i < length; i++) {
                 callbackInverse = !callback(elems[i], i);
                 if (callbackInverse !== callbackExpect) {
@@ -115,9 +113,11 @@ hAzzle.define('svg', function() {
                     });
                 }
                 var origArgs = arguments;
+
                 return hAzzle(this).each(function() {
                     if (types.isSVGElem(this)) {
-                        for (var n in options) {
+                        var n;
+                        for (n in options) {
                             (type ? this.style[n] = options[n] : this.setAttribute(n, options[n]));
                         }
                     } else {
@@ -131,14 +131,13 @@ hAzzle.define('svg', function() {
         this.removeAttr = function(origRemoveAttr) {
             return function(names) {
                 var origArgs = arguments;
-                return this.each(function() {
-                    if (types.isSVGElem(this)) {
-                        var node = this;
+                return this.each(function(elem) {
+                    if (types.isSVGElem(elem)) {
                         util.each(names.split(whiteSpace), function(name) {
-                            (node[name] && node[name].baseVal ? node[name].baseVal.value = null : node.removeAttribute(name));
+                            (elem[name] && elem[name].baseVal ? elem[name].baseVal.value = null : elem.removeAttribute(name));
                         });
                     } else {
-                        origRemoveAttr.apply(hAzzle(this), origArgs);
+                        origRemoveAttr.apply(hAzzle(elem), origArgs);
                     }
                 });
             };
@@ -150,55 +149,65 @@ hAzzle.define('svg', function() {
     if (hAzzle.installed.classes) {
         //  Add class(es) to element
         this.addClass = function(origAddClass) {
-            return function(classNames) {
+            return function(clazz) {
                 if (types.isType('Function')(classNames)) {
                     return this.each(function(elem, index) {
                         hAzzle(elem).addClass(classNames.call(elem, index, getClasses(elem)));
                     });
                 }
-                var origArgs = arguments;
-                classNames = classNames || '';
-                return this.each(function() {
-                    if (types.isSVGElem(this)) {
-                        var node = this;
+                var origArgs = arguments,
+                    els = this.elements, elem,
+                    classNames = clazz || '',
+                    i = 0,
+                    len = els.length;
+                // Faster then each() 
+                for (; i < len; i++) {
+                    elem = els[i];
+                    if (types.isSVGElem(elem)) {
                         util.each(classNames.split(whiteSpace), function(className) {
-                            var classes = getClasses(node);
+                            var classes = getClasses(elem);
                             if (!classes.split(whiteSpace).contains(className)) {
-                                setClassNames(node, classes += (classes ? ' ' : '') + className);
+                                setClassNames(elem, classes += (classes ? ' ' : '') + className);
                             }
                         });
-                    } else {
-                        origAddClass.apply(hAzzle(this), origArgs);
+                    } else { // Use original Core methods
+                        origAddClass.apply(hAzzle(elem), origArgs);
                     }
-                });
+                }
             };
         }(this.addClass);
         // Remove class(es) from element
         this.removeClass = function(origRemoveClass) {
-            return function(classNames) {
+            return function(clazz) {
                 if (types.isType('Function')(classNames)) {
-                    return this.each(function(i) {
-                        hAzzle(this).removeClass(classNames.call(this, i, getClasses(this)));
+                    return this.each(function(elem, index) {
+                        hAzzle(elem).removeClass(classNames.call(elem, index, getClasses(elem)));
                     });
                 }
-                var origArgs = arguments;
-                classNames = classNames || '';
-                return this.each(function() {
-                    if (types.isSVGElem(this)) {
-                        var node = this;
+
+                var origArgs = arguments,
+                    els = this.elements,
+                    classNames = clazz || '',
+                    i = 0,
+                    len = els.length, elem;
+                // Faster then each()
+                for (; i < len; i++) {
+                    elem = els[i];
+                    if (types.isSVGElem(elem)) {
                         util.each(classNames.split(whiteSpace), function(className) {
-                            var classes = getClasses(node);
-                            classes = grep(classes.split(whiteSpace), function(n) {
+                            var cls = getClasses(elem);
+                            cls = grep(cls.split(whiteSpace), function(n) {
                                 return n !== className;
                             }).join(' ');
-                            setClassNames(node, classes);
+                            setClassNames(elem, cls);
                         });
-                    } else {
-                        origRemoveClass.apply(hAzzle(this), origArgs);
+                    } else { // Use original Core methods
+                        origRemoveClass.apply(hAzzle(elem), origArgs);
                     }
-                });
+                }
             };
         }(this.removeClass);
+
         // Toggle class(es) on element
         this.toggleClass = function(origToggleClass) {
             return function(classNames, state) {
@@ -221,14 +230,14 @@ hAzzle.define('svg', function() {
                                 node[(state ? 'add' : 'remove') + 'Class'](className);
                             });
                         } else {
-                            var classes = getClasses(this);
-                            if (classes) {
-                                storage.private.get(this, '__className__', classes); // store className if set
+                            var cls = getClasses(this);
+                            if (cls) {
+                                storage.private.get(this, '__className__', cls);
                             }
                             // toggle whole className
-                            setClassNames(this, classes || classNames === false ? '' : storage.private.set(this, '__className__') || '');
+                            setClassNames(this, cls || classNames === false ? '' : storage.private.set(this, '__className__') || '');
                         }
-                    } else {
+                    } else { // Use original Core methods                        
                         origToggleClass.apply(hAzzle(this), origArgs);
                     }
                 });
@@ -253,16 +262,16 @@ hAzzle.define('svg', function() {
             };
         }(this.hasClass);
     }
-    
+
     //#CSS
-    
+
     this.css = function(origCSS) {
-		return function(elem, name, numeric, extra) {
-			var value = (name.match(/^svg.*/) ? hAzzle(elem).attr(style.cssProps[name] || name) : '');
-			return value || origCSS(elem, name);
-		};
-	}(this.css);
-    
+        return function(elem, name) {
+            var value = (name.match(/^svg.*/) ? hAzzle(elem).attr(style.cssProps[name] || name) : '');
+            return value || origCSS(elem, name);
+        };
+    }(this.css);
+
     return {
         svgNS: svgNS,
         xmlNS: xmlNS,
