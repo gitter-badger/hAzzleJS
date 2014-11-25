@@ -229,6 +229,8 @@ Example of usage:
 
 The **ecma7.js** module only contains functions that most likely will not change in the future. 
 
+Which browsers who support **ECMA7** features, take a look here: http://kangax.github.io/compat-table/es7/
+
 Why is the Core so big?
 ---------------------
 The hAzzle Core are not so big comparing to other libraries, and contains a lot more then the Javascript library. It take care of cross-browser issues, browsers bugs, setting the right document (**HTML** / **XML**), feature detection and more.
