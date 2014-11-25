@@ -134,8 +134,6 @@ SVG
 
 **hAzzle Core** doesn't support SVG, except a few methods for detection SVG and getting SVG attributes.
 
-Examples on the SVG features inside the Core:
-
 ```javascript
 // Detect if SVG element
 var types = hAzzle.require('types')
@@ -150,6 +148,14 @@ console.log(setters.SVGAttr( PROPERTY ))
 ```
 
 **svg.js** module has a few more **SVG methods**.
+
+* Feature detection of SVG
+* Creating SVG elements
+* getElementById
+* all default SVG namespaces
+ 
+For other **SVG* methods it has to be supported and added through 3dParty modules
+
 
 Units and dimensions
 --------------------
