@@ -212,8 +212,8 @@ hAzzle.define('svg', function() {
         this.toggleClass = function(origToggleClass) {
             return function(classNames, state) {
                 if (types.isType('Function')(classNames)) {
-                    return this.each(function(i) {
-                        hAzzle(this).toggleClass(classNames.call(this, i, getClasses(this), state), state);
+                    return this.each(function(elem, index) {
+                        hAzzle(elem).toggleClass(classNames.call(elem, index, getClasses(elem), state), state);
                     });
                 }
                 var origArgs = arguments,
