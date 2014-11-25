@@ -154,7 +154,7 @@ console.log(setters.SVGAttr( PROPERTY ))
 * getElementById
 * all default SVG namespaces
  
-For other **SVG* methods it has to be supported and added through 3dParty modules
+For other **SVG** methods it has to be supported and added through 3dParty modules
 
 
 Units and dimensions
