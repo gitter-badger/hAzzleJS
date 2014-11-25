@@ -247,9 +247,8 @@ hAzzle.define('svg', function() {
         // Check if element contains class name(s)
 
         this.hasClass = function(origHasClass) {
-            return function(className) {
-                className = className || '';
-                var found = false;
+            return function(clazz) {
+                var found = false, className = clazz || '';
                 this.each(function() {
                     if (types.isSVGElem(this)) {
                         found = getClasses(this).split(whiteSpace).cointains(getClasses(this));
