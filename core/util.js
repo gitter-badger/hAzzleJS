@@ -402,11 +402,6 @@ hAzzle.define('util', function() {
             } else {
                 return ctx;
             }
-        },
-        createElem = function(tag) {
-            if (typeof tag === 'string') {
-                return types.isSVGElem ? document.createElementNS("http://www.w3.org/2000/svg", "rect") : document.createElement(tag);
-            }
         };
 
     return {
