@@ -30,6 +30,10 @@ hAzzle.define('Types', function() {
         isNumber = function(value) {
             return typeof value === 'number';
         },
+        isNumeric = function( obj ) {
+		return !isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
+	    },
+
         isBoolean = function(value) {
             return typeof value === 'boolean';
         },
@@ -52,8 +56,7 @@ hAzzle.define('Types', function() {
         },
 
         isElement = function(node) {
-            return !!(node &&
-                node.nodeName // we are a direct element
+            return !!(node && node.nodeName // we are a direct element
             );
         },
         isNaN = function(value) {
@@ -98,7 +101,7 @@ hAzzle.define('Types', function() {
         },
 
         isPlainObject = function(obj) {
-            return isType('Object')(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) == Object.prototype;
+            return isType('Object')(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) === Object.prototype;
         },
 
         isPromiseAlike = function(object) {
@@ -134,8 +137,6 @@ hAzzle.define('Types', function() {
                 window.SVGElement && (elem instanceof window.SVGElement);
         };
 
-    this.isNodeList = isNodeList;
-
     return {
 
         isType: isType,
@@ -145,6 +146,7 @@ hAzzle.define('Types', function() {
         isObject: isObject,
         isPlainObject: isPlainObject,
         isEmptyObject: isEmptyObject,
+        isFunction: isType('Function'),
         isNode: isNode,
         isElement: isElement,
         isString: isString,
@@ -152,6 +154,7 @@ hAzzle.define('Types', function() {
         isNumber: isNumber,
         isBoolean: isBoolean,
         isNaN: isNaN,
+        isSVGElem:isSVGElem,
         isDefined: isDefined,
         isUndefined: isUndefined,
         isNodeList: isNodeList
