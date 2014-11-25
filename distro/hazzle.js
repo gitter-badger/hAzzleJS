@@ -1221,9 +1221,9 @@ hAzzle.define('Collection', function() {
         arrayProto = Array.prototype,
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
-
+        
         // Create array
-
+        
         makeArray = function(arr, results) {
             var ret = results || [];
             if (arr !== undefined) {
@@ -1236,12 +1236,12 @@ hAzzle.define('Collection', function() {
 
             return ret;
         },
-
+        
         // Replacement for native slice ( better performance)
-
+        
         slice = function(array, start, end) {
-
-            start = typeof start === 'undefined' ? 0 : start;
+           
+           start = typeof start === 'undefined' ? 0 : start;
 
             var index = -1,
                 length = (typeof end === 'undefined' ? (array ? array.length : 0) : end) - start || 0,
@@ -1381,15 +1381,15 @@ hAzzle.define('Collection', function() {
             return this.previousElementSibling;
         }).filter(sel);
     };
-
+    
     // Get all preceding siblings of each element in 
     // the set of matched elements, optionally filtered by a selector
-
+    
     this.prevAll = function() {
         var matched = [];
         this.each(function(elem) {
-            while ((elem = elem.previousElementSibling) &&
-                elem.nodeType !== 9) {
+            while ((elem = elem.previousElementSibling) && 
+                    elem.nodeType !== 9) {
                 matched.push(elem);
             }
         });
@@ -1401,8 +1401,8 @@ hAzzle.define('Collection', function() {
     this.nextAll = function() {
         var matched = [];
         this.each(function(elem) {
-            while ((elem = elem.nextElementSibling) &&
-                elem.nodeType !== 9) {
+            while ((elem = elem.nextElementSibling) && 
+                    elem.nodeType !== 9) {
                 matched.push(elem);
             }
         });
@@ -1424,30 +1424,26 @@ hAzzle.define('Collection', function() {
     };
     // Native prototype methods that return a usable value (ECMA 5+)
     this.shift = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.shift.apply(this.elements, arguments);
     };
     this.lastIndexOf = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.lastIndexOf.apply(this.elements, arguments);
     };
     this.reduceRight = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.rediceRight.apply(this.elements, arguments);
     };
     this.forEach = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.forEach.apply(this.elements, arguments);
     };
     this.splice = function() {
-        return this.elements[method].apply(this.elements, arguments);
-    };
-    this.shift = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.splice.apply(this.elements, arguments);
     };
 
     return {
         makeArray: makeArray,
         slice: slice
     };
-});
-// jiesa.js
+});// jiesa.js
 hAzzle.define('Jiesa', function() {
 
     var // Dependencies    

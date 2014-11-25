@@ -212,22 +212,19 @@ hAzzle.define('Collection', function() {
     };
     // Native prototype methods that return a usable value (ECMA 5+)
     this.shift = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.shift.apply(this.elements, arguments);
     };
     this.lastIndexOf = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.lastIndexOf.apply(this.elements, arguments);
     };
     this.reduceRight = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.rediceRight.apply(this.elements, arguments);
     };
     this.forEach = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.forEach.apply(this.elements, arguments);
     };
     this.splice = function() {
-        return this.elements[method].apply(this.elements, arguments);
-    };
-    this.shift = function() {
-        return this.elements[method].apply(this.elements, arguments);
+        return this.elements.splice.apply(this.elements, arguments);
     };
 
     return {
