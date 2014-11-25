@@ -129,10 +129,9 @@ var cls = hAzzle.require('classes')
 // Set the class names
 cls.addClass( document.getElementsByTagName('div'), 'hello!') 
 ```
-SVG
+Scalable Vector Graphics (SVG)
 --------------------
-
-**hAzzle** supports **SVG**, but doesn't support it in the **hAzzle Core**, except for a few methods for detection and getting SVG attributes.
+**SVG** are supported by **hAzzle**, but only a few methods for detection and getting SVG attributes in the Core.
 
 ```javascript
 // Detect if SVG element
@@ -152,6 +151,10 @@ For extended **SVG** support you will need to add the **svg.js** module from the
 
 * setters.js
 * classes.js
+
+and
+
+* style.js ( module folder) 
 
 Units and dimensions
 --------------------
