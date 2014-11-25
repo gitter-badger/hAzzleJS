@@ -132,7 +132,7 @@ cls.addClass( document.getElementsByTagName('div'), 'hello!')
 SVG
 --------------------
 
-**hAzzle Core** doesn't support SVG, except a few methods for detection SVG and getting SVG attributes.
+**hAzzle** supports **SVG**, but doesn't support it in the **hAzzle Core**, except for a few methods for detection and getting SVG attributes.
 
 ```javascript
 // Detect if SVG element
@@ -146,16 +146,12 @@ var setters = hAzzle.require('setters')
 
 console.log(setters.SVGAttr( PROPERTY ))
 ```
+For extended **SVG** support you will need to add the **svg.js** module from the module folder.
 
-**svg.js** module has a few more **SVG methods**.
+**Note!** Many of the functions in this module are extending the Core methods, so you need to compile the Core with this modules to get **SVG** to work:
 
-* Feature detection of SVG
-* Creating SVG elements
-* getElementById
-* all default SVG namespaces
- 
-For other **SVG** methods it has to be supported and added through 3dParty modules
-
+* setters.js
+* classes.js
 
 Units and dimensions
 --------------------
