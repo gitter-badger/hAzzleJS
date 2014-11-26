@@ -2961,7 +2961,7 @@ hAzzle.define('prophooks', function() {
     return {};
 });
 // valhooks.js
-hAzzle.define('valHooks', function() {
+hAzzle.define('valhooks', function() {
 
     var util = hAzzle.require('util'),
         strings = hAzzle.require('strings'),
@@ -2983,7 +2983,6 @@ hAzzle.define('valHooks', function() {
     util.mixin(setters.valHooks.set, {
 
         'select': function(elem, value) {
-
             var optionSet, option,
                 options = elem.options,
                 values = collection.makeArray(value),
@@ -2991,8 +2990,8 @@ hAzzle.define('valHooks', function() {
 
             while (i--) {
                 option = options[i];
-
-                // ECMA 7 - contains
+              
+              // ECMA 7 - contains
 
                 if ((option.selected = values.contains(option.value))) {
                     optionSet = true;
@@ -3009,20 +3008,20 @@ hAzzle.define('valHooks', function() {
 
     // Getter    
     util.mixin(setters.valHooks.get, {
-        // some browsers don't recognize input[type=email] etc.
-
-        'type': function(elem) {
-            return elem.getAttribute('type') || elem.type;
-
+        
+      'type': function(elem) {
+        // Some browsers don't recognize input[type=email] etc.
+        return elem.getAttribute('type') || elem.type;
+        
         },
 
-        'option': function(elem) {
+        'option': function(elem) { 
             var val = elem.getAttribute(name, 2);
             return val !== null ? val : strings.trim(text.getText(elem));
         },
 
         'select': function(elem) {
-            alert("")
+
             var index = elem.selectedIndex,
 
                 one = elem.type === 'select-one',
@@ -3037,6 +3036,7 @@ hAzzle.define('valHooks', function() {
             i = one ? index : 0;
             max = one ? index + 1 : options.length;
             for (; i < max; i++) {
+              // IE9
                 option = options[i];
                 // Traverse the option element when the elements needed to filter out disabled
                 if (option.selected && option.getAttribute('disabled') === null &&
@@ -3065,12 +3065,12 @@ hAzzle.define('valHooks', function() {
     util.each(['radio', 'checkbox'], function(val) {
         setters.valHooks.set[val] = function(elem, value) {
             if (types.isArray(value)) {
-                // ECMA 7 - contains
-                return (elem.checked = value.contains(hAzzle(elem).val()));
+               // ECMA 7 - contains
+                return (elem.checked = value.contains( hAzzle(elem).val() ));
             }
         };
     });
-
+    
     if (!supportCheckboxes) {
         setters.valHooks.get[val] = function(elem) {
             return elem.getAttribute('value') === null ? 'on' : elem.value;
