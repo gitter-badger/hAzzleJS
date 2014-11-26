@@ -2,28 +2,69 @@
 hAzzle.define('setters', function() {
 
     var // Dependencies 
-    
+
         util = hAzzle.require('util'),
         core = hAzzle.require('core'),
         features = hAzzle.require('has'),
         types = hAzzle.require('types'),
-        
+
         // Various regEx
-        
+
         whiteSpace = /\S+/g,
         wreturn = /\r/g,
-        
+
+        // Collection of various attribute names
+        i = 0,
+        at, boolElemArray = ('multiple selected checked disabled readOnly required ' +
+            'async autofocus compact nowrap declare noshade hreflang onload src' +
+            'noresize defaultChecked autoplay controls defer autocomplete ' +
+            'hidden tabindex readOnly type accesskey dropzone spellcheck isMap loop scoped open').split(' '),
+        boolAttrArray = ('input select option textarea button form details').split(' '),
+        camelCasedAttr = ('cellPadding cellSpacing maxLength rowSpan accessKey ' +
+            'colSpan useMap frameBorder contentEditable textContent valueType ' +
+            'tabIndex encType longDesc dateTime readOnly type accessKey tabIndex dropZone spellCheck ' +
+            'hrefLang isMap srcDoc mediaGroup autoComplete noValidate radioGroup').split(' '),
+
         // SVG attributes
-        
+
         SVGAttributes = 'width|height|x|y|cx|cy|r|rx|ry|x1|x2|y1|y2',
 
         boolAttr = {}, // Boolean attributes
-        boolElem = {}, // Boolean elements
+        boolElem = {}; // Boolean elements
 
-        propMap = {
-            // properties renamed to avoid clashes with reserved words  
-            'class': 'className',
-            'for': 'htmlFor'
+    // Test attributes.
+
+    var classProp = 'className',
+        forProp = 'for';
+
+    // This seems to be a bug in jQuery, why??
+    (function() {
+        var div = document.createElement('div')
+            // #IE9+
+        div.setAttribute('class', 'x');
+        if (div.className === 'x') {
+            classProp = 'class';
+        }
+    }());
+
+    // Get correct label name
+
+    (function() {
+        var label = document.createElement('label');
+        label.setAttribute(forProp, 'x');
+        if (label.htmlFor !== 'x') {
+            label.setAttribute('htmlFor', 'x');
+            if (label.htmlFor === 'x')
+                forProp = 'htmlFor';
+        }
+    }());
+    alert(classProp)
+    var propMap = {
+
+            'class': classProp,
+            'className': classProp,
+            'for': forProp,
+            'htmlFor': forProp
         },
 
         propHooks = {
@@ -72,10 +113,10 @@ hAzzle.define('setters', function() {
             }
 
             return new RegExp('^(' + SVGAttributes + ')$', 'i').test(prop);
-        }
+        },
         // Removes an attribute from an HTML element.
 
-    var removeAttr = function(elem, value) {
+        removeAttr = function(elem, value) {
             elem = getElem(elem);
             var name, propName,
                 i = 0,
@@ -297,26 +338,27 @@ hAzzle.define('setters', function() {
             });
     };
 
+    // Nasty looking code, are we agree? But doing a interal each() loop here would
+    // slow down pageLoad due to the fact that a for-loop are faster
+    // If anybody disagree, change it!!
+
     // Populate boolAttr 
-    util.each(('multiple selected checked disabled readOnly required ' +
-        'async autofocus compact nowrap declare noshade hreflang onload src' +
-        'noresize defaultChecked autoplay controls defer autocomplete ' +
-        'hidden tabindex readOnly type accesskey dropzone spellcheck isMap loop scoped open').split(' '), function(prop) {
-        boolAttr[prop.toLowerCase()] = prop;
-    });
+
+    for (; at = boolElemArray[i]; i++) {
+        boolAttr[at.toLowerCase()] = at;
+    }
+
 
     // Populate boolElem 
-    util.each(('input select option textarea button form details').split(' '), function(prop) {
-        boolElem[prop] = true;
-    });
+    for (i = 0; at = boolAttrArray[i]; i++) {
+        boolElem[at] = true;
+    }
 
     // Populate propMap - all properties are written as camelCase
-    util.each(('cellPadding cellSpacing maxLength rowSpan ' +
-        'colSpan useMap frameBorder contentEditable textContent valueType ' +
-        'tabIndex readOnly type accessKey tabIndex dropZone spellCheck ' +
-        'hrefLang isMap srcDoc mediaGroup autoComplete noValidate radioGroup').split(' '), function(prop) {
-        propMap[prop.toLowerCase()] = prop;
-    });
+
+    for (i = 0; at = camelCasedAttr[i]; i++) {
+        propMap[at.toLowerCase()] = at;
+    }
 
     return {
         attrHooks: attrHooks,
