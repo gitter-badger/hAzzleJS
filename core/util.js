@@ -1,14 +1,14 @@
 // util.js
 hAzzle.define('util', function() {
 
-    var // Modules
-        aSlice = Array.prototype.slice,
+    var // Dependencies
+    
         types = hAzzle.require('types'),
         oKeys = Object.keys,
 
         // Optimized each function
         // For ECMA 5+ standard, use native forEach()
-   each = function(obj, callback, args, /*reverse*/ rev) {
+        each = function(obj, callback, args, /*reverse*/ rev) {
             var i, length;
 
             if (args) {
@@ -23,7 +23,7 @@ hAzzle.define('util', function() {
                     }
                 } else if (types.isArrayLike(obj)) {
                     for (; i < length; i++) {
-                         i = rev ? obj.length - i - 1 : i;
+                        i = rev ? obj.length - i - 1 : i;
                         if (callback.apply(obj[i], args) === false) {
                             break;
                         }
@@ -64,7 +64,7 @@ hAzzle.define('util', function() {
                 }
             }
             return obj;
-        }
+        },
 
     createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
@@ -391,38 +391,6 @@ hAzzle.define('util', function() {
                 }
             });
             return results;
-        },
-        // Bind a function to a context, optionally partially applying any
-        // Replacement for bind() - ECMAScript 5 15.3.4.5
-
-        bind = function(fn, context) {
-
-            var curryArgs = arguments.length > 2 ?
-                aSlice.call(arguments, 2) : [],
-                tmp;
-
-            if (typeof context === 'string') {
-
-                tmp = fn[context];
-                context = fn;
-                fn = tmp;
-            }
-
-            if (typeof fn === 'function' && !(context instanceof RegExp)) {
-
-                return curryArgs.length ? function() {
-                    return arguments.length ?
-                        fn.apply(context || this, curryArgs.concat(aSlice.call(arguments, 0))) :
-                        fn.apply(context || this, curryArgs);
-                } : function() {
-                    return arguments.length ?
-                        fn.apply(context || this, arguments) :
-                        fn.call(context || this);
-                };
-
-            } else {
-                return context;
-            }
         };
 
     return {
@@ -437,7 +405,6 @@ hAzzle.define('util', function() {
         unique: unique,
         indexOf: indexOf,
         filter: filter,
-        now: Date.now,
-        bind: bind
+        now: Date.now
     };
 });

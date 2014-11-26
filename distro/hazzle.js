@@ -507,8 +507,8 @@ hAzzle.define('text', function() {
 // util.js
 hAzzle.define('util', function() {
 
-    var // Modules
-        aSlice = Array.prototype.slice,
+    var // Dependencies
+
         types = hAzzle.require('types'),
         oKeys = Object.keys,
 
@@ -570,9 +570,9 @@ hAzzle.define('util', function() {
                 }
             }
             return obj;
-        }
+        },
 
-    createCallback = function(fn, arg, count) {
+        createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
                 if (arg === undefined) return fn;
                 count = !count ? 3 : count;
@@ -776,7 +776,6 @@ hAzzle.define('util', function() {
                         result.push(value);
                     }
                 } else if (indexOf(result, value) < 0) {
-
                     result.push(value);
                 }
             }
@@ -898,38 +897,6 @@ hAzzle.define('util', function() {
                 }
             });
             return results;
-        },
-        // Bind a function to a context, optionally partially applying any
-        // Replacement for bind() - ECMAScript 5 15.3.4.5
-
-        bind = function(fn, context) {
-
-            var curryArgs = arguments.length > 2 ?
-                aSlice.call(arguments, 2) : [],
-                tmp;
-
-            if (typeof context === 'string') {
-
-                tmp = fn[context];
-                context = fn;
-                fn = tmp;
-            }
-
-            if (typeof fn === 'function' && !(context instanceof RegExp)) {
-
-                return curryArgs.length ? function() {
-                    return arguments.length ?
-                        fn.apply(context || this, curryArgs.concat(aSlice.call(arguments, 0))) :
-                        fn.apply(context || this, curryArgs);
-                } : function() {
-                    return arguments.length ?
-                        fn.apply(context || this, arguments) :
-                        fn.call(context || this);
-                };
-
-            } else {
-                return context;
-            }
         };
 
     return {
@@ -944,11 +911,9 @@ hAzzle.define('util', function() {
         unique: unique,
         indexOf: indexOf,
         filter: filter,
-        now: Date.now,
-        bind: bind
+        now: Date.now
     };
 });
-
 // core.js
 hAzzle.define('Core', function() {
     var docset = 1,
@@ -1474,7 +1439,74 @@ hAzzle.define('Collection', function() {
         makeArray: makeArray,
         slice: slice
     };
-}); // jiesa.js
+});
+// bind.js
+// Overwrite native Function.prototype.bind() with a faster solution,
+// and make it PhantomJS compatible
+Function.prototype.bind = function() {
+    var funcObj = this,
+        slice = Array.prototype.slice,
+        original = funcObj,
+        extraArgs = slice.call(arguments),
+        thisObj = extraArgs.shift(),
+        func = function() {
+            var thatObj = thisObj;
+            return original.apply(thatObj, extraArgs.concat(
+                slice.call(
+                    arguments, extraArgs.length
+                )
+            ));
+        };
+    func.bind = function() {
+        var args = slice.call(arguments);
+        return Function.prototype.bind.apply(funcObj, args);
+    }
+    return func;
+};
+
+hAzzle.define('bind', function() {
+
+    // Dependencies    
+
+    var collection = hAzzle.require('collection');
+
+    // Bind a function to a context, optionally partially applying any
+    // Replacement for bind() - ECMAScript 5 15.3.4.5
+
+    var bind = function(fn, context) {
+
+        var curryArgs = arguments.length > 2 ?
+            collection.slice(arguments, 2) : [],
+            tmp;
+
+        if (typeof context === 'string') {
+
+            tmp = fn[context];
+            context = fn;
+            fn = tmp;
+        }
+
+        if (typeof fn === 'function' && !(context instanceof RegExp)) {
+
+            return curryArgs.length ? function() {
+                return arguments.length ?
+                    fn.apply(context || this, curryArgs.concat(collection.slice(arguments, 0))) :
+                    fn.apply(context || this, curryArgs);
+            } : function() {
+                return arguments.length ?
+                    fn.apply(context || this, arguments) :
+                    fn.call(context || this);
+            };
+
+        } else {
+            return context;
+        }
+    };
+    return {
+        bind: bind
+    };
+});
+// jiesa.js
 hAzzle.define('Jiesa', function() {
 
     var // Dependencies    
@@ -1522,6 +1554,7 @@ hAzzle.define('Jiesa', function() {
                 return elem.type === 'hidden';
 
             },
+
             ':visible': function(elem) {
 
                 return !pseudos[':hidden'](elem);
@@ -2529,6 +2562,7 @@ hAzzle.define('setters', function() {
             '11': 1,
             '12': 1
         },
+
 
         // Get names on the boolean attributes
 

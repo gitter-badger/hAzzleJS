@@ -839,72 +839,16 @@ hAzzle.define('events', function() {
         this.elements[0].addEventListener('DOMContentLoaded', callback, false);
     };
 
-    // PhantomJS doesn't support Array.prototype.bind(), so we do a workaround
-
-    this.blur = function(data, fn) {
-        return arguments.length > 0 ? this.on('blur', data, fn) : this.trigger(prop);
-    };
-    this.focus = function(data, fn) {
-        return arguments.length > 0 ? this.on('focus', data, fn) : this.trigger(prop);
-    };
-    this.click = function(data, fn) {
-        return arguments.length > 0 ? this.on('click', data, fn) : this.trigger(prop);
-    };
-
-    this.load = function(data, fn) {
-        return arguments.length > 0 ? this.on('load', data, fn) : this.trigger(prop);
-    };
-    this.resize = function(data, fn) {
-        return arguments.length > 0 ? this.on('resize', data, fn) : this.trigger(prop);
-    };
-    this.scroll = function(data, fn) {
-        return arguments.length > 0 ? this.on('scroll', data, fn) : this.trigger(prop);
-    };
-    this.dblclick = function(data, fn) {
-        return arguments.length > 0 ? this.on('dblclick', data, fn) : this.trigger(prop);
-    };
-    this.change = function(data, fn) {
-        return arguments.length > 0 ? this.on('change', data, fn) : this.trigger(prop);
-    };
-    this.keydown = function(data, fn) {
-        return arguments.length > 0 ? this.on('keydown', data, fn) : this.trigger(prop);
-    };
-    this.keypress = function(data, fn) {
-        return arguments.length > 0 ? this.on('keypress', data, fn) : this.trigger(prop);
-    };
-    this.keyup = function(data, fn) {
-        return arguments.length > 0 ? this.on('keyup', data, fn) : this.trigger(prop);
-    };
-    this.submit = function(data, fn) {
-        return arguments.length > 0 ? this.on('submit', data, fn) : this.trigger(prop);
-    };
-    this.select = function(data, fn) {
-        return arguments.length > 0 ? this.on('select', data, fn) : this.trigger(prop);
-    };
-    this.mouseenter = function(data, fn) {
-        return arguments.length > 0 ? this.on('mouseenter', data, fn) : this.trigger(prop);
-    };
-    this.mouseout = function(data, fn) {
-        return arguments.length > 0 ? this.on('mouseout', data, fn) : this.trigger(prop);
-    };
-    this.mouseleave = function(data, fn) {
-        return arguments.length > 0 ? this.on('mouseleave', data, fn) : this.trigger(prop);
-    };
-    this.mouseover = function(data, fn) {
-        return arguments.length > 0 ? this.on('mouseover', data, fn) : this.trigger(prop);
-    };
-    this.mousemove = function(data, fn) {
-        return arguments.length > 0 ? this.on('mousemove', data, fn) : this.trigger(prop);
-    };
-    this.mouseup = function(data, fn) {
-        return arguments.length > 0 ? this.on('mouseup', data, fn) : this.trigger(prop);
-    };
-    this.mousedown = function(data, fn) {
-        return arguments.length > 0 ? this.on('mousedown', data, fn) : this.trigger(prop);
-    };
-    this.unload = function(data, fn) {
-        return arguments.length > 0 ? this.on('unload', data, fn) : this.trigger(prop);
-    };
+ util.each(('blur focus focusin focusout load resize scroll unload click dblclick ' +
+        'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
+        'change select submit keydown keypress keyup error contextmenu').split(' '), function(prop) {
+              // Handle event binding
+        this[prop] = function(data, fn) {
+            return arguments.length > 0 ?
+                this.on(prop, data, fn) :
+                this.trigger(prop);
+        };
+         }.bind(this));
 
     // Mouse wheel
 
