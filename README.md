@@ -98,7 +98,6 @@ or
 console.log(jQuery.css($('#console')[0], 'width') )
 
 ```
-
 Native javascript
 -----------------
 Each Core module has it's own stand-alone methods that let you use the methods you need with native Javascript. So you are not bound to use the build-in selector engine.
@@ -180,6 +179,79 @@ css.toPx(element, '2em');
 ```
 
 For the other methods - e.g.  **height()** and **offset()** you need to include the **dimensjons.js** module.
+
+Feature / Browser detection
+----------------------------
+
+hAzzle Core has build in methods for handling feature / browser, following the ** Modernizr**  style with a few exception.
+
+Adding a test case:
+
+```javascript
+
+// Include the needed module
+var feature = hAzzle.require('has')
+
+// Adding test cases with functions
+
+add('chrome', function() { return win.chrome; });
+
+// Adding test case without function
+  // Chrome
+    add('chrome', win.chrome);
+
+```
+Both examples above will return the same result.
+
+Check if the browser are Chrome:
+
+```javascript
+
+// Include the needed module
+var feature = hAzzle.require('has')
+
+// Returning a boolean
+
+feature.has('chrome');
+```
+
+You can also add test cases with object, just like this:
+
+```javascript
+
+// Include the needed module
+var feature = hAzzle.require('has')
+
+add({
+
+ 'chrome': !!win.chrome,
+ 'firefox': typeof InstallTrigger !== 'undefined'   
+ })
+```
+
+Accessing the feature detection cache:
+
+```javascript
+
+// Include the needed module
+var feature = hAzzle.require('has')
+
+// Output cache content to the console
+console.log(feature.cache)
+
+```
+Internet Explorer detection are a unique case. And can be done like this:
+
+```javascript
+
+// Include the needed module
+var feature = hAzzle.require('has')
+// Output boolean and version number
+
+// Or simple IE detection
+feature.has('ie');
+```
+**Note!** hAzzle avoid use of **userAgent** to detect browsers, and instead rely on feature detection
 
 Your modules
 --------------
