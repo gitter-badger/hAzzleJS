@@ -265,7 +265,7 @@ You can develop your own modules for **hAzzle**. If you do so, upload them to th
 DOM Level 4 (DL4)
 ------------------
 
- **hAzzle** has a build in polify in the Core supporting the most common features. And also fixes a couple of cross-browser issues (e.g. IE9 and IE10's customEvent() are not usable as a constructor. The polify can't be removed, and needed for some of the modules (not part of the Core) to work. 
+ **hAzzle** has a build in polify in the Core supporting the most common features. And also fixes a couple of cross-browser issues (e.g. **IE9** and **IE10**'s customEvent() are not usable as a constructor. The polify can't be removed, and needed for some of the modules (not part of the Core) to work. 
 
 * prepend
 * append
@@ -278,7 +278,7 @@ DOM Level 4 (DL4)
 
 ECMA 7
 -------
-**ECMA 6** are soon to be part of the modern browsers, and **ECMA 7** are still experimental, but still **hAzzle** are forced to support ECMA 7 because of a few experimental methods are supported in **Firefox v. 35**. 
+**ECMA 6** are soon to be part of the modern browsers, and **ECMA 7** are still experimental, but still **hAzzle** are forced to support **ECMA 7** because of a few experimental methods are supported in **Firefox v. 35**. 
 
 This browser includes support for the 'contains' method of **ECMA 7**, and based on the fact that hAzzle's main goal are to make all browsers equal, this is now part of the **Core**. 
 
