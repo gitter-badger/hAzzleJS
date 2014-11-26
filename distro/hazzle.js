@@ -508,7 +508,7 @@ hAzzle.define('text', function() {
 hAzzle.define('util', function() {
 
     var // Dependencies
-
+    
         types = hAzzle.require('types'),
         oKeys = Object.keys,
 
@@ -572,7 +572,7 @@ hAzzle.define('util', function() {
             return obj;
         },
 
-        createCallback = function(fn, arg, count) {
+    createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
                 if (arg === undefined) return fn;
                 count = !count ? 3 : count;
@@ -600,7 +600,7 @@ hAzzle.define('util', function() {
         },
 
         // Determine if at least one element in the object matches a truth test. 
-        // ECMAScript 5 15.4.4.17
+        // ECMA-5 15.4.4.17
 
         some = function(obj, fn, context) {
             if (obj) {
@@ -783,7 +783,7 @@ hAzzle.define('util', function() {
         },
 
         // Replacement for indexOf
-        // ECMAScript 5 15.4.4.14
+        // ECMA-5 15.4.4.14
 
         indexOf = function(arr, item, isSorted) {
 
@@ -833,7 +833,7 @@ hAzzle.define('util', function() {
         },
 
         // Return the results of applying the callback to each element.
-        // ECMAScript 5 15.4.4.19
+        // ECMA-5 15.4.4.19
 
         map = function(obj, fn, context) {
             if (obj) {
@@ -851,7 +851,7 @@ hAzzle.define('util', function() {
             return [];
         },
         // Reduces a collection
-        // ECMAScript 5 15.4.4.21     
+        // ECMA-5 15.4.4.21     
         reduce = function(collection, fn, accumulator, args) {
 
             if (collection) {
@@ -883,7 +883,7 @@ hAzzle.define('util', function() {
         },
 
         // Native solution for filtering arrays. 
-        // ECMAScript 5 15.4.4.20  
+        // ECMA-5 15.4.4.20  
 
         filter = function(arr, fn, context) {
             var results = [];
@@ -2541,7 +2541,7 @@ hAzzle.define('setters', function() {
         boolAttr = {}, // Boolean attributes
         boolElem = {}; // Boolean elements
 
-    // Test attributes.
+    // Capability checks
 
     var classProp = 'className',
         forProp = 'for';
@@ -2561,13 +2561,14 @@ hAzzle.define('setters', function() {
     (function() {
         var label = document.createElement('label');
         label.setAttribute(forProp, 'x');
-        if (label.htmlFor !== 'x') {
+        // translate content name `htmlFor`
+        if (label.getAttribute.htmlFor !== 'x') {
             label.setAttribute('htmlFor', 'x');
-            if (label.htmlFor === 'x')
+            if (label.getAttribute.htmlFor === 'x')
                 forProp = 'htmlFor';
         }
     }());
-    alert(classProp)
+
     var propMap = {
 
             'class': classProp,

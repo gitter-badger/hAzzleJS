@@ -838,7 +838,7 @@ hAzzle.define('events', function() {
     this.ready = function(callback) {
         this.elements[0].addEventListener('DOMContentLoaded', callback, false);
     };
-
+// mandate event attribute getter
  util.each(('blur focus focusin focusout load resize scroll unload click dblclick ' +
         'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
         'change select submit keydown keypress keyup error contextmenu').split(' '), function(prop) {

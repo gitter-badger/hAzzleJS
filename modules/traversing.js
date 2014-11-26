@@ -1,6 +1,8 @@
 // traversing.js
 var hAzzle = window.hAzzle || (window.hAzzle = {});
 
+// Support W3C ElementTraversal interface
+ 
 hAzzle.define('traversing', function() {
 
     var jiesa = hAzzle.require('jiesa'),

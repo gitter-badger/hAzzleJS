@@ -94,7 +94,7 @@ hAzzle.define('util', function() {
         },
 
         // Determine if at least one element in the object matches a truth test. 
-        // ECMAScript 5 15.4.4.17
+        // ECMA-5 15.4.4.17
 
         some = function(obj, fn, context) {
             if (obj) {
@@ -277,7 +277,7 @@ hAzzle.define('util', function() {
         },
 
         // Replacement for indexOf
-        // ECMAScript 5 15.4.4.14
+        // ECMA-5 15.4.4.14
 
         indexOf = function(arr, item, isSorted) {
 
@@ -327,7 +327,7 @@ hAzzle.define('util', function() {
         },
 
         // Return the results of applying the callback to each element.
-        // ECMAScript 5 15.4.4.19
+        // ECMA-5 15.4.4.19
 
         map = function(obj, fn, context) {
             if (obj) {
@@ -345,7 +345,7 @@ hAzzle.define('util', function() {
             return [];
         },
         // Reduces a collection
-        // ECMAScript 5 15.4.4.21     
+        // ECMA-5 15.4.4.21     
         reduce = function(collection, fn, accumulator, args) {
 
             if (collection) {
@@ -377,7 +377,7 @@ hAzzle.define('util', function() {
         },
 
         // Native solution for filtering arrays. 
-        // ECMAScript 5 15.4.4.20  
+        // ECMA-5 15.4.4.20  
 
         filter = function(arr, fn, context) {
             var results = [];

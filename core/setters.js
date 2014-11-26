@@ -32,7 +32,7 @@ hAzzle.define('setters', function() {
         boolAttr = {}, // Boolean attributes
         boolElem = {}; // Boolean elements
 
-    // Test attributes.
+    // Capability checks
 
     var classProp = 'className',
         forProp = 'for';
@@ -52,13 +52,14 @@ hAzzle.define('setters', function() {
     (function() {
         var label = document.createElement('label');
         label.setAttribute(forProp, 'x');
-        if (label.htmlFor !== 'x') {
+        // translate content name `htmlFor`
+        if (label.getAttribute.htmlFor !== 'x') {
             label.setAttribute('htmlFor', 'x');
-            if (label.htmlFor === 'x')
+            if (label.getAttribute.htmlFor === 'x')
                 forProp = 'htmlFor';
         }
     }());
-    alert(classProp)
+
     var propMap = {
 
             'class': classProp,
