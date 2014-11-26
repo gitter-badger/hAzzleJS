@@ -196,25 +196,24 @@ var feature = hAzzle.require('has')
 
 add('chrome', function() { return win.chrome; });
 
-// Adding test case without function
-  // Chrome
+// Adding the same test case without function
+  
     add('chrome', win.chrome);
 
 ```
 Both examples above will return the same result.
 
-Check if the browser are Chrome:
+Another example:
 
 ```javascript
 
 // Include the needed module
 var feature = hAzzle.require('has')
 
-// Returning a boolean
+// Check if the browser are Chrome ( will return a boolean value):
 
 feature.has('chrome');
 ```
-
 You can also add test cases with object, just like this:
 
 ```javascript
@@ -245,10 +244,13 @@ Internet Explorer detection are a unique case. And can be done like this:
 ```javascript
 
 // Include the needed module
+
 var feature = hAzzle.require('has')
+
 // Output boolean and version number
 
 // Or simple IE detection
+
 feature.has('ie');
 ```
 **Note!** hAzzle avoid use of **userAgent** to detect browsers, and instead rely on feature detection
