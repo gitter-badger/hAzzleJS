@@ -696,5 +696,6 @@ Browser compatiblity
 </tbody>
 </table>
 
-
+Developer: Kenny Flashlight
+Github pages: http://hazzlejs.github.io/hAzzleJS/
 
