@@ -5,58 +5,13 @@
  * Version: 1.0.2d
  * Released under the MIT License.
  *
- * Date: 2014-11-26
+ * Date: 2014-11-24
  */
 (function() {
 
     var
 
-    // Container for all modules
-
-        modules = {},
-
-        // Container for installed modules
-
-        installed = {},
-
-        // Version
-
-        version = '1.0.2d',
-
-        // Codename
-
-        codename = 'new-age',
-
-        // Throws an error if `condition` is `true`.
-
-        err = function(condition, code, message) {
-            if (condition) {
-                throw new Error('[hAzzle-' + code + '] ' + message);
-            }
-        },
-
-        // Require a module
-
-        require = function(name) {
-            if (name && typeof name === 'string') {
-                return modules[name.toLowerCase()];
-            }
-        },
-
-        // Define a module
-
-        define = function(name, fn) {
-            if (typeof name === 'string' && typeof fn === 'function' && !modules[name]) {
-                installed[name.toLowerCase()] = true;
-                modules[name.toLowerCase()] = fn.call(hAzzle.prototype);
-            }
-        },
-
-        validTypes = function(elem) {
-            return elem && (elem.ELEMENT_NODE || elem.DOCUMENT_NODE);
-        },
-
-        // Define a local copy of hAzzle
+    // Define a local copy of hAzzle
 
         hAzzle = function(selector, context) {
 
@@ -99,7 +54,7 @@
                 var util = require('Util');
                 this.elements = util.unique(util.filter(selector, validTypes));
                 // nodeList
-            } else if (this.isNodeList(selector)) {
+            } else if (require('types').isNodeList(selector)) {
                 var util = require('Util');
                 this.elements = util.filter(util.makeArray(selector), validTypes);
                 // DOMElement
@@ -141,11 +96,52 @@
 
             }
             return this;
-        };
+        },
 
-    var _hAzzle = window.hAzzle;
+        // Container for all modules
 
-    // Restores original hAzzle namespace  
+        modules = {},
+
+        // Container for installed modules
+
+        installed = hAzzle.installed = {},
+
+        // Version
+
+        version = hAzzle.version = '1.0.2d',
+
+        // Throws an error if `condition` is `true`.
+
+        err = hAzzle.err = function(condition, code, message) {
+            if (condition) {
+                throw new Error('[hAzzle-' + code + '] ' + message);
+            }
+        },
+
+        // Require a module
+
+        require = hAzzle.require = function(name) {
+            if (name && typeof name === 'string') {
+                return modules[name.toLowerCase()];
+            }
+        },
+
+        // Define a module
+
+        define = hAzzle.define = function(name, fn) {
+            if (typeof name === 'string' && typeof fn === 'function' && !modules[name]) {
+                installed[name.toLowerCase()] = true;
+                modules[name.toLowerCase()] = fn.call(hAzzle.prototype);
+            }
+        },
+
+        validTypes = function(elem) {
+            return elem && (elem.ELEMENT_NODE || elem.DOCUMENT_NODE);
+        },
+
+        _hAzzle = window.hAzzle;
+
+    // Restore original hAzzle namespace  
 
     hAzzle.noConflict = function() {
         if (window.hAzzle === hAzzle) {
@@ -154,15 +150,6 @@
 
         return window;
     };
-
-    // Expose
-
-    hAzzle.err = err;
-    hAzzle.installed = installed;
-    hAzzle.require = require;
-    hAzzle.define = define;
-    hAzzle.codename = codename;
-    hAzzle.version = version;
 
     // Expose hAzzle to the global namespace
 
