@@ -207,9 +207,7 @@ hAzzle.define('has', function() {
 
             if (typeof name == 'object') {
                 for (var key in name) {
-                    if (Object.prototype.hasOwnProperty(name, key)) {
-                        add(key, name[key]);
-                    }
+                    add(key, name[key]);
                 }
             } else {
                 (typeof cache[name] === 'undefined' || force) && (cache[name] = test);
@@ -224,69 +222,72 @@ hAzzle.define('has', function() {
 
     //# FEATURE DETECTION
 
-    // Mobile
+    add({
 
-    add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
+        // Mobile
 
-    // Android
+        'mobile': /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua),
 
-    add('android', /^Android/i.test(ua));
+        // Android
 
-    // Opera
-    add('opera',
-        oString.call(window.opera) === '[object Opera]'
-    );
+        'android': /^Android/i.test(ua),
 
-    // Firefox
-    add('firefox', typeof InstallTrigger !== 'undefined');
+        // Opera
 
-    // Chrome
-    add('chrome', win.chrome);
+        'opera': oString.call(window.opera) === '[object Opera]',
 
-    // Webkit
-    add('webkit', 'WebkitAppearance' in doc.documentElement.style);
+        // Firefox
+        'firefox': typeof InstallTrigger !== 'undefined',
 
-    // Safari
-    add('safari', oString.call(window.HTMLElement).indexOf('Constructor') > 0);
+        // Chrome
+        'chrome': !!win.chrome,
 
-    // Internet Explorer
-    add('ie', function() {
-        return false || !!doc.documentMode;
+        // Webkit
+        'webkit': 'WebkitAppearance' in doc.documentElement.style,
+
+        // Safari
+        'safari': oString.call(window.HTMLElement).indexOf('Constructor') > 0,
+
+        // Internet Explorer
+        'ie': function() {
+            return false || !!doc.documentMode;
+        },
+
+        // Macintosh
+        'mac': navigator.appVersion.indexOf('Macintosh') >= 0,
+
+        // ClassList
+        'classlist': !!document.documentElement.classList,
+
+        // Quirks mode
+
+        'quirks': document.compatMode === 'BackCompat',
+
+        // XPath
+
+        'xpath': !!doc.evaluate,
+
+        // Air 
+
+        'air': !!win.runtime,
+
+        // Detects native support for the Dart programming language
+
+        'dart': !!(win.startDart || doc.startDart),
+
+        // Detects native support for promises
+
+        'promise': !!win.Promise,
+
+        // Audio detection
+
+        'audio': !!('webkitAudioContext' in window || 'AudioContext' in window),
+
+        // QuerySelectorAll
+
+        'qsa': !!document.querySelectorAll
+
     });
-
-    // Macintosh
-    add('mac', navigator.appVersion.indexOf('Macintosh') >= 0);
-
-    // ClassList
-    add('classlist', !!document.documentElement.classList);
-
-    // Quirks mode
-
-    add('quirks', document.compatMode === 'BackCompat');
-
-    // XPath
-
-    add('xpath', !!doc.evaluate);
-
-    // Air 
-
-    add('air', !!win.runtime);
-
-    // Detects native support for the Dart programming language
-
-    add('dart', !!(win.startDart || doc.startDart));
-
-    // Detects native support for promises
-
-    add('promise', !!win.Promise);
-
-    // Audio detection
-
-    add('audio', !!('webkitAudioContext' in window || 'AudioContext' in window));
-
-    // QuerySelectorAll
-
-    add('qsa', !!document.querySelectorAll);
 
     return {
         has: has,
@@ -328,9 +329,9 @@ hAzzle.define('Types', function() {
         isNumber = function(value) {
             return typeof value === 'number';
         },
-        isNumeric = function( obj ) {
-		return !isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
-	    },
+        isNumeric = function(obj) {
+            return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
+        },
 
         isBoolean = function(value) {
             return typeof value === 'boolean';
@@ -382,7 +383,7 @@ hAzzle.define('Types', function() {
         },
 
         // Returns a function that returns `true` if `arg` is of the correct `type`, otherwise `false`.
-        // e.g isType('Function')( fn )
+        // e.g isType('Date')( fn )
 
         isType = function(type) {
             return type ? function(arg) {
@@ -451,13 +452,13 @@ hAzzle.define('Types', function() {
         isNumber: isNumber,
         isBoolean: isBoolean,
         isNaN: isNaN,
-        isSVGElem:isSVGElem,
+        isSVGElem: isSVGElem,
         isDefined: isDefined,
         isUndefined: isUndefined,
         isNodeList: isNodeList,
-        
+
         // This method are *only* added here to do it easier for developers
-       
+
         isFunction: isType('Function')
     };
 });
@@ -501,7 +502,7 @@ hAzzle.define('text', function() {
 hAzzle.define('util', function() {
 
     var // Dependencies
-    
+
         types = hAzzle.require('types'),
         oKeys = Object.keys,
 
@@ -565,10 +566,10 @@ hAzzle.define('util', function() {
             return obj;
         },
 
-    createCallback = function(fn, arg, count) {
+        createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
                 if (arg === undefined) {
-                return fn;
+                    return fn;
                 }
                 count = !count ? 3 : count;
                 return count === 1 ? function(value) {
@@ -601,9 +602,10 @@ hAzzle.define('util', function() {
             if (obj) {
                 fn = iterate(fn, context);
 
-           var keys = obj.length !== +obj.length && oKeys(obj),
-               length = (keys || obj).length,
-                i = 0, currentKey;
+                var keys = obj.length !== +obj.length && oKeys(obj),
+                    length = (keys || obj).length,
+                    i = 0,
+                    currentKey;
 
                 for (; i < context; i++) {
 
@@ -1888,7 +1890,7 @@ hAzzle.define('Strings', function() {
             return camelCache[str] ? camelCache[str] :
                 camelCache[str] = str.
             replace(specialChars, fcamelize).
-            // Special replace for the 'Moz' prefix
+                // Special replace for the 'Moz' prefix
             replace(mozPrefix, 'Moz$1');
         },
 
@@ -2553,7 +2555,7 @@ hAzzle.define('setters', function() {
     // This seems to be a bug in jQuery, why??
     (function() {
         var div = document.createElement('div');
-            // #IE9+
+        // #IE9+
         div.setAttribute('class', 'x');
         if (div.className === 'x') {
             classProp = 'class';
@@ -2570,7 +2572,7 @@ hAzzle.define('setters', function() {
             label.setAttribute('htmlFor', 'x');
             if (label.getAttribute.htmlFor === 'x') {
                 forProp = 'htmlFor';
-            }    
+            }
         }
     }());
 
@@ -2859,19 +2861,22 @@ hAzzle.define('setters', function() {
 
     // Populate boolAttr 
 
-    for (; (at = boolElemArray[i]); i++) {
+    for (;
+        (at = boolElemArray[i]); i++) {
         boolAttr[at.toLowerCase()] = at;
     }
 
 
     // Populate boolElem 
-    for (i = 0; (at = boolAttrArray[i]); i++) {
+    for (i = 0;
+        (at = boolAttrArray[i]); i++) {
         boolElem[at] = true;
     }
 
     // Populate propMap - all properties are written as camelCase
 
-    for (i = 0; (at = camelCasedAttr[i]); i++) {
+    for (i = 0;
+        (at = camelCasedAttr[i]); i++) {
         propMap[at.toLowerCase()] = at;
     }
 
@@ -2995,8 +3000,8 @@ hAzzle.define('valhooks', function() {
 
             while (i--) {
                 option = options[i];
-              
-              // ECMA 7 - contains
+
+                // ECMA 7 - contains
 
                 if ((option.selected = values.contains(option.value))) {
                     optionSet = true;
@@ -3013,14 +3018,14 @@ hAzzle.define('valhooks', function() {
 
     // Getter    
     util.mixin(setters.valHooks.get, {
-        
-      'type': function(elem) {
-        // Some browsers don't recognize input[type=email] etc.
-        return elem.getAttribute('type') || elem.type;
-        
+
+        'type': function(elem) {
+            // Some browsers don't recognize input[type=email] etc.
+            return elem.getAttribute('type') || elem.type;
+
         },
 
-        'option': function(elem) { 
+        'option': function(elem) {
             var val = elem.getAttribute(name, 2);
             return val !== null ? val : strings.trim(text.getText(elem));
         },
@@ -3041,7 +3046,7 @@ hAzzle.define('valhooks', function() {
             i = one ? index : 0;
             max = one ? index + 1 : options.length;
             for (; i < max; i++) {
-              // IE9
+                // IE9
                 option = options[i];
                 // Traverse the option element when the elements needed to filter out disabled
                 if (option.selected && option.getAttribute('disabled') === null &&
@@ -3070,12 +3075,12 @@ hAzzle.define('valhooks', function() {
     util.each(['radio', 'checkbox'], function(val) {
         setters.valHooks.set[val] = function(elem, value) {
             if (types.isArray(value)) {
-               // ECMA 7 - contains
-                return (elem.checked = value.contains( hAzzle(elem).val() ));
+                // ECMA 7 - contains
+                return (elem.checked = value.contains(hAzzle(elem).val()));
             }
         };
     });
-    
+
     if (!supportCheckboxes) {
         setters.valHooks.get[val] = function(elem) {
             return elem.getAttribute('value') === null ? 'on' : elem.value;

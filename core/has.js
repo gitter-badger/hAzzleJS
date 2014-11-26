@@ -46,9 +46,7 @@ hAzzle.define('has', function() {
 
             if (typeof name == 'object') {
                 for (var key in name) {
-                    if (Object.prototype.hasOwnProperty(name, key)) {
-                        add(key, name[key]);
-                    }
+                    add(key, name[key]);
                 }
             } else {
                 (typeof cache[name] === 'undefined' || force) && (cache[name] = test);
@@ -63,69 +61,72 @@ hAzzle.define('has', function() {
 
     //# FEATURE DETECTION
 
-    // Mobile
+    add({
 
-    add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
+        // Mobile
 
-    // Android
+        'mobile': /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua),
 
-    add('android', /^Android/i.test(ua));
+        // Android
 
-    // Opera
-    add('opera',
-        oString.call(window.opera) === '[object Opera]'
-    );
+        'android': /^Android/i.test(ua),
 
-    // Firefox
-    add('firefox', typeof InstallTrigger !== 'undefined');
+        // Opera
 
-    // Chrome
-    add('chrome', win.chrome);
+        'opera': oString.call(window.opera) === '[object Opera]',
 
-    // Webkit
-    add('webkit', 'WebkitAppearance' in doc.documentElement.style);
+        // Firefox
+        'firefox': typeof InstallTrigger !== 'undefined',
 
-    // Safari
-    add('safari', oString.call(window.HTMLElement).indexOf('Constructor') > 0);
+        // Chrome
+        'chrome': !!win.chrome,
 
-    // Internet Explorer
-    add('ie', function() {
-        return false || !!doc.documentMode;
+        // Webkit
+        'webkit': 'WebkitAppearance' in doc.documentElement.style,
+
+        // Safari
+        'safari': oString.call(window.HTMLElement).indexOf('Constructor') > 0,
+
+        // Internet Explorer
+        'ie': function() {
+            return false || !!doc.documentMode;
+        },
+
+        // Macintosh
+        'mac': navigator.appVersion.indexOf('Macintosh') >= 0,
+
+        // ClassList
+        'classlist': !!document.documentElement.classList,
+
+        // Quirks mode
+
+        'quirks': document.compatMode === 'BackCompat',
+
+        // XPath
+
+        'xpath': !!doc.evaluate,
+
+        // Air 
+
+        'air': !!win.runtime,
+
+        // Detects native support for the Dart programming language
+
+        'dart': !!(win.startDart || doc.startDart),
+
+        // Detects native support for promises
+
+        'promise': !!win.Promise,
+
+        // Audio detection
+
+        'audio': !!('webkitAudioContext' in window || 'AudioContext' in window),
+
+        // QuerySelectorAll
+
+        'qsa': !!document.querySelectorAll,
+
     });
-
-    // Macintosh
-    add('mac', navigator.appVersion.indexOf('Macintosh') >= 0);
-
-    // ClassList
-    add('classlist', !!document.documentElement.classList);
-
-    // Quirks mode
-
-    add('quirks', document.compatMode === 'BackCompat');
-
-    // XPath
-
-    add('xpath', !!doc.evaluate);
-
-    // Air 
-
-    add('air', !!win.runtime);
-
-    // Detects native support for the Dart programming language
-
-    add('dart', !!(win.startDart || doc.startDart));
-
-    // Detects native support for promises
-
-    add('promise', !!win.Promise);
-
-    // Audio detection
-
-    add('audio', !!('webkitAudioContext' in window || 'AudioContext' in window));
-
-    // QuerySelectorAll
-
-    add('qsa', !!document.querySelectorAll);
 
     return {
         has: has,
