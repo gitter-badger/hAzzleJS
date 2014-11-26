@@ -467,6 +467,10 @@ Core
         <td>Ultility belt functions faithfull to native Javascript and browser features</td>
   </tr>
   <tr>
+    <th><a href="core/bind.js#files">bind</a></th>
+        <td>Provides a optimized cross-browser Function.prototype.bind(), and a internal native prototype bind()alternative</td>
+  </tr>
+  <tr>
     <th><a href="core/text.js#files">text</a></th>
         <td></td>
   </tr>
