@@ -305,7 +305,8 @@ hAzzle.define('dimensions', function() {
         }
 
         var elem = this.elements[0],
-        style = elem.style,
+            style = elem.style,
+            body = elem.body,
             originalValues = false,
 
             // Get window width or height
@@ -320,23 +321,21 @@ hAzzle.define('dimensions', function() {
         // offsetHeight/offsetWidth properties return 0 on elements
         // with display:none, so show the element temporarily
 
-        if (!doc && !!elem.style && !elem.offsetWidth && !elem.offsetHeight) {
-
-                originalValues = style.cssText;
+        if (!doc && !!style && !elem.offsetWidth && !elem.offsetHeight) {
+            originalValues = style.cssText;
             style.cssText += ';display:block;visibility:hidden;position:absolute;';
-
         }
         // Calculate width
 
         var width = win ? elem.document.documentElement.clientWidth :
-            doc ? Math.max(elem.body.scrollWidth, elem.body.offsetWidth, doc.scrollWidth, doc.offsetWidth, doc.clientWidth) :
+            doc ? Math.max(body.scrollWidth, body.offsetWidth, doc.scrollWidth, doc.offsetWidth, doc.clientWidth) :
             elem.offsetWidth,
 
             // Calculate height
 
             height = win ? elem.document.documentElement.clientHeight :
 
-            doc ? Math.max(elem.body.scrollHeight, elem.body.offsetHeight, doc.scrollHeight, doc.offsetHeight, doc.clientHeight) :
+            doc ? Math.max(body.scrollHeight, body.offsetHeight, doc.scrollHeight, doc.offsetHeight, doc.clientHeight) :
             elem.offsetHeight;
 
 
