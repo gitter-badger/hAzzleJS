@@ -48,7 +48,7 @@ hAzzle.define('svg', function() {
             var i = 0,
                 len = checkSet.length;
             for (; i < len; i++) {
-                if (checkSet[i].nodeType == 1 && checkSet[i].namespaceURI === svgNS) {
+                if (checkSet[i].nodeType === 1 && checkSet[i].namespaceURI === svgNS) {
                     return true;
                 }
             }

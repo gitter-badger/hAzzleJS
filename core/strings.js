@@ -50,10 +50,12 @@ hAzzle.define('strings', function() {
         },
 
         // Convert a string to camel case notation.
+        // Support: IE9-11+
         camelize = function(str) {
             return camelCache[str] ? camelCache[str] :
                 camelCache[str] = str.
             replace(specialChars, fcamelize).
+            // Special replace for the 'Moz' prefix
             replace(mozPrefix, 'Moz$1');
         },
 

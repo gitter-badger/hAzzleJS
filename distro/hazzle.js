@@ -241,9 +241,6 @@ hAzzle.define('has', function() {
 
     // Opera
     add('opera',
-        // Opera 8.x+ can be detected with `window.opera`
-        // This is a safer inference than plain boolean type conversion of `window.opera`
-        // But note that the newer Opera versions (15.x+) are using the webkit engine
         oString.call(window.opera) === '[object Opera]'
     );
 
@@ -259,7 +256,7 @@ hAzzle.define('has', function() {
     // Safari
     add('safari', oString.call(window.HTMLElement).indexOf('Constructor') > 0);
 
-    // ie
+    // Internet Explorer
     add('ie', function() {
         return false || !!doc.documentMode;
     });
@@ -272,7 +269,7 @@ hAzzle.define('has', function() {
 
     // Quirks mode
 
-    add('quirks', document.compatMode == 'BackCompat');
+    add('quirks', document.compatMode === 'BackCompat');
 
     // XPath
 
@@ -574,7 +571,9 @@ hAzzle.define('util', function() {
 
     createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
-                if (arg === undefined) return fn;
+                if (arg === undefined) {
+                return fn;
+                }
                 count = !count ? 3 : count;
                 return count === 1 ? function(value) {
                         return fn.call(arg, value);
@@ -606,15 +605,9 @@ hAzzle.define('util', function() {
             if (obj) {
                 fn = iterate(fn, context);
 
-                context = (keys || obj).length;
-
-                var keys,
-                    i = 0,
-                    currentKey;
-
-                if (obj.length !== +obj.length) {
-                    keys = keys(obj);
-                }
+           var keys = obj.length !== +obj.length && oKeys(obj),
+               length = (keys || obj).length,
+                i = 0, currentKey;
 
                 for (; i < context; i++) {
 
@@ -1894,10 +1887,12 @@ hAzzle.define('Strings', function() {
         },
 
         // Convert a string to camel case notation.
+        // Support: IE9-11+
         camelize = function(str) {
             return camelCache[str] ? camelCache[str] :
                 camelCache[str] = str.
             replace(specialChars, fcamelize).
+            // Special replace for the 'Moz' prefix
             replace(mozPrefix, 'Moz$1');
         },
 
@@ -2548,7 +2543,7 @@ hAzzle.define('setters', function() {
 
     // This seems to be a bug in jQuery, why??
     (function() {
-        var div = document.createElement('div')
+        var div = document.createElement('div');
             // #IE9+
         div.setAttribute('class', 'x');
         if (div.className === 'x') {
@@ -2564,8 +2559,9 @@ hAzzle.define('setters', function() {
         // translate content name `htmlFor`
         if (label.getAttribute.htmlFor !== 'x') {
             label.setAttribute('htmlFor', 'x');
-            if (label.getAttribute.htmlFor === 'x')
+            if (label.getAttribute.htmlFor === 'x') {
                 forProp = 'htmlFor';
+            }    
         }
     }());
 
@@ -2854,19 +2850,19 @@ hAzzle.define('setters', function() {
 
     // Populate boolAttr 
 
-    for (; at = boolElemArray[i]; i++) {
+    for (; (at = boolElemArray[i]); i++) {
         boolAttr[at.toLowerCase()] = at;
     }
 
 
     // Populate boolElem 
-    for (i = 0; at = boolAttrArray[i]; i++) {
+    for (i = 0; (at = boolAttrArray[i]); i++) {
         boolElem[at] = true;
     }
 
     // Populate propMap - all properties are written as camelCase
 
-    for (i = 0; at = camelCasedAttr[i]; i++) {
+    for (i = 0; (at = camelCasedAttr[i]); i++) {
         propMap[at.toLowerCase()] = at;
     }
 

@@ -39,7 +39,7 @@ hAzzle.define('setters', function() {
 
     // This seems to be a bug in jQuery, why??
     (function() {
-        var div = document.createElement('div')
+        var div = document.createElement('div');
             // #IE9+
         div.setAttribute('class', 'x');
         if (div.className === 'x') {
@@ -55,8 +55,9 @@ hAzzle.define('setters', function() {
         // translate content name `htmlFor`
         if (label.getAttribute.htmlFor !== 'x') {
             label.setAttribute('htmlFor', 'x');
-            if (label.getAttribute.htmlFor === 'x')
+            if (label.getAttribute.htmlFor === 'x') {
                 forProp = 'htmlFor';
+            }    
         }
     }());
 
@@ -345,19 +346,19 @@ hAzzle.define('setters', function() {
 
     // Populate boolAttr 
 
-    for (; at = boolElemArray[i]; i++) {
+    for (; (at = boolElemArray[i]); i++) {
         boolAttr[at.toLowerCase()] = at;
     }
 
 
     // Populate boolElem 
-    for (i = 0; at = boolAttrArray[i]; i++) {
+    for (i = 0; (at = boolAttrArray[i]); i++) {
         boolElem[at] = true;
     }
 
     // Populate propMap - all properties are written as camelCase
 
-    for (i = 0; at = camelCasedAttr[i]; i++) {
+    for (i = 0; (at = camelCasedAttr[i]); i++) {
         propMap[at.toLowerCase()] = at;
     }
 

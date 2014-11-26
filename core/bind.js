@@ -18,7 +18,7 @@ Function.prototype.bind = function() {
     func.bind = function() {
         var args = slice.call(arguments);
         return Function.prototype.bind.apply(funcObj, args);
-    }
+    };
     return func;
 };
 

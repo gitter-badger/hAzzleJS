@@ -67,9 +67,6 @@ hAzzle.define('has', function() {
 
     // Opera
     add('opera',
-        // Opera 8.x+ can be detected with `window.opera`
-        // This is a safer inference than plain boolean type conversion of `window.opera`
-        // But note that the newer Opera versions (15.x+) are using the webkit engine
         oString.call(window.opera) === '[object Opera]'
     );
 
@@ -85,7 +82,7 @@ hAzzle.define('has', function() {
     // Safari
     add('safari', oString.call(window.HTMLElement).indexOf('Constructor') > 0);
 
-    // ie
+    // Internet Explorer
     add('ie', function() {
         return false || !!doc.documentMode;
     });
@@ -98,7 +95,7 @@ hAzzle.define('has', function() {
 
     // Quirks mode
 
-    add('quirks', document.compatMode == 'BackCompat');
+    add('quirks', document.compatMode === 'BackCompat');
 
     // XPath
 

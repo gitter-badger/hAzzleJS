@@ -68,7 +68,9 @@ hAzzle.define('util', function() {
 
     createCallback = function(fn, arg, count) {
             if (typeof fn === 'function') {
-                if (arg === undefined) return fn;
+                if (arg === undefined) {
+                return fn;
+                }
                 count = !count ? 3 : count;
                 return count === 1 ? function(value) {
                         return fn.call(arg, value);
@@ -100,15 +102,9 @@ hAzzle.define('util', function() {
             if (obj) {
                 fn = iterate(fn, context);
 
-                context = (keys || obj).length;
-
-                var keys,
-                    i = 0,
-                    currentKey;
-
-                if (obj.length !== +obj.length) {
-                    keys = keys(obj);
-                }
+           var keys = obj.length !== +obj.length && oKeys(obj),
+               length = (keys || obj).length,
+                i = 0, currentKey;
 
                 for (; i < context; i++) {
 
