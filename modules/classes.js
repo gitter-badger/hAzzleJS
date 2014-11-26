@@ -67,7 +67,9 @@ hAzzle.define('classes', function() {
 
             classes = str2array(classes);
 
-            // Use native classList property if possible
+            // Use native classList property if possible. #IE9 doesn't support it, but
+            // as soon as we can skip IE9 support everything would be much easier.
+            // http://www.netmarketshare.com/browser-market-share.aspx?qprid=2&qpcustomd=0
 
             if (clist) {
 
