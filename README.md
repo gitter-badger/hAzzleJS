@@ -183,7 +183,7 @@ For the other methods - e.g.  **height()** and **offset()** you need to include 
 Feature / Browser detection
 ----------------------------
 
-hAzzle Core has build in methods for handling feature / browser, following the ** Modernizr**  style with a few exception.
+**hAzzle Core** has build in methods for handling feature / browser, following the **Modernizr**  style with a few exception.
 
 Adding a test case:
 
@@ -278,8 +278,9 @@ DOM Level 4 (DL4)
 
 ECMA 7
 -------
+**ECMA 6** are soon to be part of the modern browsers, and **ECMA 7** are still experimental, but still **hAzzle** are forced to support ECMA 7 because of a few experimental methods are supported in **Firefox v. 35**. 
 
-**ECMA 7** are still experimental, and no browsers supports it except **Firefox v. 35**. This browser includes support for the 'contains' method of **ECMA 7**, and because the main goal with hAzzle are to create all browsers equal, **hAzzle** supports this in the **Core**. 
+This browser includes support for the 'contains' method of **ECMA 7**, and based on the fact that hAzzle's main goal are to make all browsers equal, this is now part of the **Core**. 
 
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/contains
 
