@@ -5,7 +5,7 @@
  * Version: 1.0.2d
  * Released under the MIT License.
  *
- * Date: 2014-11-24
+ * Date: 2014-11-27
  */
 (function() {
 
@@ -30,7 +30,7 @@
                 return selector;
             }
 
-            // Handle HTML strings if the manipulation.js module are installed
+            // Handle HTML strings if the manipulation.js module are loaded
 
             if (typeof selector === 'string') {
 
@@ -45,7 +45,7 @@
                         selector,
                         context && context.nodeType ? context.ownerDocument || context : document
                     );
-                    // If no HTML, fallback to Jiesa selector engine
+                    // If no HTML creation, select DOM nodes with Jiesa
                 } else {
                     this.elements = this.find(selector, context, true);
                 }
@@ -136,12 +136,12 @@
         },
 
         validTypes = function(elem) {
-            return elem && (elem.ELEMENT_NODE || elem.DOCUMENT_NODE);
+            return elem && (elem.nodeType === 1 || elem.nodeType === 9);
         },
 
         _hAzzle = window.hAzzle;
 
-    // Restore original hAzzle namespace  
+    // Restore the original hAzzle namespace  
 
     hAzzle.noConflict = function() {
         if (window.hAzzle === hAzzle) {

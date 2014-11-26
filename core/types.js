@@ -146,7 +146,6 @@ hAzzle.define('Types', function() {
         isObject: isObject,
         isPlainObject: isPlainObject,
         isEmptyObject: isEmptyObject,
-        isFunction: isType('Function'),
         isNode: isNode,
         isElement: isElement,
         isString: isString,
@@ -157,6 +156,10 @@ hAzzle.define('Types', function() {
         isSVGElem:isSVGElem,
         isDefined: isDefined,
         isUndefined: isUndefined,
-        isNodeList: isNodeList
+        isNodeList: isNodeList,
+        
+        // This method are *only* added here to do it easier for developers
+       
+        isFunction: isType('Function')
     };
 });

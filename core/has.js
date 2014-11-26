@@ -34,29 +34,23 @@ hAzzle.define('has', function() {
         })(),
         // Return the current value of the named feature
         has = function(name) {
-            return typeof cache[name] === 'function' ? (cache[name] = cache[name](win, doc, element)) : cache[name];
+            return typeof cache[name] === 'function' ?
+                (cache[name] = cache[name](win, doc, element)) :
+                cache[name];
         },
         // Register a new feature test for some named feature
         add = function(name, test, now, force) {
             (typeof cache[name] === 'undefined' || force) && (cache[name] = test);
             return now && has(name);
         },
-        // Conditional loading of AMD modules based on a has feature test value.
-        load = function(id, parentRequire, loaded) {
-            if (id) {
-                parentRequire([id], loaded);
-            } else {
-                loaded();
-            }
-        },
         // Delete the content of the element passed to test functions.
         clear = function(elem) {
             elem.innerHTML = '';
             return elem;
         };
-   
-   //# FEATURE DETECTION
-   
+
+    //# FEATURE DETECTION
+
     // Mobile
 
     add('mobile', /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
@@ -113,13 +107,17 @@ hAzzle.define('has', function() {
 
     add('promise', !!win.Promise);
 
-   
-    // querySelectorAll
+    // Audio detection
+
+    add('audio', !!('webkitAudioContext' in window || 'AudioContext' in window));
+
+    // QuerySelectorAll
+
     add('qsa', !!document.querySelectorAll);
+
     return {
         has: has,
         add: add,
-        load: load,
         cache: cache,
         clear: clear,
         ie: ie
