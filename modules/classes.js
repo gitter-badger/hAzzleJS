@@ -107,17 +107,26 @@ hAzzle.define('classes', function() {
         // Check if element contains class name(s)
 
         hasClass = function(elem, classes) {
-            var className = ' ' + classes + ' ',
-                els = elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem : [elem],
+            var cn, original = cn,
+                els = elem instanceof hAzzle ? elem.elements : elem.length ? elem : [elem],
                 i = 0,
                 l = els.length;
 
             for (; i < l; i++) {
                 if (els[i].nodeType === 1) {
-                    if (clist && els[i].classList.contains(classes)) {
-                        return true;
+                    if (clist) {
+                        if (els[i].classList.contains(classes)) {
+                            return true;
+                        }
                     } else { // #IE9 
-                        if ((' ' + els[i].className + ' ').replace(reSpace, ' ').contains(className)) {
+                        cn = els[i].className;
+                        reSpace.lastIndex = 0;
+                        if (cn.length && (cn === classes ||
+                                (' ' + (cn = cn.replace(reSpace, ' ')) + ' ').contains(' ' + classes + ' '))) {
+                            // normalize to optimize future calls
+                            if (cn !== original) {
+                                elem.className = cn;
+                            }
                             return true;
                         }
                     }
@@ -134,14 +143,14 @@ hAzzle.define('classes', function() {
                     return addRemove(elem, classes, 'add', function(elem, clazz) {
 
                         var cur = (' ' + elem.className + ' ').replace(reSpace, ' '),
-                            finalValue;
+                            end;
                         // ECMA 7 - contains
                         if (!cur.contains(' ' + clazz + ' ')) {
                             cur += clazz + ' ';
                         }
 
                         // Only assign if different to avoid unneeded rendering.
-                        finalValue = strings.trim(cur);
+                        end = strings.trim(cur);
                         if (elem.className !== finalValue) {
                             elem.className = finalValue;
                         }
@@ -157,18 +166,23 @@ hAzzle.define('classes', function() {
             util.each(getElem(elem), function(elem) {
                 if (elem.nodeType === 1) {
                     return addRemove(elem, classes, 'remove', function(elem, clazz) {
+                        var cn = elem.className,
+                            classNames, length,
+                            result = [],
+                            i = 0;
+                        if (cn) {
 
-                        var cur = (' ' + elem.className + ' ').replace(reSpace, ' '),
-                            finalValue;
+                            reSpace.lastIndex = 0;
+                            classNames = cn.replace(reSpace, ' ').split(' ');
+                            length = classNames.length;
 
-                        // ECMA 7 - contains
-                        if (cur.contains(' ' + clazz + ' ')) {
-                            cur = cur.replace(' ' + clazz + ' ', ' ');
-                        }
-                        // Only assign if different to avoid unneeded rendering.
-                        finalValue = clazz ? strings.trim(cur) : '';
-                        if (elem.className !== finalValue) {
-                            elem.className = finalValue;
+                            while (i < length) {
+                                cn = classNames[i++];
+                                if (cn !== clazz) {
+                                    result.push(cn);
+                                }
+                            }
+                            elem.className = result.join(' ');
                         }
 
                     }, fn);
