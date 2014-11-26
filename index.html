@@ -1,0 +1,737 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>hAzzle Javascript Library by hazzlejs</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>hAzzle Javascript Library</h1>
+        <p>Javascript library</p>
+
+        <p class="view"><a href="https://github.com/hazzlejs/hAzzleJS">View the Project on GitHub <small>hazzlejs/hAzzleJS</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/hazzlejs/hAzzleJS/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/hazzlejs/hAzzleJS/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/hazzlejs/hAzzleJS">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="hazzle-javascript-library" class="anchor" href="#hazzle-javascript-library" aria-hidden="true"><span class="octicon octicon-link"></span></a>hAzzle Javascript Library</h1>
+
+<p><a href="https://travis-ci.org/hazzlejs/hAzzleJS"><img src="https://travis-ci.org/hazzlejs/hAzzleJS.svg?branch=master" alt="Build Status"></a> <a href="https://codeclimate.com/github/hazzlejs/hAzzleJS"><img src="https://codeclimate.com/github/hazzlejs/hAzzleJS.png" alt="Code Climate"></a> <a href="https://coveralls.io/r/mehranhatami/hAzzleJS?branch=master"><img src="https://coveralls.io/repos/mehranhatami/hAzzleJS/badge.png?branch=master" alt="Coverage Status"></a></p>
+
+<p><strong>hAzzle</strong> is a modular javascript library licensed under the terms of the MIT License written from the ground-up with modern browsers in mind. It is an attempt to bring together the best from all familiar libraries such as <strong>jQuery</strong>, <strong>Underscore</strong>, <strong>Loadash</strong>, and <strong>Zepto</strong>, borrowing from both browser and node.js code patterns.</p>
+
+<p>It's biggest design goal is to be as minimal as possible, and give the controll back to you in form of modules, and this is the main reason why <strong>hAzzle</strong> is built as a collection of modules. </p>
+
+<p>The Core contains only the basic code needed for the modules to work. On top of the Core is the module layer. You can use it whole, or just import specific modules you need. The API should be familiar to everyone who has worked with some of the libraries mentioned above.</p>
+
+<p>One important thing to note is that <strong>hAzzle</strong> doesn't try to subclass Array in any way. A <strong>hAzzle instance</strong> is just a standard object, with the current elements selection stored in the <strong>.elements array</strong>. This gives you option to use all <strong>ES5</strong> / <strong>ES6</strong> functions methods, or deal with the <strong>.elements array</strong> with the same methods you find in libraries such as <strong>Underscore</strong> and <strong>Loadash</strong>.</p>
+
+<p>This alone gives you over 100 different ways to deal with the <strong>.elements array</strong>, and you are not restricted to a few methods as you find in <strong>jQuery</strong> / <strong>Zepto</strong>. </p>
+
+<p>The <strong>util.js module</strong> ( part of the Core) uses some of this native functions. And a couple of other functions such as <strong>odd()</strong> and <strong>even()</strong>.</p>
+
+<p><strong>hAzzle</strong> also provide some of the same <strong>DOM traversing methods</strong> you might know from <strong>jQuery</strong> / <strong>Zepto</strong> like <strong>.siblings()</strong>, <strong>.has()</strong>, <strong>.children()</strong>, etc. in the <strong>traversing.js module</strong>.</p>
+
+<p>You will also find similar methods like <strong>.eq()</strong>, <strong>.prev()</strong>, <strong>.nextAll()<em>, *</em>.next()</strong> e.g. in the <strong>collection.js module</strong> ( part of the Core) to traverse through the <strong>.elements array</strong></p>
+
+<p>Other methodds such as <strong>.addClass()</strong>, <strong>.prepend()</strong>, <strong>.text()</strong>, <strong>.html()</strong> e.g. are all included in the <strong>module folder</strong>.</p>
+
+<h2>
+<a id="jquery--zepto" class="anchor" href="#jquery--zepto" aria-hidden="true"><span class="octicon octicon-link"></span></a>jQuery / Zepto</h2>
+
+<p><strong>hAzzle</strong> are <strong>not</strong> compatible with <strong>jQuery</strong> / <strong>Zepto</strong>, but if you use only this modules:</p>
+
+<ul>
+<li>hazzle.js</li>
+<li>support.js</li>
+<li>core.js</li>
+<li>jiesa.js</li>
+</ul>
+
+<p>and use this command on the set of elements:</p>
+
+<p><strong>.toJqueryZepto()</strong></p>
+
+<p>the <strong>.elements array</strong> will be converted to <strong>jQuery / Zepto style</strong> and you can develop your own functions in the same way as you do for this libraries.</p>
+
+<p><strong>Note! hazzle will work as before, so you can actually use both hAzzle and jQuery / Zepto methods together</strong></p>
+
+<h2>
+<a id="jquery-similarities" class="anchor" href="#jquery-similarities" aria-hidden="true"><span class="octicon octicon-link"></span></a>jQuery similarities</h2>
+
+<p>As most of the developers are accustomed to using jQuery, hAzzle supports some of the same features, although the API is different. This function names are identical:</p>
+
+<ul>
+<li>attr () </li>
+<li>prop () </li>
+<li>val () </li>
+<li>css () </li>
+</ul>
+
+<p><strong>and</strong></p>
+
+<ul>
+<li>valHooks () </li>
+<li>propHooks () </li>
+<li>attrHooks () </li>
+<li>cssHooks ()</li>
+</ul>
+
+<p><strong>Note!</strong> The css methods in hAzzle are little different then <strong>jQuery</strong>, only the method names are the same.</p>
+
+<p>An example on the differences.</p>
+
+<p>In <strong>hAzzle</strong> you can do:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Include the needed module</span>
+<span class="pl-s">var</span> css <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>css<span class="pl-pds">'</span></span>)
+<span class="pl-c">// Get the result</span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(css.css($(<span class="pl-s1"><span class="pl-pds">'</span>#console<span class="pl-pds">'</span></span>), <span class="pl-s1"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span>) )
+
+Result<span class="pl-k">:</span> 1030px
+</pre></div>
+
+<p>Width <strong>jQuery</strong>:</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-c">// Get the result</span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(jQuery.css($(<span class="pl-s1"><span class="pl-pds">'</span>#console<span class="pl-pds">'</span></span>), <span class="pl-s1"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span>) )
+
+Result<span class="pl-k">:</span>
+
+TypeError<span class="pl-k">:</span> invalid <span class="pl-s1"><span class="pl-pds">'</span>in<span class="pl-pds">'</span></span> operand style
+<span class="pl-k">if</span> ( name <span class="pl-k">in</span> style ) {</pre></div>
+
+<p>Meaning <strong>jQuery</strong> throws an error in this case. To archive the same in <strong>jQuery</strong> you have to do this:</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-c">// Get the result</span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(jQuery.css($(<span class="pl-s1"><span class="pl-pds">'</span>#console<span class="pl-pds">'</span></span>).get(<span class="pl-c1">0</span>), <span class="pl-s1"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span>) )
+</pre></div>
+
+<p>or</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-c">// Get the result</span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(jQuery.css($(<span class="pl-s1"><span class="pl-pds">'</span>#console<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>], <span class="pl-s1"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span>) )
+</pre></div>
+
+<h2>
+<a id="native-javascript" class="anchor" href="#native-javascript" aria-hidden="true"><span class="octicon octicon-link"></span></a>Native javascript</h2>
+
+<p>Each Core module has it's own stand-alone methods that let you use the methods you need with native Javascript. So you are not bound to use the build-in selector engine.</p>
+
+<p>Couple of examples wihtout a selector engine:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Include the needed module</span>
+<span class="pl-s">var</span> css <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>css<span class="pl-pds">'</span></span>)
+<span class="pl-c">// Get the result </span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(css.css( <span class="pl-s3">document</span>.<span class="pl-s3">getElementById</span>(<span class="pl-s1"><span class="pl-pds">'</span>test<span class="pl-pds">'</span></span>), <span class="pl-s1"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span>) )
+</pre></div>
+
+<p>You can also use <strong>nodeList</strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Include the needed module</span>
+<span class="pl-s">var</span> css <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>css<span class="pl-pds">'</span></span>)
+<span class="pl-c">// Get the result </span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(css.css( <span class="pl-s3">document</span>.<span class="pl-s3">getElementsByTagName</span>(<span class="pl-s1"><span class="pl-pds">'</span>div<span class="pl-pds">'</span></span>), <span class="pl-s1"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span>) )</pre></div>
+
+<p>Adding a class (This example will set the same className on each div element):</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Include the needed module</span>
+<span class="pl-s">var</span> cls <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>classes<span class="pl-pds">'</span></span>)
+<span class="pl-c">// Set the class names</span>
+cls.addClass( <span class="pl-s3">document</span>.<span class="pl-s3">getElementsByTagName</span>(<span class="pl-s1"><span class="pl-pds">'</span>div<span class="pl-pds">'</span></span>), <span class="pl-s1"><span class="pl-pds">'</span>hello!<span class="pl-pds">'</span></span>) </pre></div>
+
+<h2>
+<a id="scalable-vector-graphics-svg" class="anchor" href="#scalable-vector-graphics-svg" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scalable Vector Graphics (SVG)</h2>
+
+<p><strong>SVG</strong> are supported by <strong>hAzzle</strong>, but only a few methods for detection and getting SVG attributes in the Core.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Detect if SVG element</span>
+<span class="pl-s">var</span> types <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>types<span class="pl-pds">'</span></span>)
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(types.isSVGElem( ELEM ))</pre></div>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Get SVG attributes</span>
+<span class="pl-s">var</span> setters <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>setters<span class="pl-pds">'</span></span>)
+
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(setters.SVGAttr( PROPERTY ))</pre></div>
+
+<p>For extended <strong>SVG</strong> support you will need to add the <strong>svg.js</strong> module from the module folder.</p>
+
+<p><strong>Note!</strong> Many of the functions in this module are extending the Core methods, so you need to compile the Core with this modules to get <strong>SVG</strong> to work:</p>
+
+<ul>
+<li>setters.js</li>
+<li>classes.js</li>
+</ul>
+
+<p>and</p>
+
+<ul>
+<li>style.js ( module folder) </li>
+</ul>
+
+<h2>
+<a id="units-and-dimensions" class="anchor" href="#units-and-dimensions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Units and dimensions</h2>
+
+<p>In many other libraries such as <strong>jQuery</strong> there are issues and glitches when it comes to returning correct values on different dimensions methods such as  <strong>height()</strong>, <strong>offset()</strong>, <strong>position()</strong> and <strong>offsetParent()</strong>.
+One of hAzzle design goals is to return the the correct values on this methods, and supports all known units ( e.g. <strong>px</strong>,  <strong>pc</strong>, <strong>mm</strong>, <strong>%</strong>, <strong>cm</strong>)</p>
+
+<p>Build in the Core are the units conversation, and you can convert units like this:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Include the needed module</span>
+<span class="pl-s">var</span> css <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>css<span class="pl-pds">'</span></span>)
+
+css.toPx(element, <span class="pl-s1"><span class="pl-pds">'</span>2vh<span class="pl-pds">'</span></span>);</pre></div>
+
+<p>Or convert from <strong>em</strong> to <strong>px</strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Include the needed module</span>
+<span class="pl-s">var</span> css <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>css<span class="pl-pds">'</span></span>)
+<span class="pl-c">// convert from em to px</span>
+css.toPx(element, <span class="pl-s1"><span class="pl-pds">'</span>2em<span class="pl-pds">'</span></span>);</pre></div>
+
+<p>For the other methods - e.g.  <strong>height()</strong> and <strong>offset()</strong> you need to include the <strong>dimensjons.js</strong> module.</p>
+
+<h2>
+<a id="your-modules" class="anchor" href="#your-modules" aria-hidden="true"><span class="octicon octicon-link"></span></a>Your modules</h2>
+
+<p>You can develop your own modules for <strong>hAzzle</strong>. If you do so, upload them to the <strong>public folder</strong> with a sub-directory that has the same name as your plugin.</p>
+
+<p><strong>Important!!</strong> Don't forget to add a <strong>dependency list</strong> document in the root of your directory so other developers know what <strong>hAzzle modules</strong> to include together with the <strong>Core</strong> to get your module to work.</p>
+
+<h2>
+<a id="dom-level-4-dl4" class="anchor" href="#dom-level-4-dl4" aria-hidden="true"><span class="octicon octicon-link"></span></a>DOM Level 4 (DL4)</h2>
+
+<p><strong>hAzzle</strong> has a build in polify in the Core supporting the most common features. And also fixes a couple of cross-browser issues (e.g. IE9 and IE10's customEvent() are not usable as a constructor. The polify can't be removed, and needed for some of the modules (not part of the Core) to work. </p>
+
+<ul>
+<li>prepend</li>
+<li>append</li>
+<li>before</li>
+<li>after</li>
+<li>replace</li>
+<li>remove</li>
+<li>matches</li>
+<li>customEvent</li>
+</ul>
+
+<h2>
+<a id="ecma-7" class="anchor" href="#ecma-7" aria-hidden="true"><span class="octicon octicon-link"></span></a>ECMA 7</h2>
+
+<p><strong>ECMA 7</strong> are still experimental, and no browsers supports it except <strong>Firefox v. 35</strong>. This browser includes support for the 'contains' method of <strong>ECMA 7</strong>, and because the main goal with hAzzle are to create all browsers equal, <strong>hAzzle</strong> supports this in the <strong>Core</strong>. </p>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/contains">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/contains</a></p>
+
+<p>Example of usage:</p>
+
+<div class="highlight highlight-javascript"><pre>[<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>].contains(<span class="pl-c1">2</span>);     <span class="pl-c">// true</span>
+[<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>].contains(<span class="pl-c1">4</span>);     <span class="pl-c">// false</span>
+[<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>].contains(<span class="pl-c1">3</span>, <span class="pl-c1">3</span>);  <span class="pl-c">// false</span>
+[<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>].contains(<span class="pl-c1">3</span>, <span class="pl-k">-</span><span class="pl-c1">1</span>); <span class="pl-c">// true</span>
+[<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">NaN</span>].contains(<span class="pl-c1">NaN</span>); <span class="pl-c">// true</span></pre></div>
+
+<p><strong>hAzzle</strong> also supports other <strong>ECMA 7</strong> specs through the <strong>ecma7.js</strong> module in the <strong>/modules folder</strong>. </p>
+
+<ul>
+<li>entries
+
+<ul>
+<li>escape</li>
+<li>compare</li>
+<li>getPropertyNames</li>
+<li>getOwnPropertyDescriptors</li>
+<li>getPropertyDescriptor</li>
+</ul>
+</li>
+</ul>
+
+<p>The <strong>ecma7.js</strong> module only contains functions that most likely will not change in the future. </p>
+
+<p>Which browsers who support <strong>ECMA7</strong> features, take a look here: <a href="http://kangax.github.io/compat-table/es7/">http://kangax.github.io/compat-table/es7/</a></p>
+
+<h2>
+<a id="why-is-the-core-so-big" class="anchor" href="#why-is-the-core-so-big" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why is the Core so big?</h2>
+
+<p>The hAzzle Core are not so big comparing to other libraries, and contains a lot more then the Javascript library. It take care of cross-browser issues, browsers bugs, setting the right document (<strong>HTML</strong> / <strong>XML</strong>), feature detection and more.</p>
+
+<p>One example are the <strong>customEvent</strong>. This method are not usable as a constructor in <strong>IE9</strong> / <strong>IE10</strong>. With <strong>hAzzle Core</strong> this is fixed! Ref: <a href="https://developer.mozilla.org/en/docs/Web/API/CustomEvent">https://developer.mozilla.org/en/docs/Web/API/CustomEvent</a></p>
+
+<p>Another quick example on the benefits using the <strong>hAzzle Core</strong> comparing to <strong>jQuery library</strong>.</p>
+
+<p>Let's say you want to append() some content. With hAzzle and <strong>DL4</strong>, you do it like this:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>div id<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>d<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>Hello<span class="pl-k">!</span> <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>
+<span class="pl-s3">document</span>.<span class="pl-s3">getElementById</span>(<span class="pl-s1"><span class="pl-pds">'</span>d<span class="pl-pds">'</span></span>).append(<span class="pl-s1"><span class="pl-pds">'</span>new content<span class="pl-pds">'</span></span>);</pre></div>
+
+<p><strong>2 lines of code</strong>, and pure, native Javascript is all it takes to append content.</p>
+
+<p>Comparing to <strong>jQuery</strong>, to archive the same you have to add over <strong>60 lines of code</strong>:</p>
+
+<p><a href="https://github.com/jquery/jquery/blob/master/src/manipulation.js#L194">https://github.com/jquery/jquery/blob/master/src/manipulation.js#L194</a></p>
+
+<p>and you are stricted to use <strong>jQuery</strong> for this methods.</p>
+
+<h2>
+<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use</h2>
+
+<p>You can use all functions internally in the same way as you do in <strong>jQuery</strong> / <strong>Zepto</strong>. </p>
+
+<div class="highlight highlight-javascript"><pre>hAzzle(<span class="pl-s1"><span class="pl-pds">'</span>#id<span class="pl-pds">'</span></span>).eq(<span class="pl-c1">1</span>).append(<span class="pl-s1"><span class="pl-pds">'</span>new content<span class="pl-pds">'</span></span>);</pre></div>
+
+<p>or a each example:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-v">this</span>.each(<span class="pl-st">function</span>(<span class="pl-vpf">elem</span>) {
+});</pre></div>
+
+<p><strong>NOTE!</strong> From v. 1.01a the <strong>this</strong> keyword in the <strong>each()</strong> and <strong>map()</strong> methods are no longer pointing to the window object, but to the element itself. They are now working the same way as you are used to from <strong>jQuery</strong> / <strong>Zepto</strong> / <strong>Mootools</strong> and <strong>Prototype</strong>.</p>
+
+<p>You can still bind the elements to the Window Object as before.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-v">this</span>.each(<span class="pl-st">function</span>(<span class="pl-vpf">elem</span>) {
+<span class="pl-v">this</span>[<span class="pl-s1"><span class="pl-pds">'</span>hello<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-st">function</span>() { <span class="pl-en">console</span><span class="pl-s3">.log</span>(<span class="pl-s1"><span class="pl-pds">'</span>Hello!<span class="pl-pds">'</span></span>); });
+}.bind(<span class="pl-v">this</span>));
+
+Then you can access it like this<span class="pl-k">:</span>
+
+hAzzle(<span class="pl-s1"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>).hello();
+
+and it will show you <span class="pl-s1"><span class="pl-pds">'</span>Hello!<span class="pl-pds">'</span></span> <span class="pl-k">in</span> the <span class="pl-en">console</span> log</pre></div>
+
+<p>For the methods <strong>find()</strong>, <strong>filter()</strong>, <strong>reduce()</strong> , the  <strong>this</strong> keyword are still a reference to the Window object.</p>
+
+<p><strong>hAzzle</strong> are more powerfull then this, and you can choose to include and use only the modules you want ( Core need to be loaded on the page first)</p>
+
+<p>In the each() example above, we can also do it like this:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> _util <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>Util<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> obj <span class="pl-k">=</span> {a<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">'</span>1<span class="pl-pds">'</span></span>, b<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">'</span>2<span class="pl-pds">'</span></span>};
+
+_util.each(obj, <span class="pl-st">function</span>(<span class="pl-vpf">a</span>, <span class="pl-vpf">b</span>) {}) </pre></div>
+
+<p><strong>Note!</strong> Mostly all functions can be used this way. There are a few exceptions, and this is restricted for internal uage with the <strong>. elements array</strong></p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-c">// Get the elements array</span>
+<span class="pl-s">var</span> _arr  <span class="pl-k">=</span> hAzzle(<span class="pl-s1"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>)
+
+The array can be used like this<span class="pl-k">:</span>
+
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(_arr.<span class="pl-sc">elements</span>)</pre></div>
+
+<p>Natives <strong>ES5</strong> / <strong>ES6</strong> on the <strong>.elements array</strong> are easy as well.</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-c">// Get the elements array</span>
+<span class="pl-s">var</span> _arr  <span class="pl-k">=</span> hAzzle(<span class="pl-s1"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>).<span class="pl-sc">elements</span>
+
+and then some natives<span class="pl-k">:</span>
+
+_arr.<span class="pl-s3">reverse</span>()
+_arr.<span class="pl-s3">sort</span>()
+_arr.<span class="pl-s3">find</span>()
+_arr.filter()
+</pre></div>
+
+<p>Adding / removing classes can be done same way:</p>
+
+<div class="highlight highlight-javascript"><pre>
+hAzzle(<span class="pl-s1"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>).addClass(<span class="pl-s1"><span class="pl-pds">'</span>test<span class="pl-pds">'</span></span>)
+or
+<span class="pl-s">var</span> _cls <span class="pl-k">=</span> hAzzle.require(<span class="pl-s1"><span class="pl-pds">'</span>Classes<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// hAzzle </span>
+_cls.addClass(hAzzle(<span class="pl-s1"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>), <span class="pl-s1"><span class="pl-pds">'</span>test<span class="pl-pds">'</span></span>)
+
+<span class="pl-c">// native</span>
+_cls.addClass(<span class="pl-s3">document</span>.<span class="pl-s3">getElementById</span>(<span class="pl-s1"><span class="pl-pds">'</span>example<span class="pl-pds">'</span></span>), <span class="pl-s1"><span class="pl-pds">'</span>test<span class="pl-pds">'</span></span>)
+</pre></div>
+
+<p><strong>Note!</strong> If you include all modules you have a complete library like <strong>jQuery</strong> / <strong>Zepto</strong>, and you have mostly the same methods with a <strong>big</strong> exception. Everything are done the native way with hAzzle, so nothing are compatible with the mentioned libraries. Meaning you can't copy a function from <strong>hAzzle</strong> and hope it works for <strong>jQuery</strong>, because it won't.</p>
+
+<p>However. You can make jQuery work on hAzzle.</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-c">// Make jQuery / Zepto work</span>
+<span class="pl-s">var</span> _arr  <span class="pl-k">=</span> hAzzle(<span class="pl-s1"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>).toJqueryZepto();
+
+the created _arr would look like
+
+_arr[<span class="pl-c1">0</span>] elem
+_arr[<span class="pl-c1">1</span>] elem
+_arr[<span class="pl-c1">2</span>] elem
+</pre></div>
+
+<p>Now you can use <strong>jQuery / Zepto</strong> methods as you are used too. But you can also use <strong>hAzzle</strong> methods together
+with this functions.</p>
+
+<p><strong>UnderscoreJS</strong> and <strong>Loadash</strong> can be used as well. </p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-c">// Get the elements array</span>
+<span class="pl-s">var</span> _arr  <span class="pl-k">=</span> hAzzle(<span class="pl-s1"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>).<span class="pl-sc">elements</span>;
+
+<span class="pl-c">// Include the library you want, and then use the methods like this:</span>
+
+_arr {method}
+
+and you are dealing <span class="pl-k">with</span> the array.</pre></div>
+
+<p>It's also easy to create your own methods. No examples given, but with the <strong>. elements array</strong> as illustrated below you can use all native methods or <strong>UnderscoreJS</strong> // <strong>Loadash</strong> and create your own methods with the array.</p>
+
+<h2>
+<a id="jiesa" class="anchor" href="#jiesa" aria-hidden="true"><span class="octicon octicon-link"></span></a>Jiesa</h2>
+
+<p><strong>hAzzle</strong> have a build in selector engine - <strong>jiesa</strong>. <strong>Jiesa</strong> are using the native <strong>querySelectorAll (QSA)</strong> if no other selector engines are installed. </p>
+
+<p>The main selector engine for <strong>hAzzle</strong> are a stand-alone module - <strong>selector.js</strong> - and can be replaced with your own selector engine.</p>
+
+<p>To get your engine to work with <strong>hAzzle</strong>, you need to include this piece of code: </p>
+
+<div class="highlight highlight-javascript"><pre>
+hAzzle.define(<span class="pl-s1"><span class="pl-pds">'</span>selector<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>() {
+
+ <span class="pl-k">return</span> { find<span class="pl-k">:</span> { YOUR NAME HERE }  };
+
+});
+</pre></div>
+
+<p><strong>find { YOUR NAME HERE };</strong> are important because <strong>Jiesa</strong> will check if the <strong>selector.js</strong> are installed and use that selector engine over <strong>QSA</strong> if installed.</p>
+
+<p><strong>hAzzle</strong> also have a quick way to detect browsers features / bugs, if you choose to develop your own selector engine. </p>
+
+<p>Example:</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-c">// Use addFeature() to add a feature / bug check</span>
+
+_core.addFeature(<span class="pl-s1"><span class="pl-pds">'</span>supportAttributes<span class="pl-pds">'</span></span>, <span class="pl-k">!</span>div.<span class="pl-s3">getAttribute</span>(<span class="pl-s1"><span class="pl-pds">'</span>className<span class="pl-pds">'</span></span>));
+
+<span class="pl-c">// Output the result</span>
+
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(_core.environment.supportAttributes); <span class="pl-c">// boolean true / false</span>
+</pre></div>
+
+<p>You can get unique ID for current document like this:</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(_core.environment.<span class="pl-sc">id</span>);
+</pre></div>
+
+<p>And if you want to check if current document is HTML or XML, you do:</p>
+
+<div class="highlight highlight-javascript"><pre>
+<span class="pl-c">// HTML doc</span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(_core.isHTML);
+
+<span class="pl-c">// XML doc</span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(_core.isXML);
+</pre></div>
+
+<p><strong>Note!</strong> hAzzle's selector engine has a few similarites with other selector engines regarding the <strong>core.js</strong> module. It can't be avoid, for if you
+look at <strong>Prototype</strong>, <strong>Slick</strong> or even <strong>Sizzle</strong> they are almost the same when it comes to sorting DOM nodes e.g.
+Based on this <strong>hAzzle</strong> supports similarities with Sizzle when it comes to <strong>QSA</strong> and <strong>matchesSelector</strong> bug tests. </p>
+
+<p><strong>Sizzle</strong></p>
+
+<ul>
+<li>rbuggyQSA<br>
+</li>
+<li> rbuggyMatches </li>
+</ul>
+
+<p><strong>hAzzle</strong></p>
+
+<ul>
+<li>QSABugs</li>
+<li>matchesBugs</li>
+</ul>
+
+<h2>
+<a id="core" class="anchor" href="#core" aria-hidden="true"><span class="octicon octicon-link"></span></a>Core</h2>
+
+<table>
+<thead><tr>
+  <th>module</th>  <th>description</th>
+</tr></thead>
+<tbody>
+   <tr>
+    <th><a href="core/hazzle.js#files">hazzle</a></th>
+        <td>Main functions such as the module system</td>
+  </tr>
+  <tr>
+    <th><a href="core/has.js#files">has</a></th>
+        <td>Feature and browser detection methods. All browsers are detected with feature detection and not UserAgent (ua) for better security</td>
+  </tr>
+  <tr>
+    <th><a href="core/core.js#files">core</a></th>
+        <td>Core functions for the library. Dealing with correct documents - XML and HTML e.g.</td>
+  </tr>
+  <tr>
+    <th><a href="core/types.js#files">types</a></th>
+        <td>Provides a collection of <code>'is-methods'</code> e.g. <code>isString</code> and <code>isObject</code>
+</td>
+  </tr>
+  <tr>
+    <th><a href="core/util.js#files">util</a></th>
+        <td>Ultility belt functions faithfull to native Javascript and browser features</td>
+  </tr>
+  <tr>
+    <th><a href="core/bind.js#files">bind</a></th>
+        <td>Provides a optimized cross-browser Function.prototype.bind(), and a internal native prototype bind()alternative</td>
+  </tr>
+  <tr>
+    <th><a href="core/text.js#files">text</a></th>
+        <td></td>
+  </tr>
+  <tr>
+    <th><a href="core/collection.js#files">collection</a></th>
+     <td>
+      Internal function for dealing with the <code>.elements array</code>
+</td>
+  </tr>
+  <tr>
+    <th><a href="core/jiesa.js#files">jiesa</a></th>
+     <td>
+      <code>Jiesa</code> basic selector. Also includes <code>find()</code>, <code>filter()</code> methods. <code>DOM Level 4 - matches()</code> are used for some of this methods.
+    </td>
+  </tr>
+  <tr>
+    <th><a href="core/strings.js#files">strings</a></th>
+    <td><code>Provides methods for dealing with string such as <code>trim()</code> and <code>camelize()</code> </code></td>
+  </tr>
+  <tr>
+    <th><a href="core/storage.js#files">storage</a></th>
+    <td>
+      Data / element storage methods. Store private and public data on object or <code>HTML5</code>.
+    </td>
+  </tr>
+  <tr>
+    <th><a href="core/curcss.js#files">curcss</a></th>
+     <td>
+      Provides basic getter / setter function for <code>CSS styles</code>, and return correct native values in the <code>px</code> unit
+    </td>
+  </tr>
+ <tr>
+    <th><a href="core/setters.js#files">setters</a></th>
+     <td> Provide methods for setting / getting <code>attributes</code>, <code>properties</code> and <code>values</code>
+</td>
+  </tr>
+ <tr>
+    <th><a href="core/attrhooks.js#files">attrhooks</a></th>
+     <td>
+      Provides basic getter / setter function for the <code>attr()</code> method <code>setters.js</code> module.
+    </td>
+  </tr>
+ <tr>
+    <th><a href="core/prophooks.js#files">prophooks</a></th>
+     <td>
+      Provides basic getter / setter function for the <code>prop()</code> method <code>setters.js</code> module.
+    </td>
+  </tr>
+ 
+ <tr>
+    <th><a href="core/valhooks.js#files">valhooks</a></th>
+     <td>
+      Provides basic getter / setter function for the <code>val()</code> method <code>setters.js</code> module.
+    </td>
+  </tr>
+     <th><a href="core/doml4.js#files">doml4</a></th>
+     <td>
+      DOM Level 4 pollify. See the <code>DOM Level 4 section</code>
+    </td>
+  
+  <tr>
+    <th><a href="core/contains.js#files">contains</a></th>
+     <td>
+      ECMA 7 pollify function for contains() methods for browsers who don't support it. See the <code>ECMA 7 section</code>
+    </td>
+  </tr>
+</tbody>
+</table>
+
+<h2>
+<a id="modules" class="anchor" href="#modules" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modules</h2>
+
+<table>
+<thead><tr>
+  <th>module</th>  <th>description</th>
+</tr></thead>
+<tbody>
+   <tr>
+    <th><a href="modules/attributes.js#files">attributes</a></th>
+        <td>
+<code>HTML5</code> attribute functions</td>
+  </tr>
+  <tr>
+    <th><a href="modules/style.js#files">style</a></th>
+        <td>Setter and getter for CSS styles</td>
+  </tr>
+  <tr>
+    <th><a href="modules/csshook.js#files">csshooks</a></th>
+        <td>cssHooks for the style.js module</td>
+  </tr>
+  <tr>
+    <th><a href="modules/dimensions.js#files">dimensions</a></th>
+        <td>Provides various features for deling with width, and height, viewport, positions e.g.</td>
+  </tr>
+  <tr>
+    <th><a href="modules/xhr.js#files">xhr</a></th>
+        <td>XHR v. 2 with native promises support</td>
+  </tr>
+  <tr>
+    <th><a href="modules/ready.js#files">ready</a></th>
+        <td>Document ready method</td>
+  </tr>
+  <tr>
+    <th><a href="modules/classes.js#files">classes</a></th>
+     <td>
+      <code>Add</code>, <code>remove</code> and <code>toggle</code> classes. Uses <code>classList</code> if browser supports it</td>
+  </tr>
+  <tr>
+    <th><a href="modules/traversing.js#files">traversing</a></th>
+     <td>
+      Most common DOM traversion methods such as <code>up()</code>, <code>down()</code>, <code>next()<code>, <code>prev()</code> and similar methods know from jQuery / Zepto
+    </code></code>
+</td>
+  </tr>
+  <tr>
+    <th><a href="modules/visibility.js#files">visibility</a></th>
+    <td>
+       <code>Add</code>, <code>remove</code> and <code>toggle</code> DOM elements     
+    </td>
+  </tr>
+  <tr>
+    <th><a href="modules/jsonxml.js#files">jsonxml</a></th>
+    <td>
+      <code>JSON</code> and <code>XML</code> support / parsing
+    </td>
+  </tr>
+  <tr>
+    <th><a href="modules/manipulation.js#files">manipulation</a></th>
+     <td>
+      Provides <code>append</code>, <code>prepend</code>, <code>text</code> and other familiar methods known from from jQuery / Zepto. <code>DOM Level 4</code> are used for some of this methods, and <code>insertAdjutantHTML</code>.
+    </td>
+  </tr>
+ <tr>
+    <th><a href="modules/ecma7.js#files">ecma7</a></th>
+     <td>
+      Provides a few <code>ECMA 7 (ecma262)</code> methids. This is experimentell and not supported by browsers!
+    </td>
+  </tr>
+  <tr>
+    <th><a href="modules/touch.js#files">ecma7</a></th>
+     <td>
+      Provides touch feature detection on various platforms
+    </td>
+  </tr>
+</tbody>
+</table>
+
+<h2>
+<a id="browser-compatiblity" class="anchor" href="#browser-compatiblity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Browser compatiblity</h2>
+
+<table>
+<thead>
+<tr>
+<th id="browser"> Browser </th>
+<th id="version"> Version </th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td> Chrome  </td>
+<td>20+       </td>
+</tr>
+
+<tr>
+<td> Safari  </td>
+<td>6       </td>
+</tr>
+
+<tr>
+<td> Firefox </td>
+<td>22+       </td>
+</tr>
+
+<tr>
+<td> IE      </td>
+<td>9+       </td>
+</tr>
+
+<tr>
+<td> Opera   </td>
+<td>15+    </td>
+</tr>
+
+</tbody>
+</table>
+
+<table>
+<thead>
+<tr>
+<th id="browser"> Browser           </th>
+<th id="version"> Version      </th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td> iOS               </td>
+<td> 6.0.1 </td>
+</tr>
+
+<tr>
+<td> Android           </td>
+<td> 4.0+         </td>
+</tr>
+
+<tr>
+<td> Blackberry        </td>
+<td> 9.0+          </td>
+</tr>
+
+<tr>
+<td> Opera Mobile      </td>
+<td> 13.1+  </td>
+</tr>
+
+<tr>
+<td> Chrome (Android)  </td>
+<td> 22+      </td>
+</tr>
+
+<tr>
+<td> Firefox (Android) </td>
+<td> 24+      </td>
+</tr>
+
+</tbody>
+</table>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/hazzlejs">hazzlejs</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
