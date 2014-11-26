@@ -195,20 +195,14 @@ hAzzle.define('has', function() {
         })(),
         // Return the current value of the named feature
         has = function(name) {
-            return typeof cache[name] === 'function' ? (cache[name] = cache[name](win, doc, element)) : cache[name];
+            return typeof cache[name] === 'function' ?
+                (cache[name] = cache[name](win, doc, element)) :
+                cache[name];
         },
         // Register a new feature test for some named feature
         add = function(name, test, now, force) {
             (typeof cache[name] === 'undefined' || force) && (cache[name] = test);
             return now && has(name);
-        },
-        // Conditional loading of AMD modules based on a has feature test value.
-        load = function(id, parentRequire, loaded) {
-            if (id) {
-                parentRequire([id], loaded);
-            } else {
-                loaded();
-            }
         },
         // Delete the content of the element passed to test functions.
         clear = function(elem) {
@@ -274,14 +268,17 @@ hAzzle.define('has', function() {
 
     add('promise', !!win.Promise);
 
+    // Audio detection
 
-    // querySelectorAll
+    add('audio', !!('webkitAudioContext' in window || 'AudioContext' in window));
+
+    // QuerySelectorAll
+
     add('qsa', !!document.querySelectorAll);
 
     return {
         has: has,
         add: add,
-        load: load,
         cache: cache,
         clear: clear,
         ie: ie
@@ -319,9 +316,9 @@ hAzzle.define('Types', function() {
         isNumber = function(value) {
             return typeof value === 'number';
         },
-        isNumeric = function(obj) {
-            return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
-        },
+        isNumeric = function( obj ) {
+		return !isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
+	    },
 
         isBoolean = function(value) {
             return typeof value === 'boolean';
@@ -435,10 +432,6 @@ hAzzle.define('Types', function() {
         isObject: isObject,
         isPlainObject: isPlainObject,
         isEmptyObject: isEmptyObject,
-
-        //This method as *only* added to do it easier for developers
-
-        isFunction: isType('Function'),
         isNode: isNode,
         isElement: isElement,
         isString: isString,
@@ -446,10 +439,14 @@ hAzzle.define('Types', function() {
         isNumber: isNumber,
         isBoolean: isBoolean,
         isNaN: isNaN,
-        isSVGElem: isSVGElem,
+        isSVGElem:isSVGElem,
         isDefined: isDefined,
         isUndefined: isUndefined,
-        isNodeList: isNodeList
+        isNodeList: isNodeList,
+        
+        // This method are *only* added here to do it easier for developers
+       
+        isFunction: isType('Function')
     };
 });
 // text.js
