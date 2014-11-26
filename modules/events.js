@@ -5,13 +5,16 @@ hAzzle.define('events', function() {
     var win = window,
         doc = window.document || {},
 
-        // Include needed modules
+        // Dependencies
+
         util = hAzzle.require('util'),
         core = hAzzle.require('core'),
         collection = hAzzle.require('collection'),
         features = hAzzle.require('has'),
         istypes = hAzzle.require('types'),
         jiesa = hAzzle.require('jiesa'),
+
+        // Various regEx
 
         evwhite = (/\S+/g),
         mouseEvent = /^click|mouse(?!(.*wheel|scroll))|menu|pointer|contextmenu|drag|drop/i,
@@ -23,9 +26,20 @@ hAzzle.define('events', function() {
         touchEvent = /^touch|^gesture/i,
         messageEvent = /^message$/i,
         popstateEvent = /^popstate$/i,
+
+        nonValidTypes = {
+            '3': 1,
+            '8': 1
+        },
+
+        // Container for internal registry
+
         map = {},
+
         fixHook = {},
+
         propHook = {},
+
         eventTranslation = {},
 
         // Common properties for all event types
@@ -61,18 +75,16 @@ hAzzle.define('events', function() {
 
         addEvent = function(elem, events, selector, fn, /* internal */ one) {
 
-            // Check if typeof hAzzle, then wrap it out, and return current elem
-
-            if (elem instanceof hAzzle) {
-                elem = elem.elements[0];
-            }
+            elem = elem instanceof hAzzle ?
+                elem.elements[0] :
+                elem.length ? elem[0] : elem;
 
             var original, type, types, i, args, entry, first,
                 namespaces, nodeType = elem ? elem.nodeType : undefined;
 
             // Don't attach events to text/comment nodes 
 
-            if (!nodeType || nodeType === 3 || nodeType === 8 || !events) {
+            if (!nodeType || nonValidTypes[nodeType] || !events) {
                 return;
             }
 
@@ -163,9 +175,11 @@ hAzzle.define('events', function() {
 
             var k, type, namespaces, i;
 
-            if (elem instanceof hAzzle) {
-                elem = elem.elements[0];
-            }
+            elem = elem instanceof hAzzle ?
+                elem.elements[0] :
+                elem.length ? elem[0] : elem;
+
+
 
             if (!elem) {
                 hAzzle.err(true, 17, 'no element exist in removeEvent() in events.js module');
@@ -182,7 +196,6 @@ hAzzle.define('events', function() {
                 i = types.length;
 
                 while (i--) {
-
                     removeEvent(elem, types[i], selector, fn);
                 }
 
@@ -239,7 +252,7 @@ hAzzle.define('events', function() {
             return elem;
         },
 
-       //  Fires a custom event with the current element as its target.
+        //  Fires a custom event with the current element as its target.
         fire = function(elem, type, args) {
 
             var cur, types = type.split(' '),
@@ -256,68 +269,68 @@ hAzzle.define('events', function() {
 
             // Don't do events on text and comment nodes
 
-            if (!nodeType || nodeType === 3 || nodeType === 8 || !type) {
-                return;
-            }
+            if (nodeType && !nonValidTypes[nodeType]) {
 
-            for (; i--;) {
+                for (; i--;) {
 
-                type = types[i].replace(nameRegex, '');
+                    type = types[i].replace(nameRegex, '');
 
-                if ((names = types[i].replace(namespaceRegex, ''))) {
-                    names = names.split('.');
-                }
-
-                if (names && args) {
-
-                    // non-native event, either because of a namespace, arguments or a non DOM element
-                    // iterate over all listeners and manually 'fire'
-
-                    handlers = getRegistered(cur, type, null, false);
-
-                    evt = Event(null, cur);
-                    evt.type = type;
-                    call = args ? 'apply' : 'call';
-                    args = args ? [evt].concat(args) : evt;
-
-                    for (j = 0, l = handlers.length; j < l; j++) {
-                        if (handlers[j].inNamespaces(names)) {
-                            handlers[j].handler.apply(cur, args);
-                        }
+                    if ((names = types[i].replace(namespaceRegex, ''))) {
+                        names = names.split('.');
                     }
-                } else {
 
-                    /**
-                     * Create custom events.
-                     *
-                     * These events can be listened by hAzzle via `on`,
-                     * and by pure javascript via `addEventListener`
-                     *
-                     * Examples:
-                     *
-                     * hAzzle('p').on('customEvent', handler);
-                     *
-                     * hAzzle('p').fire('customEvent');
-                     *
-                     * window.document.addEventListener('customEvent', handler);
-                     *
-                     * Width arguments:
-                     * ----------------
-                     *
-                     * hAzzle('p').on('partytime', function(e) {
-                     *       console.log(e.detail) // Console.log:  'Object { cheeseburger=true}'
-                     * });
-                     *
-                     * hAzzle('p').fire('partytime', {'detail':{'cheeseburger':true}});
-                     *
-                     */
+                    if (names && args) {
 
-                    // create and dispatch the event
+                        // non-native event, either because of a namespace, arguments or a non DOM element
+                        // iterate over all listeners and manually 'fire'
 
-                    evt = new CustomEvent(type, args);
-                    elem.dispatchEvent(evt);
+                        handlers = getRegistered(cur, type, null, false);
+
+                        evt = Event(null, cur);
+                        evt.type = type;
+                        call = args ? 'apply' : 'call';
+                        args = args ? [evt].concat(args) : evt;
+
+                        for (j = 0, l = handlers.length; j < l; j++) {
+                            if (handlers[j].inNamespaces(names)) {
+                                handlers[j].handler.apply(cur, args);
+                            }
+                        }
+                    } else {
+
+                        /**
+                         * Create custom events.
+                         *
+                         * These events can be listened by hAzzle via `on`,
+                         * and by pure javascript via `addEventListener`
+                         *
+                         * Examples:
+                         *
+                         * hAzzle('p').on('customEvent', handler);
+                         *
+                         * hAzzle('p').fire('customEvent');
+                         *
+                         * window.document.addEventListener('customEvent', handler);
+                         *
+                         * Width arguments:
+                         * ----------------
+                         *
+                         * hAzzle('p').on('partytime', function(e) {
+                         *       console.log(e.detail) // Console.log:  'Object { cheeseburger=true}'
+                         * });
+                         *
+                         * hAzzle('p').fire('partytime', {'detail':{'cheeseburger':true}});
+                         *
+                         */
+
+                        // create and dispatch the event
+
+                        evt = new CustomEvent(type, args);
+                        elem.dispatchEvent(evt);
+                    }
                 }
             }
+
             return elem;
         },
         once = function(rm, elem, type, fn, original) {
@@ -407,7 +420,6 @@ hAzzle.define('events', function() {
             if (list) {
                 i = list.length;
                 while (i--) {
-
                     if (!list[i].root && list[i].matches(elem, original, null)) {
                         return true;
                     }
@@ -463,9 +475,9 @@ hAzzle.define('events', function() {
                 }
             }
         },
-       
-       // EVENT DELEGATION
-       // Fix me! Add observer pattern for event delegation
+
+        // EVENT DELEGATION
+        // Fix me! Add observer pattern for event delegation
 
         delegateTarget = function(event, sel, ctx) {
             var cur = event.target;
@@ -508,7 +520,6 @@ hAzzle.define('events', function() {
                         return fn.apply(element, args ? collection.slice(arguments).concat(args) : arguments);
                     }
                 } : function(event) {
-
 
                     if (fn.__kfx2rcf) {
 
@@ -671,6 +682,7 @@ hAzzle.define('events', function() {
             this.preventDefault();
             this.stopPropagation();
 
+
             // Set a 'stopped' property so that a custom event can be inspected
             // after the fact to determine whether or not it was stopped.
             this.stopped = true;
@@ -826,20 +838,73 @@ hAzzle.define('events', function() {
     this.ready = function(callback) {
         this.elements[0].addEventListener('DOMContentLoaded', callback, false);
     };
-    
 
-    util.each(('blur focus focusin focusout load resize scroll unload click dblclick ' +
-        'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
-        'change select submit keydown keypress keyup error contextmenu').split(' '), function(prop) {
+    // PhantomJS doesn't support Array.prototype.bind(), so we do a workaround
 
-        // Handle event binding
-        this[prop] = function(data, fn) {
-            return arguments.length > 0 ?
-                this.on(prop, data, fn) :
-                this.trigger(prop);
-        };
+    this.blur = function(data, fn) {
+        return arguments.length > 0 ? this.on('blur', data, fn) : this.trigger(prop);
+    };
+    this.focus = function(data, fn) {
+        return arguments.length > 0 ? this.on('focus', data, fn) : this.trigger(prop);
+    };
+    this.click = function(data, fn) {
+        return arguments.length > 0 ? this.on('click', data, fn) : this.trigger(prop);
+    };
 
-    }.bind(this));
+    this.load = function(data, fn) {
+        return arguments.length > 0 ? this.on('load', data, fn) : this.trigger(prop);
+    };
+    this.resize = function(data, fn) {
+        return arguments.length > 0 ? this.on('resize', data, fn) : this.trigger(prop);
+    };
+    this.scroll = function(data, fn) {
+        return arguments.length > 0 ? this.on('scroll', data, fn) : this.trigger(prop);
+    };
+    this.dblclick = function(data, fn) {
+        return arguments.length > 0 ? this.on('dblclick', data, fn) : this.trigger(prop);
+    };
+    this.change = function(data, fn) {
+        return arguments.length > 0 ? this.on('change', data, fn) : this.trigger(prop);
+    };
+    this.keydown = function(data, fn) {
+        return arguments.length > 0 ? this.on('keydown', data, fn) : this.trigger(prop);
+    };
+    this.keypress = function(data, fn) {
+        return arguments.length > 0 ? this.on('keypress', data, fn) : this.trigger(prop);
+    };
+    this.keyup = function(data, fn) {
+        return arguments.length > 0 ? this.on('keyup', data, fn) : this.trigger(prop);
+    };
+    this.submit = function(data, fn) {
+        return arguments.length > 0 ? this.on('submit', data, fn) : this.trigger(prop);
+    };
+    this.select = function(data, fn) {
+        return arguments.length > 0 ? this.on('select', data, fn) : this.trigger(prop);
+    };
+    this.mouseenter = function(data, fn) {
+        return arguments.length > 0 ? this.on('mouseenter', data, fn) : this.trigger(prop);
+    };
+    this.mouseout = function(data, fn) {
+        return arguments.length > 0 ? this.on('mouseout', data, fn) : this.trigger(prop);
+    };
+    this.mouseleave = function(data, fn) {
+        return arguments.length > 0 ? this.on('mouseleave', data, fn) : this.trigger(prop);
+    };
+    this.mouseover = function(data, fn) {
+        return arguments.length > 0 ? this.on('mouseover', data, fn) : this.trigger(prop);
+    };
+    this.mousemove = function(data, fn) {
+        return arguments.length > 0 ? this.on('mousemove', data, fn) : this.trigger(prop);
+    };
+    this.mouseup = function(data, fn) {
+        return arguments.length > 0 ? this.on('mouseup', data, fn) : this.trigger(prop);
+    };
+    this.mousedown = function(data, fn) {
+        return arguments.length > 0 ? this.on('mousedown', data, fn) : this.trigger(prop);
+    };
+    this.unload = function(data, fn) {
+        return arguments.length > 0 ? this.on('unload', data, fn) : this.trigger(prop);
+    };
 
     // Mouse wheel
 
