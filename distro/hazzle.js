@@ -2510,19 +2510,22 @@ hAzzle.define('css', function() {
 // setters.js
 hAzzle.define('setters', function() {
 
-    var util = hAzzle.require('util'),
+    var // Dependencies 
+    
+        util = hAzzle.require('util'),
         core = hAzzle.require('core'),
         features = hAzzle.require('has'),
         types = hAzzle.require('types'),
+        
+        // Various regEx
+        
         whiteSpace = /\S+/g,
         wreturn = /\r/g,
+        
+        // SVG attributes
+        
         SVGAttributes = 'width|height|x|y|cx|cy|r|rx|ry|x1|x2|y1|y2',
 
-        boolElemArray = ('input select option textarea button form details').split(' '),
-        boolAttrArray = ('multiple selected checked disabled readonly required ' +
-            'async autofocus compact nowrap declare noshade hreflang onload src' +
-            'noresize defaultChecked autoplay controls defer autocomplete ' +
-            'hidden tabindex readonly type accesskey dropzone spellcheck ismap loop scoped open').split(' '),
         boolAttr = {}, // Boolean attributes
         boolElem = {}, // Boolean elements
 
@@ -2549,7 +2552,7 @@ hAzzle.define('setters', function() {
             set: {}
         },
         getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements : elem;
+            return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
         },
         validTypes = {
             '1': 1,
@@ -2562,7 +2565,6 @@ hAzzle.define('setters', function() {
             '11': 1,
             '12': 1
         },
-
 
         // Get names on the boolean attributes
 
@@ -2792,40 +2794,36 @@ hAzzle.define('setters', function() {
         });
     };
 
-    this.attr = function(name, value, type) {
-
-        var elem = this.elements;
-        if (typeof name === 'object') {
-            return this.each(function(elem) {
+    this.attr = function(name, value) {
+        return typeof name === 'object' ? this.each(function(elem) {
                 util.each(name, function(value, key) {
                     attr(elem, key, value);
                 });
-            });
-        }
-
-        return typeof value === 'undefined' ?
-            attr(elem[0], name) :
+            }) : typeof value === 'undefined' ?
+            attr(this.elements[0], name) :
             this.each(function(elem) {
                 attr(elem, name, value);
             });
     };
 
-    util.each(boolAttrArray, function(prop) {
-        boolAttr[boolAttrArray[prop]] = boolAttrArray[prop];
+    // Populate boolAttr 
+    util.each(('multiple selected checked disabled readOnly required ' +
+        'async autofocus compact nowrap declare noshade hreflang onload src' +
+        'noresize defaultChecked autoplay controls defer autocomplete ' +
+        'hidden tabindex readOnly type accesskey dropzone spellcheck isMap loop scoped open').split(' '), function(prop) {
+        boolAttr[prop.toLowerCase()] = prop;
     });
 
-    util.each(boolElemArray, function(prop) {
-        boolElem[prop.toUpperCase()] = true;
+    // Populate boolElem 
+    util.each(('input select option textarea button form details').split(' '), function(prop) {
+        boolElem[prop] = true;
     });
 
     // Populate propMap - all properties are written as camelCase
-    util.each(['cellPadding', 'cellSpacing', 'maxLength', 'rowSpan',
-        'colSpan', 'useMap', 'frameBorder', 'contentEditable', 'textContent', 'valueType',
-        'tabIndex', 'readOnly', 'type', 'accessKey', 'tabIndex', 'dropZone', 'spellCheck',
-        'hrefLang', 'isMap', 'srcDoc', 'mediaGroup', 'autoComplete', 'noValidate',
-        'radioGroup'
-    ], function(prop) {
-
+    util.each(('cellPadding cellSpacing maxLength rowSpan ' +
+        'colSpan useMap frameBorder contentEditable textContent valueType ' +
+        'tabIndex readOnly type accessKey tabIndex dropZone spellCheck ' +
+        'hrefLang isMap srcDoc mediaGroup autoComplete noValidate radioGroup').split(' '), function(prop) {
         propMap[prop.toLowerCase()] = prop;
     });
 
