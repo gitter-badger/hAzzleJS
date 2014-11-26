@@ -55,29 +55,30 @@ hAzzle.define('storage', function() {
         };
 
     Storage.prototype = {
-        
+
         constructor: Storage,
 
         register: function(elem, initial) {
 
-            hAzzle.err(!types.isObject(elem), 22, 'no valid DOM element in storage.js');
+            if (types.isObject(elem)) {
 
-            if (elem.nodeType) {
+                if (elem.nodeType) {
 
-                elem[this.expando] = {
-                    value: initial || {}
-                };
+                    elem[this.expando] = {
+                        value: initial || {}
+                    };
 
-                // Only use ES5 defineProperty for non-nodes
-            } else {
-                Object.defineProperty(elem, this.expando, {
-                    value: initial || {},
-                    writable: true,
-                    configurable: true
-                });
+                    // Otherwise secure it in a non-enumerable, non-writable property
+                } else {
+                    Object.defineProperty(elem, this.expando, {
+                        value: initial || {},
+                        writable: true,
+                        configurable: true
+                    });
+                }
+
+                return elem[this.expando];
             }
-
-            return elem[this.expando];
         },
         cache: function(elem, initial) {
 
@@ -100,6 +101,7 @@ hAzzle.define('storage', function() {
             return this.register(elem, initial);
         },
         set: function(elem, data, value) {
+
             if (elem) {
 
                 var prop, cache = this.cache(elem);
@@ -127,21 +129,18 @@ hAzzle.define('storage', function() {
             }
         },
         access: function(elem, key, value) {
-            var stored;
 
             if (key === undefined ||
                 ((key && typeof key === 'string') && value === undefined)) {
 
-                stored = this.get(elem, key);
+                var saved = this.get(elem, key);
 
-                return stored !== undefined ?
-                    stored : this.get(elem, camelize(key));
+                return saved !== undefined ?
+                    saved : this.get(elem, camelize(key));
             }
 
             this.set(elem, key, value);
 
-            // Since the 'set' path can have two possible entry points
-            // return the expected data based on which path was taken[*]
             return value !== undefined ? value : key;
         },
         get: function(elem, key) {
@@ -180,9 +179,8 @@ hAzzle.define('storage', function() {
             }
         },
         hasData: function(elem) {
-            return !types.isEmptyObject(
-                elem[this.expando] || {}
-            );
+
+            return !types.isEmptyObject(elem[this.expando] || {});
         },
         flush: function(elem) {
             if (elem[this.expando]) {
@@ -298,6 +296,21 @@ hAzzle.define('storage', function() {
             userData.release(elem, key);
         });
     };
+
+    /**
+     * Differently from jQuery or other libs, hAzzle are not exposing any
+     * storage methods global, but *only* return 'raw' access to the
+     * prototype methods
+     *
+     * Internally hAzzle works like other libs and data can be set / recived like this:
+     *
+     *  this.data();
+     *
+     * or removed like this:
+     *
+     * this.removeData();
+     *
+     */
 
     return {
         private: privateData,

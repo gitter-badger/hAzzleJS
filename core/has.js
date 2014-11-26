@@ -34,14 +34,26 @@ hAzzle.define('has', function() {
         })(),
         // Return the current value of the named feature
         has = function(name) {
+            if (!cache[name]) {
+                return;
+            }
             return typeof cache[name] === 'function' ?
                 (cache[name] = cache[name](win, doc, element)) :
                 cache[name];
         },
         // Register a new feature test for some named feature
         add = function(name, test, now, force) {
-            (typeof cache[name] === 'undefined' || force) && (cache[name] = test);
-            return now && has(name);
+
+            if (typeof name == 'object') {
+                for (var key in name) {
+                    if (Object.prototype.hasOwnProperty(name, key)) {
+                        add(key, name[key]);
+                    }
+                }
+            } else {
+                (typeof cache[name] === 'undefined' || force) && (cache[name] = test);
+                return now && has(name);
+            }
         },
         // Delete the content of the element passed to test functions.
         clear = function(elem) {
