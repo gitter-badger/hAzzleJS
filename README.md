@@ -255,12 +255,6 @@ feature.has('ie');
 ```
 **Note!** hAzzle avoid use of **userAgent** to detect browsers, and instead rely on feature detection
 
-Your modules
---------------
-
-You can develop your own modules for **hAzzle**. If you do so, upload them to the **public folder** with a sub-directory that has the same name as your plugin.
-
-**Important!!** Don't forget to add a **dependency list** document in the root of your directory so other developers know what **hAzzle modules** to include together with the **Core** to get your module to work.
 
 DOM Level 4 (DL4)
 ------------------
