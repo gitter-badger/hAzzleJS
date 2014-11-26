@@ -143,7 +143,6 @@ hAzzle.define('classes', function() {
             util.each(getElem(elem), function(elem) {
                 if (elem.nodeType === 1) {
                     return addRemove(elem, classes, 'add', function(elem, clazz) {
-
                         var cur = (' ' + elem.className + ' ').replace(reSpace, ' '),
                             end;
                         // ECMA 7 - contains

@@ -13,27 +13,6 @@ hAzzle.define('dimensions', function() {
         styles = hAzzle.require('style'),
         css = hAzzle.require('css'),
 
-        origValues = function(elem, core) {
-
-            var style = elem.style,
-                originalValues = {
-                    position: style.position,
-                    visibility: style.visibility,
-                    display: style.display
-                };
-
-            // Set new CSS rules *only* on the first element in a collection,
-            // and return it's original values
-
-            core.first().css({
-                position: 'absolute',
-                visibility: 'hidden',
-                display: 'block'
-            });
-
-            return originalValues;
-        },
-
         _matchMedia = win.matchMedia || win.msMatchMedia,
         mq = _matchMedia ? function(q) {
             return !!_matchMedia.call(win, q).matches;
@@ -172,14 +151,14 @@ hAzzle.define('dimensions', function() {
                 curElem.css(props);
             }
         };
-// As default hAzzle are not using getBoundingClientRect() due to the fact
-// it's terrible slow. This solution returned rounded decimals (e.g. 124) and 
-// not 123,349535 as gBCR() would have done. Therefor if we pass in a 'boolean'
-// value to the offset(), we are allowing use of gBCR().
+    // As default hAzzle are not using getBoundingClientRect() due to the fact
+    // it's terrible slow. This solution returned rounded decimals (e.g. 124) and 
+    // not 123,349535 as gBCR() would have done. Therefor if we pass in a 'boolean'
+    // value to the offset(), we are allowing use of gBCR().
 
- this.offset = function(opts) {
+    this.offset = function(opts) {
 
-  var gBCR = arguments.length && typeof opts === 'boolean'
+        var gBCR = arguments.length && typeof opts === 'boolean';
 
         if (arguments.length && !gBCR) {
             return opts === undefined ?
@@ -206,33 +185,37 @@ hAzzle.define('dimensions', function() {
             return {
                 top: 0,
                 left: 0,
-                height:0,
-                width:0
+                height: 0,
+                width: 0
             };
         }
 
-      if(gBCR && opts) {
-          
-        var box = elem.getBoundingClientRect(),
-	    	win = getWindow( doc ), position = {x: 0, y: 0},
-            isFixed = (css.css(elem, 'position') == 'fixed'),
-		    element = elem.parentNode;
-        
-		while (element && util.nodeName(element, 'html')){
-			position.x += element.scrollLeft;
-			position.y += element.scrollTop;
-			element = element.parentNode;
-		}
+        if (gBCR && opts) {
 
-		return {
-			top: box.top + position.x + ((isFixed) ? 0 : win.pageXOffset) - docElem.clientLeft,
-			left: box.left + position.y + ((isFixed) ? 0 : win.pageYOffset) - docElem.clientTop,
-            right: box.right + position.y + ((isFixed) ? 0 : win.pageYOffset) - docElem.clientLeft,
-            bottom: box.bottom + ((isFixed) ? 0 : win.pageXOffset) - docElem.clientTop,
-            width: box.right - box.left,
-            height: box.bottom - box.top
-          } 
-     }
+            var box = elem.getBoundingClientRect(),
+                win = getWindow(doc),
+                position = {
+                    x: 0,
+                    y: 0
+                },
+                isFixed = (css.css(elem, 'position') == 'fixed'),
+                element = elem.parentNode;
+
+            while (element && util.nodeName(element, 'html')) {
+                position.x += element.scrollLeft;
+                position.y += element.scrollTop;
+                element = element.parentNode;
+            }
+
+            return {
+                top: box.top + position.x + ((isFixed) ? 0 : win.pageXOffset) - docElem.clientLeft,
+                left: box.left + position.y + ((isFixed) ? 0 : win.pageYOffset) - docElem.clientTop,
+                right: box.right + position.y + ((isFixed) ? 0 : win.pageYOffset) - docElem.clientLeft,
+                bottom: box.bottom + ((isFixed) ? 0 : win.pageXOffset) - docElem.clientTop,
+                width: box.right - box.left,
+                height: box.bottom - box.top
+            };
+        }
         while (elem && elem !== document.body && elem !== document.documentElement) {
 
             left += elem.offsetLeft;
@@ -262,8 +245,8 @@ hAzzle.define('dimensions', function() {
         return {
             top: top,
             left: left,
-            height:elem.offsetWidth,
-            width:elem.offsetHeight
+            height: elem.offsetWidth,
+            width: elem.offsetHeight
         };
     };
 
@@ -272,7 +255,7 @@ hAzzle.define('dimensions', function() {
 
     this.position = function() {
 
-        var elem = this.elements[0]
+        var elem = this.elements[0];
 
         if (!elem) {
             return null;
@@ -305,7 +288,7 @@ hAzzle.define('dimensions', function() {
     // Follows spec http://www.w3.org/TR/cssom-view/#offset-attributes
 
     this.offsetParent = function() {
-        return this.map(function(elem) {
+        return this.map(function() {
             var offsetParent = this.offsetParent || docElem;
             if (util.nodeName(offsetParent.nodeName, 'html') || css.css(this, 'position') === 'fixed') {
                 return null;
@@ -313,7 +296,6 @@ hAzzle.define('dimensions', function() {
             return offsetParent;
 
         });
-
     };
 
     this.getWidthHeight = function(dim) {
@@ -323,6 +305,8 @@ hAzzle.define('dimensions', function() {
         }
 
         var elem = this.elements[0],
+        style = elem.style,
+            originalValues = false,
 
             // Get window width or height
 
@@ -330,29 +314,36 @@ hAzzle.define('dimensions', function() {
 
             // Get document width or height
 
-            doc = elem.nodeType == 9 && elem.documentElement,
+            doc = elem.nodeType == 9 && elem.documentElement;
 
-            // Check if the element are visible or not. If hidden, we get the original values, and set new ones so
-            // we can measure the right values properly. The original values will be restored later on
+        // First get our offset(Width/Height)
+        // offsetHeight/offsetWidth properties return 0 on elements
+        // with display:none, so show the element temporarily
 
-            orig = !doc && !!elem.style && !elem.offsetWidth && !elem.offsetHeight ? origValues(elem, this) : null,
+        if (!doc && !!elem.style && !elem.offsetWidth && !elem.offsetHeight) {
 
-            // Calculate width
+                originalValues = style.cssText;
+            style.cssText += ';display:block;visibility:hidden;position:absolute;';
 
-            width = win ? elem.document.documentElement.clientWidth :
+        }
+        // Calculate width
+
+        var width = win ? elem.document.documentElement.clientWidth :
             doc ? Math.max(elem.body.scrollWidth, elem.body.offsetWidth, doc.scrollWidth, doc.offsetWidth, doc.clientWidth) :
             elem.offsetWidth,
 
             // Calculate height
 
             height = win ? elem.document.documentElement.clientHeight :
+
             doc ? Math.max(elem.body.scrollHeight, elem.body.offsetHeight, doc.scrollHeight, doc.offsetHeight, doc.clientHeight) :
             elem.offsetHeight;
 
+
         // Restore original CSS values on current element it's not a window or document object
 
-        if (orig) {
-            this.first().css(orig);
+        if (originalValues) {
+            elem.style.cssText = originalValues;
         }
 
         // Return 'width' or 'height' if given, if not return a object with both dimensions
@@ -363,16 +354,19 @@ hAzzle.define('dimensions', function() {
         };
     };
 
-    // width / height
+    this.height = function(val) {
+        return val ? styles.setCSS(this.elements[0], 'height', val) : this.getWidthHeight('height');
+    };
+    this.width = function(val) {
+        return val ? styles.setCSS(this.elements[0], 'height', val) : this.getWidthHeight('width');
+    };
 
-    util.each([
-        'height',
-        'width'
-    ], function(prop) {
-        this[prop] = function(val) {
-            return val ? styles.setCSS(this.elements[0], prop, val) : this.getWidthHeight(prop);
-        };
-    }.bind(this));
+    this.innerHeight = function() {
+        return this.elements[0].clientHeight;
+    };
+    this.innerWidth = function() {
+        return this.elements[0].clientWidth;
+    };
 
     // innerHeight / outerHeight
 
@@ -380,12 +374,6 @@ hAzzle.define('dimensions', function() {
         height: 'Height',
         width: 'Width'
     }, function(val, prop) {
-
-        // innerHeight / innerWidth
-        this['inner' + val] = function() {
-            return this.elements[0]['client' + val];
-        };
-        // outerHeight / outerWidth
         this['outer' + val] = function(margin) {
 
             var elem = this.elements[0];
@@ -413,7 +401,7 @@ hAzzle.define('dimensions', function() {
         var top = 'pageYOffset' === prop;
 
         this[method] = function(val) {
-            
+
             var elem = this.elements[0],
                 win = getWindow(elem);
 
