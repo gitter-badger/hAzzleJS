@@ -171,28 +171,16 @@ hAzzle.define('has', function() {
         cache = {},
 
         // IE feature detection
-        ie = (function() {
+        // Difference between this 'detection method' and has('ie') is that the last
+        // method only return a boolean, and this method return version numbers
 
+        ie = (function() {
             if (doc.documentMode) {
                 return doc.documentMode;
-            } else {
-                var i = 7,
-                    div;
-                for (; i > 4; i--) {
-
-                    div = doc.createElement('div');
-
-                    div.innerHTML = '<!--[if IE ' + i + ']><span></span><![endif]-->';
-
-                    if (div.getElementsByTagName('span').length) {
-                        div = null; // Release memory in IE
-                        return i;
-                    }
-                }
             }
-
-            return undefined;
+            return false;
         })(),
+
         // Return the current value of the named feature
         has = function(name) {
             if (!cache[name]) {
@@ -206,7 +194,8 @@ hAzzle.define('has', function() {
         add = function(name, test, now, force) {
 
             if (typeof name == 'object') {
-                for (var key in name) {
+                var key;
+                for (key in name) {
                     add(key, name[key]);
                 }
             } else {
@@ -220,17 +209,25 @@ hAzzle.define('has', function() {
             return elem;
         };
 
-    //# FEATURE DETECTION
-
     add({
 
-        // Mobile
+        //# BROWSER DETECTION
+
+        // Mobiles / tablets
 
         'mobile': /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua),
 
         // Android
 
         'android': /^Android/i.test(ua),
+
+        // iPad (most popular??)
+
+        'ipad': /^iPad/i.test(ua),
+
+        // BlackBerry
+
+        'blackberry': /^BlackBerry/i.test(ua),
 
         // Opera
 
@@ -255,6 +252,8 @@ hAzzle.define('has', function() {
 
         // Macintosh
         'mac': navigator.appVersion.indexOf('Macintosh') >= 0,
+
+        //# FEATURE DETECTION
 
         // ClassList
         'classlist': !!document.documentElement.classList,
@@ -286,7 +285,6 @@ hAzzle.define('has', function() {
         // QuerySelectorAll
 
         'qsa': !!document.querySelectorAll
-
     });
 
     return {
@@ -305,6 +303,10 @@ hAzzle.define('Types', function() {
         // Determines if a reference is an `Array`
 
         isArray = Array.isArray,
+
+        // nodeList regExp
+
+        nodeRegExp = /^\[object (HTMLCollection|NodeList|Object)\]$/,
 
         // Determines if a reference is a `String`
 
@@ -326,6 +328,7 @@ hAzzle.define('Types', function() {
             return isString(obj) || isArray(obj) || length === 0 ||
                 typeof length === 'number' && length > 0 && (length - 1) in obj;
         },
+        // Determines if a reference is a `Number`
         isNumber = function(value) {
             return typeof value === 'number';
         },
@@ -355,11 +358,10 @@ hAzzle.define('Types', function() {
         },
 
         isElement = function(node) {
-            return !!(node && node.nodeName // we are a direct element
-            );
+            return !!(node && node.nodeName);
         },
+        // `NaN` as a primitive is the only value that is not equal to itself
         isNaN = function(value) {
-            // `NaN` as a primitive is the only value that is not equal to itself
             return isNumber(value) && value != +value;
         },
         // Determines if a reference is undefined
@@ -400,36 +402,28 @@ hAzzle.define('Types', function() {
         },
 
         isPlainObject = function(obj) {
-            return isType('Object')(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) === Object.prototype;
+            return isType('Object')(obj) &&
+                !isWindow(obj) &&
+                Object.getPrototypeOf(obj) === Object.prototype;
         },
 
-        isPromiseAlike = function(object) {
-            return isObject(object) && typeof object.then === 'function';
+        isPromiseLike = function(obj) {
+            return obj && isType('Function')(obj.then);
         },
 
         isNode = function(elem) {
             return !!elem && typeof elem === 'object' && 'nodeType' in elem;
         },
+        // Test if 'elem' is a DOM NodeList
         isNodeList = function(elem) {
-            var result = Object.prototype.toString.call(elem);
-            // Modern browser such as IE9 / firefox / chrome etc.
-            if (result === '[object HTMLCollection]' ||
-                result === '[object NodeList]' ||
-                // https://developer.mozilla.org/en/docs/Web/API/HTMLFormControlsCollection
-                result === '[object HTMLFormControlsCollection]') {
-                return true;
-            }
-            // Detect length and item 
-            if (!('length' in elem) || !('item' in elem)) {
-                return false;
-            }
-            try {
-                if (elem(0) === null || (elem(0) && elem(0).tagName)) return true;
-            } catch (e) {
-                return false;
-            }
-            return false;
+            var stringRepr = Object.prototype.toString.call(elem);
+
+            return typeof elem === 'object' &&
+                nodeRegExp.test(stringRepr) &&
+                elem.length !== undefined &&
+                (elem.length === 0 || (typeof elem[0] === 'object' && elem[0].nodeType > 0));
         },
+
         // Check for SVG namespace
         isSVGElem = function(elem) {
             return (elem.nodeType === 1 && elem.namespaceURI === 'http://www.w3.org/2000/svg') ||
@@ -445,21 +439,20 @@ hAzzle.define('Types', function() {
         isObject: isObject,
         isPlainObject: isPlainObject,
         isEmptyObject: isEmptyObject,
+        isPromiseLike: isPromiseLike,
         isNode: isNode,
         isElement: isElement,
         isString: isString,
         isArrayLike: isArrayLike,
         isNumber: isNumber,
+        isNumeric: isNumeric,
         isBoolean: isBoolean,
         isNaN: isNaN,
         isSVGElem: isSVGElem,
         isDefined: isDefined,
         isUndefined: isUndefined,
         isNodeList: isNodeList,
-
-        // This method are *only* added here to do it easier for developers
-
-        isFunction: isType('Function')
+        isFunction: isType('Function') // Frequently used by developers (shorthand)
     };
 });
 // text.js
@@ -478,20 +471,24 @@ hAzzle.define('text', function() {
                 // Do not traverse comment nodes
                 ret += getText(node);
             }
-        } else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
+        } else if (nodeType === 1 ||
+            nodeType === 9 ||
+            nodeType === 11) {
+
             if (typeof elem.textContent === 'string') {
                 return elem.textContent;
-            } else {
-                // Traverse its children
-                for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
-                    ret += getText(elem);
-                }
             }
-        } else if (nodeType === 3 || nodeType === 4) { // Text or CDataSection
+            // Traverse its children
+            for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
+                ret += getText(elem);
+            }
+
+        } else if (nodeType === 3 ||
+            nodeType === 4) { // Text or CDataSection
             return elem.nodeValue;
         }
         return ret;
-    }
+    };
 
     return {
         getText: getText
@@ -2104,7 +2101,6 @@ hAzzle.define('storage', function() {
             }
         },
         hasData: function(elem) {
-
             return !types.isEmptyObject(elem[this.expando] || {});
         },
         flush: function(elem) {

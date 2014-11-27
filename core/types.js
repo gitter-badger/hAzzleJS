@@ -7,6 +7,10 @@ hAzzle.define('Types', function() {
 
         isArray = Array.isArray,
 
+        // nodeList regExp
+
+        nodeRegExp = /^\[object (HTMLCollection|NodeList|Object)\]$/,
+
         // Determines if a reference is a `String`
 
         isString = function(value) {
@@ -27,12 +31,13 @@ hAzzle.define('Types', function() {
             return isString(obj) || isArray(obj) || length === 0 ||
                 typeof length === 'number' && length > 0 && (length - 1) in obj;
         },
+        // Determines if a reference is a `Number`
         isNumber = function(value) {
             return typeof value === 'number';
         },
-        isNumeric = function( obj ) {
-		return !isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
-	    },
+        isNumeric = function(obj) {
+            return !isArray(obj) && (obj - parseFloat(obj) + 1) >= 0;
+        },
 
         isBoolean = function(value) {
             return typeof value === 'boolean';
@@ -56,11 +61,10 @@ hAzzle.define('Types', function() {
         },
 
         isElement = function(node) {
-            return !!(node && node.nodeName // we are a direct element
-            );
+            return !!(node && node.nodeName);
         },
+        // `NaN` as a primitive is the only value that is not equal to itself
         isNaN = function(value) {
-            // `NaN` as a primitive is the only value that is not equal to itself
             return isNumber(value) && value != +value;
         },
         // Determines if a reference is undefined
@@ -84,7 +88,7 @@ hAzzle.define('Types', function() {
         },
 
         // Returns a function that returns `true` if `arg` is of the correct `type`, otherwise `false`.
-        // e.g isType('Function')( fn )
+        // e.g isType('Date')( fn )
 
         isType = function(type) {
             return type ? function(arg) {
@@ -101,36 +105,28 @@ hAzzle.define('Types', function() {
         },
 
         isPlainObject = function(obj) {
-            return isType('Object')(obj) && !isWindow(obj) && Object.getPrototypeOf(obj) === Object.prototype;
+            return isType('Object')(obj) &&
+                !isWindow(obj) &&
+                Object.getPrototypeOf(obj) === Object.prototype;
         },
 
-        isPromiseAlike = function(object) {
-            return isObject(object) && typeof object.then === 'function';
+        isPromiseLike = function(obj) {
+            return obj && isType('Function')(obj.then);
         },
 
         isNode = function(elem) {
             return !!elem && typeof elem === 'object' && 'nodeType' in elem;
         },
+        // Test if 'elem' is a DOM NodeList
         isNodeList = function(elem) {
-            var result = Object.prototype.toString.call(elem);
-            // Modern browser such as IE9 / firefox / chrome etc.
-            if (result === '[object HTMLCollection]' ||
-                result === '[object NodeList]' ||
-                // https://developer.mozilla.org/en/docs/Web/API/HTMLFormControlsCollection
-                result === '[object HTMLFormControlsCollection]') {
-                return true;
-            }
-            // Detect length and item 
-            if (!('length' in elem) || !('item' in elem)) {
-                return false;
-            }
-            try {
-                if (elem(0) === null || (elem(0) && elem(0).tagName)) return true;
-            } catch (e) {
-                return false;
-            }
-            return false;
+            var stringRepr = Object.prototype.toString.call(elem);
+
+            return typeof elem === 'object' &&
+                nodeRegExp.test(stringRepr) &&
+                elem.length !== undefined &&
+                (elem.length === 0 || (typeof elem[0] === 'object' && elem[0].nodeType > 0));
         },
+
         // Check for SVG namespace
         isSVGElem = function(elem) {
             return (elem.nodeType === 1 && elem.namespaceURI === 'http://www.w3.org/2000/svg') ||
@@ -146,20 +142,19 @@ hAzzle.define('Types', function() {
         isObject: isObject,
         isPlainObject: isPlainObject,
         isEmptyObject: isEmptyObject,
+        isPromiseLike: isPromiseLike,
         isNode: isNode,
         isElement: isElement,
         isString: isString,
         isArrayLike: isArrayLike,
         isNumber: isNumber,
+        isNumeric: isNumeric,
         isBoolean: isBoolean,
         isNaN: isNaN,
-        isSVGElem:isSVGElem,
+        isSVGElem: isSVGElem,
         isDefined: isDefined,
         isUndefined: isUndefined,
         isNodeList: isNodeList,
-        
-        // This method are *only* added here to do it easier for developers
-       
-        isFunction: isType('Function')
+        isFunction: isType('Function') // Frequently used by developers (shorthand)
     };
 });

@@ -10,28 +10,16 @@ hAzzle.define('has', function() {
         cache = {},
 
         // IE feature detection
-        ie = (function() {
+        // Difference between this 'detection method' and has('ie') is that the last
+        // method only return a boolean, and this method return version numbers
 
+        ie = (function() {
             if (doc.documentMode) {
                 return doc.documentMode;
-            } else {
-                var i = 7,
-                    div;
-                for (; i > 4; i--) {
-
-                    div = doc.createElement('div');
-
-                    div.innerHTML = '<!--[if IE ' + i + ']><span></span><![endif]-->';
-
-                    if (div.getElementsByTagName('span').length) {
-                        div = null; // Release memory in IE
-                        return i;
-                    }
-                }
             }
-
-            return undefined;
+            return false;
         })(),
+
         // Return the current value of the named feature
         has = function(name) {
             if (!cache[name]) {
@@ -45,7 +33,8 @@ hAzzle.define('has', function() {
         add = function(name, test, now, force) {
 
             if (typeof name == 'object') {
-                for (var key in name) {
+                var key;
+                for (key in name) {
                     add(key, name[key]);
                 }
             } else {
@@ -59,17 +48,25 @@ hAzzle.define('has', function() {
             return elem;
         };
 
-    //# FEATURE DETECTION
-
     add({
 
-        // Mobile
+        //# BROWSER DETECTION
+
+        // Mobiles / tablets
 
         'mobile': /^Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua),
 
         // Android
 
         'android': /^Android/i.test(ua),
+
+        // iPad (most popular??)
+
+        'ipad': /^iPad/i.test(ua),
+
+        // BlackBerry
+
+        'blackberry': /^BlackBerry/i.test(ua),
 
         // Opera
 
@@ -94,6 +91,8 @@ hAzzle.define('has', function() {
 
         // Macintosh
         'mac': navigator.appVersion.indexOf('Macintosh') >= 0,
+
+        //# FEATURE DETECTION
 
         // ClassList
         'classlist': !!document.documentElement.classList,
@@ -124,8 +123,7 @@ hAzzle.define('has', function() {
 
         // QuerySelectorAll
 
-        'qsa': !!document.querySelectorAll,
-
+        'qsa': !!document.querySelectorAll
     });
 
     return {

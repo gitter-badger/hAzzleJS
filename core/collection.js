@@ -64,6 +64,7 @@ hAzzle.define('Collection', function() {
     };
 
     // Get the element at position specified by index from the current collection.
+    
     this.eq = function(index) {
         var len = this.length,
             j = +index + (index < 0 ? len : 0);
