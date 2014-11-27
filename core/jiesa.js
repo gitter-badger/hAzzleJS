@@ -1,5 +1,5 @@
 // jiesa.js
-hAzzle.define('Jiesa', function() {
+hAzzle.define('jiesa', function() {
 
     var // Dependencies    
 
@@ -9,7 +9,8 @@ hAzzle.define('Jiesa', function() {
         types = hAzzle.require('types'),
         features = hAzzle.require('has'),
 
-    // RegEx
+        // RegEx
+
         idClassTagNameExp = /^(?:#([\w-]+)|\.([\w-]+)|(\w+))$/,
         tagNameAndOrIdAndOrClassExp = /^(\w+)(?:#([\w-]+)|)(?:\.([\w-]+)|)$/,
         unionSplit = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
@@ -53,7 +54,7 @@ hAzzle.define('Jiesa', function() {
         },
 
         fixedRoot = function(context, query, method) {
-            var oldContext = context,
+            var backup = context,
                 old = context.getAttribute('id'),
                 nid = old || '__hAzzle__',
                 hasParent = context.parentNode,
@@ -70,17 +71,22 @@ hAzzle.define('Jiesa', function() {
             if (relativeHierarchySelector && hasParent) {
                 context = context.parentNode;
             }
-            var selectors = query.match(unionSplit);
-            for (var i = 0; i < selectors.length; i++) {
+
+            var selectors = query.match(unionSplit),
+                i = 0,
+                len = selectors.length;
+
+            for (; i < len; i++) {
                 selectors[i] = "[id='" + nid + "'] " + selectors[i];
             }
+
             query = selectors.join(',');
 
             try {
                 return method.call(context, query);
             } finally {
                 if (!old) {
-                    oldContext.removeAttribute('id');
+                    backup.removeAttribute('id');
                 }
             }
         },
@@ -105,9 +111,9 @@ hAzzle.define('Jiesa', function() {
         containsClass = function(el, cls) {
             if (features.has('classList')) {
                 return el.classList.contains(cls);
-            } else {
-                return (' ' + el.className + ' ').replace(reSpace, ' ').indexOf(cls) >= 0;
             }
+            // ECMA 7 - contains
+            return (' ' + el.className + ' ').replace(reSpace, ' ').contains(cls);
         },
 
         normalizeCtx = function(root) {
@@ -196,7 +202,7 @@ hAzzle.define('Jiesa', function() {
         // Many people uses "is(':hidden') / "is(':visible'), so to make them happy we introduced basic 
         // CSS2 / CSS3 pseudo support
 
-           matches = function(elem, sel, ctx) {
+        matches = function(elem, sel, ctx) {
 
             if (sel && sel.nodeType) {
                 return elem === sel;
@@ -213,52 +219,50 @@ hAzzle.define('Jiesa', function() {
                 });
             }
 
-            var quick = quickMatch.exec(sel);
+            var match = quickMatch.exec(sel);
 
-            if (quick) { 
-                //   0  1    2   3          4
-                // [ _, tag, id, attribute, class ]
-                if (quick[1]) {
-                    quick[1] = quick[1].toLowerCase();
+            if (match) {
+                if (match[1]) {
+                    match[1] = match[1].toLowerCase();
                 }
-                if (quick[3]) {
-                    quick[3] = quick[3].split('=');
+                if (match[3]) {
+                    match[3] = match[3].split('=');
                 }
-                if (quick[4]) {
-                    quick[4] = ' ' + quick[4] + ' ';
+                if (match[4]) {
+                    match[4] = ' ' + match[4] + ' ';
                 }
 
                 return (
-                    (!quick[1] || elem.nodeName.toLowerCase() === quick[1]) &&
-                    (!quick[2] || elem.id === quick[2]) &&
-                    (!quick[3] || (quick[3][1] ? elem.getAttribute(quick[3][0]) === quick[3][1] : elem.hasAttribute(quick[3][0]))) &&
-                    (!quick[4] || (' ' + elem.className + ' ').indexOf(quick[4]) >= 0)
+                    (!match[1] || elem.nodeName.toLowerCase() === match[1]) &&
+                    (!match[2] || elem.id === match[2]) &&
+                    (!match[3] || (match[3][1] ? elem.getAttribute(match[3][0]) === match[3][1] : elem.hasAttribute(match[3][0]))) &&
+                    (!match[4] || (' ' + elem.className + ' ').indexOf(match[4]) >= 0)
                 );
+
             } else {
 
                 if ((m = pseudos[sel])) {
                     return !!m(elem);
+                }
+
+                if (core.matches && core.isHTML &&
+                    (!core.rbuggyMatches || !core.rbuggyMatches.test(sel)) &&
+                    (!core.QSABugs || !core.QSABugs.test(sel))) {
+
+                    try {
+                        var ret = matchesSelector(elem, sel, ctx);
+
+                        // IE 9's matchesSelector returns false on disconnected nodes
+                        if (ret || core.disconMatch ||
+
+                            // As well, disconnected nodes are said to be in a document
+                            // fragment in IE 9
+                            elem.document && elem.document.nodeType !== 11) {
+                            return ret;
+                        }
+                    } catch (e) {}
                 } else {
-
-                    if (core.matches && core.isHTML &&
-                        (!core.rbuggyMatches || !core.rbuggyMatches.test(sel)) &&
-                        (!core.QSABugs || !core.QSABugs.test(sel))) {
-
-                        try {
-                            var ret = matchesSelector(elem, sel, ctx);
-
-                            // IE 9's matchesSelector returns false on disconnected nodes
-                            if (ret || core.disconMatch ||
-
-                                // As well, disconnected nodes are said to be in a document
-                                // fragment in IE 9
-                                elem.document && elem.document.nodeType !== 11) {
-                                return ret;
-                            }
-                        } catch (e) {}
-                    } else {
-                        hAzzle.err(true, 23, ' jiesa.js module need to be installed');
-                    }
+                    hAzzle.err(true, 23, ' jiesa.js main module need to be installed');
                 }
             }
 
@@ -275,14 +279,14 @@ hAzzle.define('Jiesa', function() {
                     self = this.elements;
 
                 return hAzzle(util.filter(hAzzle(selector).elements, function(node) {
-                    for (; i < len; i++) {  
+                    for (; i < len; i++) {
                         if (core.contains(self[i], node)) {
                             return true;
                         }
                     }
                 }));
             }
-            return util.reduce(this.elements, function(els, element) { 
+            return util.reduce(this.elements, function(els, element) {
                 return hAzzle(els.concat(collection.slice(jiesa(selector, element))));
             }, []);
 
@@ -314,11 +318,10 @@ hAzzle.define('Jiesa', function() {
             });
         }
     };
-   
+
     return {
         matchesSelector: matchesSelector,
         matches: matches,
-        pseudos: pseudos,
         find: jiesa
     };
 });
