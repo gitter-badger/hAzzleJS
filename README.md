@@ -180,6 +180,26 @@ css.toPx(element, '2em');
 
 For the other methods - e.g.  **height()** and **offset()** you need to include the **dimensjons.js** module.
 
+Odd and even
+=============
+**jQuery** supports **POS selectors** in the **Sizzle** selector engine. **hAzzle** doesn't, but have build in **odd()** and **even()** methods in the Core for navigating the **.elements array**
+
+**Note!** There are a little difference. **hAzzle** methods are correct, but if you are coming from **jQuery** and are using this methods, you will notice that **odd()** will behave like **Sizzle** **even()** and vice versa.
+
+```javascript
+
+// Odd
+
+hAzzle('div').odd();
+
+// Even
+
+hAzzle('div').even();
+
+```
+
+
+
 Feature / Browser detection
 ----------------------------
 
