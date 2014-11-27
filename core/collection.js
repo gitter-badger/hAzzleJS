@@ -211,6 +211,26 @@ hAzzle.define('Collection', function() {
             return i % 2 === 0;
         });
     };
+    // Return 'gt' elements from the '.elements array'
+    this.gt = function(args) {
+        var els = this.elements;
+        return this.filter(function(i) {
+             var ind = parseInt(args, 10),
+                len = els.length;
+            return (i > (len + ind) % len);
+        });
+    };
+
+    // Return 'lt' elements from the '.elements array'
+    this.lt = function(args) {
+        var els = this.elements;
+        return this.filter(function(i) {
+             var ind = parseInt(args, 10),
+                len = els.length;
+             return (i < (len + ind) % len);    
+        });
+    };
+
     // Native prototype methods that return a usable value (ECMA 5+)
     this.shift = function() {
         return this.elements.shift.apply(this.elements, arguments);

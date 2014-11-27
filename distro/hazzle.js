@@ -1,17 +1,18 @@
 /*!
+/*!
  * hAzzle Javascript Library
  * Copyright (c) 2014 Kenny Flashlight
  *
- * Version: 1.0.3a
+ * Version: 1.0.4a
  * Released under the MIT License.
  *
- * Date: 2014-11-27
+ * Date: 2014-11-28
  */
 (function() {
 
     var
 
-    // Define a local copy of hAzzle
+    //  Create a new hAzzle Object
 
         hAzzle = function(selector, context) {
 
@@ -401,12 +402,6 @@ hAzzle.define('Types', function() {
             return value !== null && typeof value === 'object';
         },
 
-        isPlainObject = function(obj) {
-            return isType('Object')(obj) &&
-                !isWindow(obj) &&
-                Object.getPrototypeOf(obj) === Object.prototype;
-        },
-
         isPromiseLike = function(obj) {
             return obj && isType('Function')(obj.then);
         },
@@ -437,7 +432,6 @@ hAzzle.define('Types', function() {
         isEmpty: isEmpty,
         isWindow: isWindow,
         isObject: isObject,
-        isPlainObject: isPlainObject,
         isEmptyObject: isEmptyObject,
         isPromiseLike: isPromiseLike,
         isNode: isNode,
@@ -1205,9 +1199,9 @@ hAzzle.define('Collection', function() {
         arrayProto = Array.prototype,
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
-
+        
         // Create array
-
+        
         makeArray = function(arr, results) {
             var ret = results || [];
             if (arr !== undefined) {
@@ -1220,12 +1214,12 @@ hAzzle.define('Collection', function() {
 
             return ret;
         },
-
+        
         // Replacement for native slice ( better performance)
-
+        
         slice = function(array, start, end) {
-
-            start = typeof start === 'undefined' ? 0 : start;
+           
+           start = typeof start === 'undefined' ? 0 : start;
 
             var index = -1,
                 length = (typeof end === 'undefined' ? (array ? array.length : 0) : end) - start || 0,
@@ -1260,6 +1254,7 @@ hAzzle.define('Collection', function() {
     };
 
     // Get the element at position specified by index from the current collection.
+    
     this.eq = function(index) {
         var len = this.length,
             j = +index + (index < 0 ? len : 0);
@@ -1365,15 +1360,15 @@ hAzzle.define('Collection', function() {
             return this.previousElementSibling;
         }).filter(sel);
     };
-
+    
     // Get all preceding siblings of each element in 
     // the set of matched elements, optionally filtered by a selector
-
+    
     this.prevAll = function() {
         var matched = [];
         this.each(function(elem) {
-            while ((elem = elem.previousElementSibling) &&
-                elem.nodeType !== 9) {
+            while ((elem = elem.previousElementSibling) && 
+                    elem.nodeType !== 9) {
                 matched.push(elem);
             }
         });
@@ -1385,8 +1380,8 @@ hAzzle.define('Collection', function() {
     this.nextAll = function() {
         var matched = [];
         this.each(function(elem) {
-            while ((elem = elem.nextElementSibling) &&
-                elem.nodeType !== 9) {
+            while ((elem = elem.nextElementSibling) && 
+                    elem.nodeType !== 9) {
                 matched.push(elem);
             }
         });
@@ -1406,6 +1401,26 @@ hAzzle.define('Collection', function() {
             return i % 2 === 0;
         });
     };
+    // Return 'gt' elements from the '.elements array'
+    this.gt = function(args) {
+        var els = this.elements;
+        return this.filter(function(i) {
+             var ind = parseInt(args, 10),
+                len = els.length;
+            return (i > (len + ind) % len);
+        });
+    };
+
+    // Return 'lt' elements from the '.elements array'
+    this.lt = function(args) {
+        var els = this.elements;
+        return this.filter(function(i) {
+             var ind = parseInt(args, 10),
+                len = els.length;
+             return (i < (len + ind) % len);    
+        });
+    };
+
     // Native prototype methods that return a usable value (ECMA 5+)
     this.shift = function() {
         return this.elements.shift.apply(this.elements, arguments);
@@ -2335,7 +2350,7 @@ hAzzle.define('css', function() {
             if (elem === null || elem === undefined) {
                 return;
             } else {
-                elem = elem != null && elem instanceof hAzzle ? elem.elements : elem.length ? elem[0] : elem;
+                elem = elem != null && elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
             }
 
             // Avoid hAzzle from throwing errors if the element doesn't exist
