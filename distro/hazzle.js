@@ -1,5 +1,4 @@
 /*!
-/*!
  * hAzzle Javascript Library
  * Copyright (c) 2014 Kenny Flashlight
  *
@@ -2528,7 +2527,7 @@ hAzzle.define('setters', function() {
     // This seems to be a bug in jQuery, why??
     (function() {
         var div = document.createElement('div');
-        // #IE9+
+            // #IE9+
         div.setAttribute('class', 'x');
         if (div.className === 'x') {
             classProp = 'class';
@@ -2545,7 +2544,7 @@ hAzzle.define('setters', function() {
             label.setAttribute('htmlFor', 'x');
             if (label.getAttribute.htmlFor === 'x') {
                 forProp = 'htmlFor';
-            }
+            }    
         }
     }());
 
@@ -2815,6 +2814,12 @@ hAzzle.define('setters', function() {
             removeAttr(elem, value);
         });
     };
+    
+    //  Check if  element has an attribute
+
+    this.hasAttr = function(name) {
+        return name && typeof this.attr(name) !== 'undefined';
+    };
 
     this.attr = function(name, value) {
         return typeof name === 'object' ? this.each(function(elem) {
@@ -2834,22 +2839,19 @@ hAzzle.define('setters', function() {
 
     // Populate boolAttr 
 
-    for (;
-        (at = boolElemArray[i]); i++) {
+    for (; (at = boolElemArray[i]); i++) {
         boolAttr[at.toLowerCase()] = at;
     }
 
 
     // Populate boolElem 
-    for (i = 0;
-        (at = boolAttrArray[i]); i++) {
+    for (i = 0; (at = boolAttrArray[i]); i++) {
         boolElem[at] = true;
     }
 
     // Populate propMap - all properties are written as camelCase
 
-    for (i = 0;
-        (at = camelCasedAttr[i]); i++) {
+    for (i = 0; (at = camelCasedAttr[i]); i++) {
         propMap[at.toLowerCase()] = at;
     }
 

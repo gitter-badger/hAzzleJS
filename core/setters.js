@@ -327,6 +327,12 @@ hAzzle.define('setters', function() {
             removeAttr(elem, value);
         });
     };
+    
+    //  Check if  element has an attribute
+
+    this.hasAttr = function(name) {
+        return name && typeof this.attr(name) !== 'undefined';
+    };
 
     this.attr = function(name, value) {
         return typeof name === 'object' ? this.each(function(elem) {
