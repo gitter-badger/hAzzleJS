@@ -9,9 +9,9 @@ hAzzle.define('Collection', function() {
         arrayProto = Array.prototype,
         aConcat = arrayProto.concat,
         aPush = arrayProto.push,
-        
+
         // Create array
-        
+
         makeArray = function(arr, results) {
             var ret = results || [];
             if (arr !== undefined) {
@@ -24,12 +24,12 @@ hAzzle.define('Collection', function() {
 
             return ret;
         },
-        
+
         // Replacement for native slice ( better performance)
-        
+
         slice = function(array, start, end) {
-           
-           start = typeof start === 'undefined' ? 0 : start;
+
+            start = typeof start === 'undefined' ? 0 : start;
 
             var index = -1,
                 length = (typeof end === 'undefined' ? (array ? array.length : 0) : end) - start || 0,
@@ -40,18 +40,6 @@ hAzzle.define('Collection', function() {
             }
             return result;
         };
-
-    // Convert hAzzle '.elements Array' to a jQuery / Zepto array
-    // where 'this' contains the elements. The '.elements Array 
-    // will be kept, but it will be possible to run jQuery / Zepto functions
-
-    this.toJqueryZepto = function() {
-        var i = this.length;
-        while (i--) {
-            this[i] = this.elements[i];
-        }
-        return this;
-    };
 
     // Return an array or a specific DOM element matched by the hAzzle object
 
@@ -64,7 +52,7 @@ hAzzle.define('Collection', function() {
     };
 
     // Get the element at position specified by index from the current collection.
-    
+
     this.eq = function(index) {
         var len = this.length,
             j = +index + (index < 0 ? len : 0);
@@ -170,15 +158,15 @@ hAzzle.define('Collection', function() {
             return this.previousElementSibling;
         }).filter(sel);
     };
-    
+
     // Get all preceding siblings of each element in 
     // the set of matched elements, optionally filtered by a selector
-    
+
     this.prevAll = function() {
         var matched = [];
         this.each(function(elem) {
-            while ((elem = elem.previousElementSibling) && 
-                    elem.nodeType !== 9) {
+            while ((elem = elem.previousElementSibling) &&
+                elem.nodeType !== 9) {
                 matched.push(elem);
             }
         });
@@ -190,8 +178,8 @@ hAzzle.define('Collection', function() {
     this.nextAll = function() {
         var matched = [];
         this.each(function(elem) {
-            while ((elem = elem.nextElementSibling) && 
-                    elem.nodeType !== 9) {
+            while ((elem = elem.nextElementSibling) &&
+                elem.nodeType !== 9) {
                 matched.push(elem);
             }
         });
@@ -213,39 +201,18 @@ hAzzle.define('Collection', function() {
     };
     // Return 'gt' elements from the '.elements array'
     this.gt = function(args) {
-        var els = this.elements;
+        var len = this.length;
         return this.filter(function(i) {
-             var ind = parseInt(args, 10),
-                len = els.length;
-            return (i > (len + ind) % len);
+            return typeof args === 'number' && (i > (len + args) % len);
         });
     };
 
     // Return 'lt' elements from the '.elements array'
     this.lt = function(args) {
-        var els = this.elements;
+        var len = this.length;
         return this.filter(function(i) {
-             var ind = parseInt(args, 10),
-                len = els.length;
-             return (i < (len + ind) % len);    
+            return typeof args === 'number' && (i < (len + args) % len);
         });
-    };
-
-    // Native prototype methods that return a usable value (ECMA 5+)
-    this.shift = function() {
-        return this.elements.shift.apply(this.elements, arguments);
-    };
-    this.lastIndexOf = function() {
-        return this.elements.lastIndexOf.apply(this.elements, arguments);
-    };
-    this.reduceRight = function() {
-        return this.elements.rediceRight.apply(this.elements, arguments);
-    };
-    this.forEach = function() {
-        return this.elements.forEach.apply(this.elements, arguments);
-    };
-    this.splice = function() {
-        return this.elements.splice.apply(this.elements, arguments);
     };
 
     return {

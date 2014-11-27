@@ -2,10 +2,7 @@ var hAzzle = window.hAzzle || (window.hAzzle = {});
 
 hAzzle.define('events', function() {
 
-    var win = window,
-        doc = window.document || {},
-
-        // Dependencies
+    var // Dependencies
 
         util = hAzzle.require('util'),
         core = hAzzle.require('core'),
@@ -13,6 +10,9 @@ hAzzle.define('events', function() {
         features = hAzzle.require('has'),
         istypes = hAzzle.require('types'),
         jiesa = hAzzle.require('jiesa'),
+
+        win = window,
+        doc = window.document || {},
 
         // Various regEx
 
@@ -69,18 +69,24 @@ hAzzle.define('events', function() {
         commonProps.concat(('webkitMovementY webkitMovementX').split(' '));
     }
 
-    var global = {},
+    var
+
+    // Allways make sure we are dealing with correct element, else hAzzle will throw
+
+        getElem = function(elem) {
+            return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
+        },
+
+        global = {},
 
         // Add event to element
 
-        addEvent = function(elem, events, selector, fn, /* internal */ one) {
-
-            elem = elem instanceof hAzzle ?
-                elem.elements[0] :
-                elem.length ? elem[0] : elem;
+        addEvent = function(node, events, selector, fn, /* internal */ one) {
 
             var original, type, types, i, args, entry, first,
-                namespaces, nodeType = elem ? elem.nodeType : undefined;
+                namespaces,
+                elem = getElem(node),
+                nodeType = elem ? elem.nodeType : undefined;
 
             // Don't attach events to text/comment nodes 
 
@@ -171,15 +177,10 @@ hAzzle.define('events', function() {
         },
         // Detach an event or set of events from an element
 
-        removeEvent = function(elem, types, selector, fn) {
+        removeEvent = function(node, types, selector, fn) {
 
-            var k, type, namespaces, i;
-
-            elem = elem instanceof hAzzle ?
-                elem.elements[0] :
-                elem.length ? elem[0] : elem;
-
-
+            var k, type, namespaces, i,
+                elem = getElem(node);
 
             if (!elem) {
                 hAzzle.err(true, 17, 'no element exist in removeEvent() in events.js module');
@@ -838,17 +839,17 @@ hAzzle.define('events', function() {
     this.ready = function(callback) {
         this.elements[0].addEventListener('DOMContentLoaded', callback, false);
     };
-// mandate event attribute getter
- util.each(('blur focus focusin focusout load resize scroll unload click dblclick ' +
+    // mandate event attribute getter
+    util.each(('blur focus focusin focusout load resize scroll unload click dblclick ' +
         'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
         'change select submit keydown keypress keyup error contextmenu').split(' '), function(prop) {
-              // Handle event binding
+        // Handle event binding
         this[prop] = function(data, fn) {
             return arguments.length > 0 ?
                 this.on(prop, data, fn) :
                 this.trigger(prop);
         };
-         }.bind(this));
+    }.bind(this));
 
     // Mouse wheel
 

@@ -95,7 +95,7 @@ hAzzle.define('css', function() {
             if (elem === null || elem === undefined) {
                 return;
             } else {
-                elem = elem != null && elem instanceof hAzzle ? elem.elements : elem.length ? elem[0] : elem;
+                elem = elem != null && elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
             }
 
             // Avoid hAzzle from throwing errors if the element doesn't exist
