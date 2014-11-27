@@ -1501,6 +1501,8 @@ hAzzle.define('jiesa', function() {
         relativeSel = /^\s*[+~]/,
         reSpace = /[\n\t\r]/g,
 
+        // Pseudos for match-method
+
         pseudos = {
 
             ':enabled': function(elem) {
@@ -1662,26 +1664,26 @@ hAzzle.define('jiesa', function() {
                     });
                     return results;
                 }
-            }
 
-            // Fallback to QSA if the native selector engine are not installed
-            // Fixme! Check for installed selector engine will be set to false soon
+                // Fallback to QSA if the stand-alone Jiesa selector engine are not installed
 
-            if (core.qsa && (!core.QSABugs || !core.QSABugs.test(sel))) {
-                try {
-                    if (ctx.nodeType === 1) {
-                        ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
-                    } else {
-                        // we can use the native qSA
-                        ret = ctx.querySelectorAll(sel);
-                    }
-                    return collection.slice(ret);
-                } catch (e) {}
+                if (core.qsa && (!core.QSABugs || !core.QSABugs.test(sel))) {
+                    try {
+                        if (ctx.nodeType === 1) {
+                            ret = fixedRoot(ctx, sel, ctx.querySelectorAll);
+                        } else {
+                            // we can use the native qSA
+                            ret = ctx.querySelectorAll(sel);
+                        }
+                        return collection.slice(ret);
+                    } catch (e) {}
+                }
             }
+            // Non-HTML needs Jiesa stand-alone module
         },
 
         // Speeding up matches
-        // Many people uses "is(':hidden') / "is(':visible'), so to make them happy we introduced basic 
+        // Many devs uses "is(':hidden') / "is(':visible'), so to make them happy we introduced basic 
         // CSS2 / CSS3 pseudo support
 
         matches = function(elem, sel, ctx) {
@@ -1752,29 +1754,26 @@ hAzzle.define('jiesa', function() {
 
     this.find = function(selector, context, /*internal*/ internal) {
 
-        if (!internal) {
+        if (internal) {
+            return jiesa(selector, context);
+        } else if (typeof selector !== 'string') {
 
-            if (typeof selector !== 'string') {
+            var i = 0,
+                len = this.length,
+                self = this.elements;
 
-                var i = 0,
-                    len = this.length,
-                    self = this.elements;
-
-                return hAzzle(util.filter(hAzzle(selector).elements, function(node) {
-                    for (; i < len; i++) {
-                        if (core.contains(self[i], node)) {
-                            return true;
-                        }
+            return hAzzle(util.filter(hAzzle(selector).elements, function(node) {
+                for (; i < len; i++) {
+                    if (core.contains(self[i], node)) {
+                        return true;
                     }
-                }));
-            }
-            return util.reduce(this.elements, function(els, element) {
-                return hAzzle(els.concat(collection.slice(jiesa(selector, element))));
-            }, []);
-
+                }
+            }));
         }
+        return util.reduce(this.elements, function(els, element) {
+            return hAzzle(els.concat(collection.slice(jiesa(selector, element))));
+        }, []);
 
-        return jiesa(selector, context);
     };
 
     // Filter element collection
