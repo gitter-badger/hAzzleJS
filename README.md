@@ -21,23 +21,6 @@ You will also find similar methods like **.eq()**, **.prev()**, **.nextAll()*, *
 
 Other methodds such as **.addClass()**, **.prepend()**, **.text()**, **.html()** e.g. are all included in the **module folder**.
 
-jQuery / Zepto
----------------
-**hAzzle** are **not** compatible with **jQuery** / **Zepto**, but if you use only this modules:
-
-* hazzle.js
-* support.js
-* core.js
-* jiesa.js
- 
-and use this command on the set of elements:
-
-**.toJqueryZepto()**
-
-the **.elements array** will be converted to **jQuery / Zepto style** and you can develop your own functions in the same way as you do for this libraries.
-
-**Note! hazzle will work as before, so you can actually use both hAzzle and jQuery / Zepto methods together**
-
 jQuery similarities
 ---------------------
 
