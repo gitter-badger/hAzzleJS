@@ -1,41 +1,45 @@
 // touch.js
 hAzzle.define('touch', function() {
 
-    var features = hAzzle.require('has');
+    var // Dependencies 
+        features = hAzzle.require('has');
 
     //# FEATURE DETECTION
 
-    // Touch support
+    features.add({
 
-    add('touch', "ontouchstart" in document ||
-        ("onpointerdown" in document && navigator.maxTouchPoints > 0) ||
-        window.navigator.msMaxTouchPoints);
+        // Touch support       
 
-    // Touch events 
+        'touch': 'ontouchstart' in document ||
+            ('onpointerdown' in document && navigator.maxTouchPoints > 0) ||
+            window.navigator.msMaxTouchPoints,
 
-    add('touchEvents', 'ontouchstart' in document);
+        // Touch events 
 
-    // Pointer Events
+        'touchEvents': 'ontouchstart' in document,
 
-    add('pointerEvents', 'onpointerdown' in document);
+        // Pointer Events
 
-    // Microsoft Pointer devices
+        'pointerEvents': 'onpointerdown' in document,
 
-    add('MSPointer', 'msMaxTouchPoints' in navigator); //IE10+
+        // Microsoft Pointer devices
 
-    add('touch', "ontouchstart" in document ||
-        ("onpointerdown" in document && navigator.maxTouchPoints > 0) ||
-        window.navigator.msMaxTouchPoints);
+        'MSPointer': 'msMaxTouchPoints' in navigator, //IE10+
 
-    // Touch events 
+        'touch': 'ontouchstart' in document ||
+            ('onpointerdown' in document && navigator.maxTouchPoints > 0) ||
+            window.navigator.msMaxTouchPoints,
 
-    add('touchEvents', 'ontouchstart' in document);
+        // Touch events 
 
-    // Pointer Events
+        'touchEvents': 'ontouchstart' in document,
 
-    add('pointerEvents', 'onpointerdown' in document);
+        // Pointer Events
 
-    add('MSPointer', 'msMaxTouchPoints' in navigator); //IE10+
+        'pointerEvents': 'onpointerdown' in document,
+
+        'MSPointer': 'msMaxTouchPoints' in navigator //IE10+
+    });
 
     return {};
 });
