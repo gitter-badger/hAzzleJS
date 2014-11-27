@@ -2,16 +2,16 @@
  * hAzzle Javascript Library
  * Copyright (c) 2014 Kenny Flashlight
  *
- * Version: 1.0.3a
+ * Version: 1.0.4a
  * Released under the MIT License.
  *
- * Date: 2014-11-27
+ * Date: 2014-11-28
  */
 (function() {
 
     var
 
-    // Define a local copy of hAzzle
+    //  Create a new hAzzle Object
 
         hAzzle = function(selector, context) {
 

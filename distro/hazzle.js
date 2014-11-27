@@ -1430,7 +1430,7 @@ Function.prototype.bind = function() {
     func.bind = function() {
         var args = slice.call(arguments);
         return Function.prototype.bind.apply(funcObj, args);
-    }
+    };
     return func;
 };
 
@@ -1441,37 +1441,41 @@ hAzzle.define('bind', function() {
     var collection = hAzzle.require('collection');
 
     // Bind a function to a context, optionally partially applying any
-    // Replacement for bind() - ECMAScript 5 15.3.4.5
+    // Replacement for bind() - ECMA-5 15.3.4.5
 
-    var bind = function(fn, context) {
+    var bind = function(callback, context) {
 
-        var curryArgs = arguments.length > 2 ?
-            collection.slice(arguments, 2) : [],
+        var
+        // Internal slice are faster then native slice
+
+            slice = collection.slice,
+            curryArgs = arguments.length > 2 ?
+            slice(arguments, 2) : [],
             tmp;
 
         if (typeof context === 'string') {
-
-            tmp = fn[context];
-            context = fn;
-            fn = tmp;
+            tmp = callback[context];
+            context = callback;
+            callback = tmp;
         }
 
-        if (typeof fn === 'function' && !(context instanceof RegExp)) {
+        if (typeof callback === 'function' && !(context instanceof RegExp)) {
 
             return curryArgs.length ? function() {
                 return arguments.length ?
-                    fn.apply(context || this, curryArgs.concat(collection.slice(arguments, 0))) :
-                    fn.apply(context || this, curryArgs);
+                    callback.apply(context || this, curryArgs.concat(slice(arguments, 0))) :
+                    callback.apply(context || this, curryArgs);
             } : function() {
                 return arguments.length ?
-                    fn.apply(context || this, arguments) :
-                    fn.call(context || this);
+                    callback.apply(context || this, arguments) :
+                    callback.call(context || this);
             };
 
         } else {
             return context;
         }
     };
+    // Expose
     return {
         bind: bind
     };

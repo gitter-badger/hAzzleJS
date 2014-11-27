@@ -104,12 +104,6 @@ hAzzle.define('Types', function() {
             return value !== null && typeof value === 'object';
         },
 
-        isPlainObject = function(obj) {
-            return isType('Object')(obj) &&
-                !isWindow(obj) &&
-                Object.getPrototypeOf(obj) === Object.prototype;
-        },
-
         isPromiseLike = function(obj) {
             return obj && isType('Function')(obj.then);
         },
@@ -140,7 +134,6 @@ hAzzle.define('Types', function() {
         isEmpty: isEmpty,
         isWindow: isWindow,
         isObject: isObject,
-        isPlainObject: isPlainObject,
         isEmptyObject: isEmptyObject,
         isPromiseLike: isPromiseLike,
         isNode: isNode,
