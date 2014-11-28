@@ -129,14 +129,15 @@ console.log(setters.SVGAttr( PROPERTY ))
 ```
 For extended **SVG** support you will need to add the **svg.js** module from the module folder.
 
-**Note!** Many of the functions in this module are extending the Core methods, so you need to compile the Core with this modules to get **SVG** to work:
+**Note!** Some of the functions in this module are extending the Core methods, so you need to compile the Core with this modules to get **SVG** to work:
 
 * setters.js
-* classes.js
 
 and
 
 * style.js ( module folder) 
+ 
+**Note!** The add / remove class methods are separate methods, and no need to add **classes.js** module. However, **classList** are not supported by the **SVG** module
 
 Units and dimensions
 --------------------
