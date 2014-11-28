@@ -2,7 +2,7 @@
  * hAzzle Javascript Library
  * Copyright (c) 2014 Kenny Flashlight
  *
- * Version: 1.0.4a
+ * Version: 1.0.4b
  * Released under the MIT License.
  *
  * Date: 2014-11-28
