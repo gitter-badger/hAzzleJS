@@ -8,42 +8,57 @@ hAzzle.define('util', function() {
 
         // Optimized each function
         // For ECMA 5+ standard, use native forEach()
-      each = function(obj, fn, args, /*reverse*/ rev) {
+        each = function(obj, callback, args, /*reverse*/ rev) {
+            var i, length;
 
-            if (obj === undefined || obj == null) {
-                return obj;
-            }
+            if (args) {
 
-            hAzzle.err(typeof fn !== 'function', 5, "'fn' must be a function in util.each()");
-
-            var i, length = obj.length,
-                key;
-
-            if (typeof fn === 'function' &&
-                typeof args === 'undefined' &&
-                typeof rev === 'undefined' &&
-                types.isArray(obj)) {
-
-                while (++i < length) {
-                    i = rev ? obj.length - i - 1 : i;
-                    if (fn.call(obj[i], obj[i], i, obj) === false) {
-                        break;
+                if (typeof obj === 'function') {
+                    for (i in obj) {
+                        if (i !== 'prototype' && i !== 'length' && i !== 'name') {
+                            if (callback.call(obj[i], obj[i], i, args) === false) {
+                                break;
+                            }
+                        }
                     }
-                }
-            }
-
-            if (length === +length) {
-                for (i = 0; i < length; i++) {
-                    i = rev ? obj.length - i - 1 : i;
-                    if (fn.call(obj[i], obj[i], i, obj) === false) {
-                        break;
+                } else if (types.isArrayLike(obj)) {
+                    for (; i < length; i++) {
+                        i = rev ? obj.length - i - 1 : i;
+                        if (callback.apply(obj[i], args) === false) {
+                            break;
+                        }
+                    }
+                } else {
+                    for (i in obj) {
+                        if (callback.apply(obj[i], args) === false) {
+                            break;
+                        }
                     }
                 }
             } else {
+
                 if (obj) {
-                    for (key in obj) {
-                        if (fn.call(obj[key], obj[key], key, obj) === false) {
-                            break;
+                    if (typeof obj === 'function') {
+                        for (i in obj) {
+                            if (i !== 'prototype' && i !== 'length' && i !== 'name') {
+                                if (callback.call(obj[i], obj[i], i) === false) {
+                                    break;
+                                }
+                            }
+                        }
+                    } else if (types.isArray(obj) || types.isArrayLike(obj)) {
+
+                        for (i = 0, length = obj.length; i < length; i++) {
+                            i = rev ? obj.length - i - 1 : i;
+                            if (callback.call(obj[i], obj[i], i) === false) {
+                                break;
+                            }
+                        }
+                    } else {
+                        for (i in obj) {
+                            if (callback.call(obj[i], obj[i], i) === false) {
+                                break;
+                            }
                         }
                     }
                 }
