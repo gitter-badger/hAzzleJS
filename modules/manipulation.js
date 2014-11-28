@@ -241,36 +241,32 @@ hAzzle.define('manipulation', function() {
                 ret;
         },
 
+        getElem = function(elem) {
+            return elem instanceof hAzzle ? elem.elements : [elem];
+        },
+
         // Removes events associated with an element
 
         clearData = function(elems) {
-            hAzzle.installed.events && util.each(elems instanceof hAzzle ?
-                elem.elements ? elems.length :
-                elems : [elems],
+            hAzzle.installed.events && util.each(getElem(elems),
                 function(elem) {
                     if (elem && elem.nodeType === 1 || elem.nodeType === 9 || !(+elem.nodeType)) {
                         hAzzle(elem).off();
                     }
                 });
         },
-         normalize = function(node, clone) {
+        normalize = function(node, clone) {
 
-           var i, l, ret;
+            var i, l, ret;
 
             if (typeof node === 'string') {
                 return create(node);
             }
 
-            if (node instanceof hAzzle) {
-                node = node.elements;
-            }
-
-            if (types.isNode(node)) {
-                node = [node];
-            }
+            node = getElem(node);
 
             if (clone) {
-                ret = []; // don't change original array
+                ret = []; // Don't change original array
 
                 for (i = 0, l = node.length; i < l; i++) {
                     ret[i] = cloneElem(node[i], true);
@@ -284,16 +280,20 @@ hAzzle.define('manipulation', function() {
         var i = 0,
             r = [],
             self = this.elements,
-            nodes = hAzzle(content);
+            nodes = hAzzle(content),
+            els = normalize(nodes),
+            len = els.length,
+            index = 0;
 
         // Start the iteration and loop through the content
 
-        util.each(normalize(nodes), function(elem, index) {
+        for (; index < len; index++) {
+
             util.each(self, function(el) {
-                elem && elem[method](index > 0 ? el.cloneNode(true) : el); // DOM Level 4
+                els[index] && els[index][method](index > 0 ? el.cloneNode(true) : el); // DOM Level 4
             }, null, rev);
 
-        }, this, rev);
+        };
         self.length = i;
         util.each(r, function(e) {
             self[--i] = e;
@@ -399,7 +399,7 @@ hAzzle.define('manipulation', function() {
         });
     };
 
-  /**
+    /**
    * append / prepend / before and after methods
    * @example
    
@@ -456,7 +456,7 @@ hAzzle( "test" ).append( manip.create("<strong>Hello</strong>") );
 
                         var el = normalize(content, index),
                             i = 0,
-                            l = elem.length;
+                            l = el.length;
 
                         // 'Normal' iteration faster then internal 'each'
                         for (; i < l; i++) {
@@ -479,6 +479,7 @@ hAzzle( "test" ).append( manip.create("<strong>Hello</strong>") );
 
         this[prop] = function(content) {
             return this.domManip(content, method, reversable[method] || false);
+
         };
     }.bind(this));
 
