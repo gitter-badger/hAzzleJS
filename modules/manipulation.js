@@ -242,7 +242,10 @@ hAzzle.define('manipulation', function() {
         },
 
         getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements : [elem];
+            // Need this check, else hAzzle will throw
+           if(elem !== undefined) {
+               return elem instanceof hAzzle ? elem.elements : elem.length ? elem : [elem];
+            }
         },
 
         // Removes events associated with an element

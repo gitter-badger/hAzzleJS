@@ -55,7 +55,10 @@ hAzzle.define('classes', function() {
             return classes;
         },
         getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements : elem.length ? elem : [elem];
+           // Need this check, else hAzzle will throw
+           if(elem !== undefined) {
+               return elem instanceof hAzzle ? elem.elements : elem.length ? elem : [elem];
+            }
         },
         addRemove = function(elem, classes, nativeMethodName, fn, done) {
 

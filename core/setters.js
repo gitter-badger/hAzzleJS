@@ -86,7 +86,10 @@ hAzzle.define('setters', function() {
             set: {}
         },
         getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
+            // Need this check, else hAzzle will throw
+           if(elem !== undefined) {
+               return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
+            }
         },
         validTypes = {
             '1': 1,

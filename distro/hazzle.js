@@ -1567,6 +1567,7 @@ hAzzle.define('jiesa', function() {
 
             try {
                 return method.call(context, query);
+
             } finally {
                 if (!old) {
                     backup.removeAttribute('id');
@@ -2527,7 +2528,7 @@ hAzzle.define('setters', function() {
     // This seems to be a bug in jQuery, why??
     (function() {
         var div = document.createElement('div');
-            // #IE9+
+        // #IE9+
         div.setAttribute('class', 'x');
         if (div.className === 'x') {
             classProp = 'class';
@@ -2544,7 +2545,7 @@ hAzzle.define('setters', function() {
             label.setAttribute('htmlFor', 'x');
             if (label.getAttribute.htmlFor === 'x') {
                 forProp = 'htmlFor';
-            }    
+            }
         }
     }());
 
@@ -2573,7 +2574,10 @@ hAzzle.define('setters', function() {
             set: {}
         },
         getElem = function(elem) {
-            return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
+            // Need this check, else hAzzle will throw
+            if (elem !== undefined) {
+                return elem instanceof hAzzle ? elem.elements[0] : elem.length ? elem[0] : elem;
+            }
         },
         validTypes = {
             '1': 1,
@@ -2814,7 +2818,7 @@ hAzzle.define('setters', function() {
             removeAttr(elem, value);
         });
     };
-    
+
     //  Check if  element has an attribute
 
     this.hasAttr = function(name) {
@@ -2839,19 +2843,22 @@ hAzzle.define('setters', function() {
 
     // Populate boolAttr 
 
-    for (; (at = boolElemArray[i]); i++) {
+    for (;
+        (at = boolElemArray[i]); i++) {
         boolAttr[at.toLowerCase()] = at;
     }
 
 
     // Populate boolElem 
-    for (i = 0; (at = boolAttrArray[i]); i++) {
+    for (i = 0;
+        (at = boolAttrArray[i]); i++) {
         boolElem[at] = true;
     }
 
     // Populate propMap - all properties are written as camelCase
 
-    for (i = 0; (at = camelCasedAttr[i]); i++) {
+    for (i = 0;
+        (at = camelCasedAttr[i]); i++) {
         propMap[at.toLowerCase()] = at;
     }
 
