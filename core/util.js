@@ -340,11 +340,11 @@ hAzzle.define('util', function() {
             }
             return [];
         },
-        // Reduces a collection
-        // ECMA-5 15.4.4.21     
+          //  Reduces a collection
+        // Replacement for reduce -  ECMAScript 5 15.4.4.21     
         reduce = function(collection, fn, accumulator, args) {
 
-            if (collection) {
+            if (!collection) {
                 collection = [];
             }
 
@@ -356,7 +356,11 @@ hAzzle.define('util', function() {
                 currentKey;
 
             if (arguments.length < 3) {
-                hAzzle.err(!length, 7, ' no collection length exist in collection.reduce()');
+
+                if (!length) {
+                    hAzzle.err(true, 7, ' no collection length exist in collection.reduce()');
+                }
+
                 accumulator = collection[keys ? keys[index++] : index++];
             }
             for (; index < length; index++) {
